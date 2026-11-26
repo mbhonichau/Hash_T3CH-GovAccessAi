@@ -1,17 +1,57 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layouts/base :: page('GovAccess AI', ~{::section})}">
+      th:replace="~{layouts/base :: page('GovAccess AI · Overview', ~{::#dashboard})}">
 <body>
-    <section aria-labelledby="overview-heading">
-        <div class="page-heading">
-            <h1 id="overview-heading" class="h3">GovAccess AI</h1>
+    <section id="dashboard" aria-labelledby="overview-heading">
+        <div class="overview-heading">
+            <h1 id="overview-heading">Eligibility overview</h1>
+            <p>Track policy versions for grants and bursaries.</p>
         </div>
-        <div class="card">
-            <div class="card-body d-flex align-items-center gap-3">
-                <span class="dashboard-icon bg-light-primary rounded" aria-hidden="true">
-                    <i class="bi-clipboard-check"></i>
-                </span>
-                <p class="mb-0">Grant and benefits eligibility assessment</p>
+        <dl class="metric-grid">
+            <div class="metric-card">
+                <span class="metric-icon metric-purple" aria-hidden="true"><i class="bi-layers-fill"></i></span>
+                <div><dt>Policy versions</dt><dd th:text="${policyCount}">0</dd></div>
+            </div>
+            <div class="metric-card">
+                <span class="metric-icon metric-blue" aria-hidden="true"><i class="bi-pencil-square"></i></span>
+                <div><dt>Drafts</dt><dd th:text="${draftCount}">0</dd></div>
+            </div>
+            <div class="metric-card">
+                <span class="metric-icon metric-green" aria-hidden="true"><i class="bi-check2-circle"></i></span>
+                <div><dt>Published</dt><dd th:text="${publishedCount}">0</dd></div>
+            </div>
+        </dl>
+
+        <div class="dashboard-grid">
+            <section class="card dashboard-card" id="policy-versions" aria-labelledby="policy-heading">
+                <div class="card-header">
+                    <h2 id="policy-heading">Policy versions</h2>
+                    <p>Up to five versions, ordered by version label.</p>
+                </div>
+                <div class="table-responsive" th:unless="${#lists.isEmpty(policyVersions)}">
+                    <table class="table policy-table">
+                        <thead><tr><th scope="col">Programme</th><th scope="col">Version</th><th scope="col">Status</th></tr></thead>
+                        <tbody>
+                            <tr th:each="version : ${policyVersions}">
+                                <td th:text="${version.programme.name}">Programme</td>
+                                <td th:text="${version.versionLabel}">Version</td>
+                                <td><span class="policy-status"
+                                    th:classappend="${version.status == 'PUBLISHED' ? 'status-published' : 'status-draft'}"
+                                    th:text="${version.status == 'PUBLISHED' ? 'Published' : 'Draft'}">Draft</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="policy-empty" th:if="${#lists.isEmpty(policyVersions)}">
+                    <i class="bi-file-earmark-text" aria-hidden="true"></i>
+                    <p>No policy versions are available yet.</p>
+                </div>
+            </section>
+            <div class="guidance-card">
+                <span class="guidance-icon"><i class="bi-shield-check" aria-hidden="true"></i></span>
+                <h2>Policy review</h2>
+                <p>Review a draft against its source policy before publishing. Eligibility recommendations use the published rules and verified evidence.</p>
+                <a href="#policy-versions">See policy versions <i class="bi-arrow-right" aria-hidden="true"></i></a>
             </div>
         </div>
     </section>

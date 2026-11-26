@@ -1,0 +1,13 @@
+govaccess:
+  ai:
+    providers:
+      - name: primary
+        base-url: ${AI_BASE_URL:}
+        api-key: ${AI_API_KEY:}
+        model: ${AI_MODEL:}
+        hosted: true
+    prompts: {}
+    # Set AI_MODEL to the model used when recording the demo cache.
+    cache-mode: REPLAY_ONLY
+    redaction-mode: MASK
+    kill-switch: false
