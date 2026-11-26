@@ -13,23 +13,38 @@
         <nav class="sidebar-menu" id="primary-navigation" aria-label="Primary">
             <ul class="menu">
                 <li class="sidebar-title">Workspace</li>
-                <li class="sidebar-item active">
+                <li class="sidebar-item" th:classappend="${screen == null and workspaceAccessPage == null and cataloguePage == null ? 'active' : null}">
                     <a class="sidebar-link" href="/" th:href="@{/}"
-                       aria-current="page">
+                       th:attr="aria-current=${screen == null and workspaceAccessPage == null and cataloguePage == null ? 'page' : null}">
                         <i class="bi-grid-fill" aria-hidden="true"></i>
                         <span>Overview</span>
                     </a>
                 </li>
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="#policy-versions">
+                <li class="sidebar-item" th:classappend="${cataloguePage == true ? 'active' : null}">
+                    <a class="sidebar-link" th:href="@{/rules/catalogue}"
+                       th:attr="aria-current=${cataloguePage == true ? 'page' : null}">
+                        <i class="bi-list-check" aria-hidden="true"></i>
+                        <span>Rule catalogue</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${screen != null ? 'active' : null}">
+                    <a class="sidebar-link" th:href="@{/policies/nsfas-2025}"
+                       th:attr="aria-current=${screen != null ? 'page' : null}">
                         <i class="bi-file-earmark-text" aria-hidden="true"></i>
-                        <span>Policy versions</span>
+                        <span>Policy Studio</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
                     <a class="sidebar-link" th:href="@{/actuator/health}">
                         <i class="bi-speedometer2" aria-hidden="true"></i>
                         <span>System status</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${workspaceAccessPage == true ? 'active' : null}">
+                    <a class="sidebar-link" th:href="@{/workspace/access}"
+                       th:attr="aria-current=${workspaceAccessPage == true ? 'page' : null}">
+                        <i class="bi-shield-check" aria-hidden="true"></i>
+                        <span>Workspace access</span>
                     </a>
                 </li>
             </ul>

@@ -9,6 +9,8 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
@@ -29,6 +31,9 @@ import za.gov.govaccess.ai.provider.AiProviderException;
 import za.gov.govaccess.ai.provider.FallbackAiProvider;
 import za.gov.govaccess.ai.repository.AiCacheRepository;
 import za.gov.govaccess.ai.repository.AiCallLogRepository;
+import za.gov.govaccess.ai.repository.AiRequestLogRepository;
+import za.gov.govaccess.ai.entity.AiRequestLog;
+import za.gov.govaccess.ai.dto.AiCallContext;
 import za.gov.govaccess.ai.repository.PromptRepository;
 import za.gov.govaccess.ai.service.*;
 
@@ -42,6 +47,14 @@ import static za.gov.govaccess.ai.enums.AiOutcome.*;
         "spring.datasource.username=sa", "spring.datasource.password="
 })
 class AiFoundationTests {
+    @Autowired org.springframework.core.env.Environment environment;
+
+    @Test
+    void usesFlywayAndValidatesEntitiesByDefault() {
+        assertThat(environment.getProperty("spring.flyway.enabled", Boolean.class)).isTrue();
+        assertThat(environment.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("validate");
+    }
+
     private static final String SCHEMA = """
             {"type":"object","properties":{"draft":{"type":"string"}},"required":["draft"],
              "additionalProperties":false}
@@ -56,12 +69,14 @@ class AiFoundationTests {
     @Autowired AiAuditService audit;
     @Autowired AiCacheRepository cacheRows;
     @Autowired AiCallLogRepository auditRows;
+    @Autowired AiRequestLogRepository requestRows;
 
     private MockWebServer server;
 
     @BeforeEach
     void setUp() throws Exception {
         auditRows.deleteAll();
+        requestRows.deleteAll();
         cacheRows.deleteAll();
         server = new MockWebServer();
         server.start();
@@ -101,6 +116,10 @@ class AiFoundationTests {
         assertThat(Duration.ofNanos(System.nanoTime() - start)).isGreaterThanOrEqualTo(Duration.ofSeconds(1));
         assertThat(server.getRequestCount()).isEqualTo(2);
         outcomes(PROVIDER_ERROR, RETRY_SUCCESS);
+        logicalOutcomes(RETRY_SUCCESS);
+        var requestRow = requestRows.findAll().getFirst();
+        assertThat(requestRow.getAttemptCount()).isEqualTo(2);
+        assertThat(auditRows.findAll()).allSatisfy(row -> assertThat(row.getRequestId()).isEqualTo(requestRow.getId()));
     }
 
     @Test
@@ -137,7 +156,8 @@ class AiFoundationTests {
                 .doesNotContain("{bad");
         assertThat(service(AiCacheMode.REPLAY_ONLY, false, settings).generate(request(), Draft.class)).isEqualTo(result);
         assertThat(server.getRequestCount()).isEqualTo(2);
-        outcomes(INVALID_OUTPUT, RETRY_SUCCESS, CACHE_HIT);
+        outcomes(INVALID_OUTPUT, RETRY_SUCCESS);
+        logicalOutcomes(RETRY_SUCCESS, CACHE_HIT);
     }
 
     @Test
@@ -178,7 +198,10 @@ class AiFoundationTests {
         var service = service(AiCacheMode.OFF, false, local(server, "primary"));
         var request = request();
         for (int count = 1; count <= 3; count++) {
-            assertThatThrownBy(() -> service.generate(request, Draft.class)).isInstanceOf(AiProviderException.class);
+            int expectedStatus = List.of(400, 401, 403).get(count - 1);
+            assertThatThrownBy(() -> service.generate(request, Draft.class))
+                    .isInstanceOfSatisfying(AiProviderException.class,
+                            failure -> assertThat(failure.status()).isEqualTo(expectedStatus));
             assertThat(server.getRequestCount()).isEqualTo(count);
         }
         outcomes(PROVIDER_ERROR, PROVIDER_ERROR, PROVIDER_ERROR);
@@ -196,7 +219,8 @@ class AiFoundationTests {
         var miss = request.withContent("System", "Other input", List.of());
         assertThatThrownBy(() -> replay.generate(miss, Draft.class)).isInstanceOf(AiReplayMissException.class);
         assertThat(server.getRequestCount()).isEqualTo(1);
-        outcomes(SUCCESS, CACHE_HIT, CACHE_HIT, PROVIDER_ERROR);
+        outcomes(SUCCESS);
+        logicalOutcomes(SUCCESS, CACHE_HIT, CACHE_HIT, PROVIDER_ERROR);
     }
 
     @Test
@@ -223,14 +247,73 @@ class AiFoundationTests {
                 .isInstanceOf(AiProviderException.class);
         var syntheticPii = new AiRequest("draft", 1, "System", "example@example.test", List.of(),
                 request.jsonSchema(), 0, true, null, null, null);
-        var blocked = new FallbackAiProvider(new AiProperties(List.of(hosted), Map.of(), AiCacheMode.OFF,
-                AiRedactionMode.BLOCK, false), builder, new RegexPiiRedactor(), cache, audit);
+        var config = new AiProperties(List.of(hosted), Map.of(), AiCacheMode.OFF, AiRedactionMode.BLOCK, false);
+        var blocked = new FallbackAiProvider(config, builder, new RegexPiiRedactor(), cache, audit,
+                new AiAvailability(config));
         assertThatThrownBy(() -> new StructuredOutputService(blocked, mapper, validator).generate(syntheticPii, Draft.class))
                 .isInstanceOf(AiProviderException.class);
         assertThatThrownBy(() -> service(AiCacheMode.OFF, true, hosted).generate(request, Draft.class))
                 .isInstanceOf(AiProviderException.class);
         assertThat(server.getRequestCount()).isZero();
-        outcomes(BLOCKED_PII, BLOCKED_PII, KILL_SWITCH);
+        outcomes();
+        logicalOutcomes(BLOCKED_PII, BLOCKED_PII, KILL_SWITCH);
+    }
+
+    @Test
+    void auditsAttributedProbeAndHonorsRuntimeSwitchWithoutRetries() throws Exception {
+        var config = new AiProperties(List.of(local(server, "primary")), Map.of(), AiCacheMode.READ_WRITE,
+                AiRedactionMode.BLOCK, false);
+        var availability = new AiAvailability(config);
+        var provider = new FallbackAiProvider(config, builder, new RegexPiiRedactor(), cache, audit, availability);
+        var service = new StructuredOutputService(provider, mapper, validator);
+        var context = new AiCallContext(java.util.UUID.randomUUID(), "AI_PROVIDER", java.util.UUID.randomUUID());
+        var request = new AiRequest("provider-probe", 1, "System", "Probe", List.of(),
+                mapper.readTree(SCHEMA), 0, true, context);
+        assertThat(availability.setEnabled(false)).isFalse();
+        assertThatThrownBy(() -> service.probe(request, Draft.class)).isInstanceOf(AiProviderException.class);
+        assertThat(server.getRequestCount()).isZero();
+        assertThat(availability.setEnabled(true)).isTrue();
+        server.enqueue(new MockResponse().setResponseCode(503));
+        assertThatThrownBy(() -> service.probe(request, Draft.class)).isInstanceOf(AiProviderException.class);
+        assertThat(server.getRequestCount()).isEqualTo(1);
+        reply(server, "{\"draft\":\"Ready\"}");
+        assertThat(service.probe(request, Draft.class)).isEqualTo(new Draft("Ready"));
+        assertThat(server.getRequestCount()).isEqualTo(2);
+        var probe = server.takeRequest(1, TimeUnit.SECONDS);
+        assertThat(mapper.readTree(probe.getBody().readUtf8()).path("max_completion_tokens").asInt()).isEqualTo(128);
+        outcomes(PROVIDER_ERROR, SUCCESS);
+        logicalOutcomes(KILL_SWITCH, PROVIDER_ERROR, SUCCESS);
+        assertThat(requestRows.findAll()).allSatisfy(row -> {
+            assertThat(row.getUserId()).isEqualTo(context.userId());
+            assertThat(row.getRelatedEntityId()).isEqualTo(context.relatedEntityId());
+        });
+    }
+
+    @Test
+    void runtimeKillSwitchEndsAnOutstandingRetryDelay() throws Exception {
+        var config = new AiProperties(List.of(local(server, "primary")), Map.of(), AiCacheMode.OFF,
+                AiRedactionMode.BLOCK, false);
+        var availability = new AiAvailability(config);
+        var provider = new FallbackAiProvider(config, builder, new RegexPiiRedactor(), cache, audit, availability);
+        var service = new StructuredOutputService(provider, mapper, validator);
+        var request = request();
+        server.enqueue(new MockResponse().setResponseCode(429).setHeader("Retry-After", "60"));
+
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            var result = executor.submit(() -> service.generate(request, Draft.class));
+            try {
+                assertThat(server.takeRequest(3, TimeUnit.SECONDS)).isNotNull();
+                availability.setEnabled(false);
+                assertThatThrownBy(() -> result.get(3, TimeUnit.SECONDS))
+                        .isInstanceOf(ExecutionException.class)
+                        .hasCauseInstanceOf(AiProviderException.class);
+            } finally {
+                result.cancel(true);
+            }
+        }
+        assertThat(server.getRequestCount()).isEqualTo(1);
+        outcomes(PROVIDER_ERROR);
+        logicalOutcomes(KILL_SWITCH);
     }
 
     @Test
@@ -248,9 +331,19 @@ class AiFoundationTests {
         assertThat(rows).allSatisfy(row -> assertThat(row.getInputSha256()).matches("[a-f0-9]{64}"));
     }
 
+    private void logicalOutcomes(AiOutcome... expected) {
+        var requests = requestRows.findAll();
+        assertThat(requests).extracting(AiRequestLog::getOutcome).containsExactlyInAnyOrder(expected);
+        var attempts = auditRows.findAll();
+        requests.forEach(request -> assertThat(request.getAttemptCount())
+                .isEqualTo(Math.toIntExact(attempts.stream()
+                        .filter(attempt -> request.getId().equals(attempt.getRequestId())).count())));
+    }
+
     private StructuredOutputService service(AiCacheMode mode, boolean killSwitch, Provider... targets) {
         var properties = new AiProperties(List.of(targets), Map.of(), mode, AiRedactionMode.MASK, killSwitch);
-        var provider = new FallbackAiProvider(properties, builder, new RegexPiiRedactor(), cache, audit);
+        var provider = new FallbackAiProvider(properties, builder, new RegexPiiRedactor(), cache, audit,
+                new AiAvailability(properties));
         return new StructuredOutputService(provider, mapper, validator);
     }
 

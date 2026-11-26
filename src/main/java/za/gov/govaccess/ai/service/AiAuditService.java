@@ -1,26 +1,86 @@
 package za.gov.govaccess.ai.service;
 
+import java.time.Duration;
+import java.util.function.Supplier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import za.gov.govaccess.ai.dto.AiRequest;
 import za.gov.govaccess.ai.dto.AiResponse;
 import za.gov.govaccess.ai.entity.AiCallLog;
+import za.gov.govaccess.ai.entity.AiRequestLog;
 import za.gov.govaccess.ai.enums.AiOutcome;
 import za.gov.govaccess.ai.repository.AiCallLogRepository;
+import za.gov.govaccess.ai.repository.AiRequestLogRepository;
 
 @Service
 public class AiAuditService {
     private final AiCallLogRepository logs;
+    private final AiRequestLogRepository requests;
+    private final TransactionTemplate independentTransaction;
+    private final ThreadLocal<RequestScope> active = new ThreadLocal<>();
 
-    public AiAuditService(AiCallLogRepository logs) {
+    public AiAuditService(AiCallLogRepository logs, AiRequestLogRepository requests,
+                          PlatformTransactionManager transactions) {
         this.logs = logs;
+        this.requests = requests;
+        independentTransaction = new TransactionTemplate(transactions);
+        independentTransaction.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
+    }
+
+    public <T> T around(AiRequest request, Supplier<T> operation) {
+        if (active.get() != null) {
+            return operation.get();
+        }
+        var entry = new AiRequestLog(request, AiRequestHashes.input(request));
+        independentTransaction.executeWithoutResult(status -> requests.saveAndFlush(entry));
+        var scope = new RequestScope(entry);
+        active.set(scope);
+        long start = System.nanoTime();
+        try {
+            return operation.get();
+        } finally {
+            active.remove();
+            long latency = Duration.ofNanos(System.nanoTime() - start).toMillis();
+            entry.finish(scope.provider, scope.model, scope.outcome, scope.attempts, latency, scope.outputHash);
+            independentTransaction.executeWithoutResult(status -> requests.saveAndFlush(entry));
+        }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void log(AiRequest request, AiResponse response, AiOutcome outcome) {
-        logs.save(new AiCallLog(request, response.provider(), response.model(), AiRequestHashes.input(request),
-                AiRequestHashes.output(response.rawText()), response.latencyMs(), response.tokensIn(),
+        var scope = recordOutcome(response, outcome);
+        logs.save(new AiCallLog(scope.entry.getId(), request, response.provider(), response.model(), AiRequestHashes.input(request),
+                scope.outputHash, response.latencyMs(), response.tokensIn(),
                 response.tokensOut(), outcome));
+        scope.attempts++;
+    }
+
+    public void logicalOutcome(AiResponse response, AiOutcome outcome) {
+        recordOutcome(response, outcome);
+    }
+
+    private RequestScope recordOutcome(AiResponse response, AiOutcome outcome) {
+        var scope = active.get();
+        scope.provider = response.provider();
+        scope.model = response.model();
+        scope.outcome = outcome;
+        scope.outputHash = AiRequestHashes.output(response.rawText());
+        return scope;
+    }
+
+    private static final class RequestScope {
+        private final AiRequestLog entry;
+        private String provider;
+        private String model;
+        private AiOutcome outcome = AiOutcome.PROVIDER_ERROR;
+        private String outputHash;
+        private int attempts;
+
+        private RequestScope(AiRequestLog entry) {
+            this.entry = entry;
+        }
     }
 }
