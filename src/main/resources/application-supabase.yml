@@ -2,10 +2,10 @@
 # Activate with --spring.profiles.active=supabase.
 spring:
   datasource:
-    url: jdbc:postgresql://aws-0-eu-west-1.pooler.supabase.com:5432/postgres?user=postgres.dsexqqtwerhhilfkjkyn&password=[YOUR-DATABASE-PASSWORD]
+    url: "${DB_URL:${SUPABASE_DB_URL:jdbc:postgresql://${SUPABASE_POOLER_HOST:aws-0-eu-west-1.pooler.supabase.com}:5432/postgres?sslmode=require}}"
     driver-class-name: org.postgresql.Driver
-    username: postgres.dsexqqtwerhhilfkjkyn
-    password: #T3ch!012345%hdc
+    username: "${DB_USERNAME:${SUPABASE_DB_USERNAME:postgres.${SUPABASE_PROJECT_REF:dsexqqtwerhhilfkjkyn}}}"
+    password: '${DB_PASSWORD:${SUPABASE_DB_PASSWORD:#T3ch!012345%hdc}}'
     hikari:
       maximum-pool-size: 5
       minimum-idle: 1

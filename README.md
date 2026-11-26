@@ -42,7 +42,7 @@ The `supabase` profile defaults to the configured project’s IPv4 session poole
 In PowerShell, enter the database password when prompted. Use `SESSION_COOKIE_SECURE=false` only for local HTTP.
 
 ```powershell
-$dbCredential = Get-Credential -UserName 'postgres.vxleshewjuwjcpnrgeev' -Message 'Enter the Supabase database password'
+$dbCredential = Get-Credential -UserName 'postgres.dsexqqtwerhhilfkjkyn' -Message 'Enter the Supabase database password'
 $env:SUPABASE_DB_USERNAME = $dbCredential.UserName
 $env:SUPABASE_DB_PASSWORD = $dbCredential.GetNetworkCredential().Password
 $env:SESSION_COOKIE_SECURE = 'false'
