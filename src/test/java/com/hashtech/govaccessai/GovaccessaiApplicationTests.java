@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(properties = {
-        "spring.datasource.url=jdbc:h2:mem:govaccess",
+        "spring.datasource.url=jdbc:h2:mem:govaccess;DATABASE_TO_LOWER=TRUE",
         "spring.datasource.username=sa",
         "spring.datasource.password="
 })

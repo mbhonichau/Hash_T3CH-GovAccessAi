@@ -12,7 +12,30 @@ Install JDK 25 and point `JAVA_HOME` to it. Run the Maven wrapper from the repos
 
 On macOS or Linux, use `./mvnw clean package`. The Maven smoke tests use an in-memory database. The running application uses Supabase PostgreSQL.
 
+## Initialise local PostgreSQL
+
+With a local PostgreSQL server running and `psql` on PATH, run this from the repository root. Use an existing PostgreSQL login with permission to create the database and its schema.
+
+```powershell
+$dbCredential = Get-Credential -Message 'Enter your local PostgreSQL credentials'
+$env:DB_USERNAME = $dbCredential.UserName
+$env:DB_PASSWORD = $dbCredential.GetNetworkCredential().Password
+.\scripts\Initialize-Database.ps1
+```
+
+The script creates the local `govaccess` database if needed, applies every checked-in Flyway migration in the `govaccess` schema, and sets `DB_URL` for the current PowerShell session. You can rerun it to apply later migrations. Use `-Database` or `-Port` to override the defaults. Start the application from the same session with `.\mvnw.cmd spring-boot:run`.
+
 ## Run with Supabase PostgreSQL
+
+For SQL Editor setup on a fresh project, paste and run [supabase-bootstrap.sql](scripts/supabase-bootstrap.sql). It creates the `govaccess` schema and the two Phase 0 tables in the project's existing database. Keep `govaccess` outside the Data API's exposed schemas.
+
+After running the SQL manually, set `DB_URL` to the project's PostgreSQL JDBC connection URL and set `DB_USERNAME` and `DB_PASSWORD` for the schema-owning role. Register the SQL as Flyway baseline version 2 once, before the first application startup.
+
+```powershell
+.\mvnw.cmd '-Dflyway.baselineVersion=2' flyway:baseline
+```
+
+On a fresh project you can also let Flyway create the schema during application startup by following the connection steps below.
 
 The `supabase` profile defaults to the configured project’s IPv4 session pooler on port 5432. Confirm the host and username under **Connect → Session pooler** in the Supabase dashboard. To target a different project, set `SUPABASE_POOLER_HOST` and `SUPABASE_PROJECT_REF` to its values. [Supabase connection modes](https://supabase.com/docs/guides/database/connecting-to-postgres)
 
