@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Policy Studio', ~{::#policy-studio})}">
+<body>
+<section id="policy-studio" aria-labelledby="studio-heading">
+    <div class="overview-heading">
+        <h1 id="studio-heading">NSFAS financial screening</h1>
+        <p>Review the 2025 policy citations and preview the financial screen with synthetic facts.</p>
+        <p class="mt-2"><strong>DEMO DATA ONLY.</strong> Verify figures against the official policy before use.</p>
+    </div>
+    <div class="alert alert-success" role="status" th:if="${importedDraftLabel != null}">
+        AI import complete. Draft <strong th:text="${importedDraftLabel}"></strong> was saved for review.
+    </div>
+    <div class="alert alert-info" th:unless="${canEditPolicy}">
+        You can review and preview drafts. Rule builder and Import with AI require the Policy Edit permission.
+        <a class="alert-link" th:href="@{/workspace/access}">Manage workspace access</a>.
+    </div>
+    <form method="get" th:action="@{/policies/nsfas-2025}" class="mb-3 d-flex gap-2 align-items-end"
+          th:unless="${#lists.isEmpty(drafts)}">
+        <div>
+            <label class="form-label" for="selected-draft">Draft version</label>
+            <select class="form-select" id="selected-draft" name="version">
+                <option th:each="draft : ${drafts}" th:value="${draft.versionLabel}" th:text="${draft.versionLabel}"
+                        th:selected="${version != null and version.versionLabel == draft.versionLabel}"></option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-outline-primary">Open draft</button>
+    </form>
+    <div class="card dashboard-card mb-3" th:if="${canEditPolicy}">
+        <div class="card-body">
+            <h2>Import with AI</h2>
+            <p>Extract the grant and standard income rules from the bundled synthetic sample. The restricted rule stays local.</p>
+            <form method="post" th:action="@{/api/policies/interpret}" id="policy-ai-import">
+                <label class="form-label" for="ai-version-label">New draft label</label>
+                <div class="d-flex gap-2 flex-wrap">
+                    <input class="form-control w-auto" id="ai-version-label" name="versionLabel" maxlength="100" required>
+                    <button class="btn btn-primary" type="submit" data-ai-submit>Import with AI</button>
+                </div>
+                <p class="alert alert-info mt-2 mb-0" role="status" hidden data-ai-progress></p>
+                <p class="alert alert-danger mt-2 mb-0" role="alert" hidden data-ai-error></p>
+            </form>
+        </div>
+    </div>
+    <div class="card dashboard-card" th:if="${version == null}">
+        <div class="card-body">
+            <h2>Load the 2025 draft</h2>
+            <p>Load the bundled policy to display its rules and run financial screening previews.</p>
+            <form method="post" th:action="@{/policies/nsfas-2025/load}" th:if="${canEditPolicy}">
+                <button type="submit" class="btn btn-primary">Load NSFAS draft</button>
+            </form>
+        </div>
+    </div>
+    <div class="row g-3" th:if="${version != null}">
+        <div class="col-12 col-xl-7">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h2>Policy citations</h2>
+                    <p>NSFAS Eligibility Criteria and Conditions for Financial Aid, 2025 Academic Year</p>
+                    <span class="policy-status status-draft" th:text="${version.status}">DRAFT</span>
+                    <span class="ms-2" th:text="${version.origin == 'AI_GENERATED' ? 'AI-generated' : 'Manual'}"></span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item px-4 py-3">
+                        <h3 class="h6">Qualifying SASSA grants</h3>
+                        <blockquote class="mb-1" th:text="${rules.qualifyingSassaGrant.sourceQuote}"></blockquote>
+                        <small th:text="|Section ${rules.qualifyingSassaGrant.sourceSection}|"></small>
+                    </li>
+                    <li class="list-group-item px-4 py-3">
+                        <h3 class="h6">Standard income pathway</h3>
+                        <blockquote class="mb-1" th:text="${rules.standardIncome.sourceQuote}"></blockquote>
+                        <small th:text="|Section ${rules.standardIncome.sourceSection}|"></small>
+                    </li>
+                    <li class="list-group-item px-4 py-3">
+                        <h3 class="h6">Disability income pathway</h3>
+                        <blockquote class="mb-1" th:text="${rules.disabilityIncome.sourceQuote}"></blockquote>
+                        <small th:text="|Section ${rules.disabilityIncome.sourceSection}|"></small>
+                    </li>
+                </ul>
+            </div>
+            <div class="card dashboard-card mt-3" th:if="${canEditPolicy and version.status == 'DRAFT'}">
+                <div class="card-body">
+                    <h2>Rule builder</h2>
+                    <p>Save changes as a new draft. Citations remain attached to the original policy text for review.</p>
+                    <p class="alert alert-danger" th:if="${editError}" th:text="${editError}" role="alert"></p>
+                    <form method="post" th:action="@{/policies/nsfas-2025/edit}">
+                        <input type="hidden" name="version" th:value="${version.versionLabel}">
+                        <label class="form-label" for="manual-version-label">New draft label</label>
+                        <input class="form-control mb-3" id="manual-version-label" name="versionLabel" maxlength="100" required>
+                        <label class="form-label" for="standard-cap">Standard annual cap (ZAR)</label>
+                        <input class="form-control mb-3" id="standard-cap" name="standardIncome" type="number"
+                               min="0" step="0.01" required th:value="${rules.standardIncome.value}">
+                        <label class="form-label" for="disability-cap">Disability-pathway annual cap (ZAR)</label>
+                        <input class="form-control mb-3" id="disability-cap" name="disabilityIncome" type="number"
+                               min="0" step="0.01" required th:value="${rules.disabilityIncome.value}">
+                        <fieldset class="mb-3">
+                            <legend class="h6">Qualifying verified SASSA grants</legend>
+                            <label class="form-check" th:each="grant : ${T(za.gov.govaccess.rules.enums.VerifiedSassaGrant).values()}"
+                                   th:unless="${grant.name() == 'NONE_OR_NON_QUALIFYING'}">
+                                <input class="form-check-input" type="checkbox" name="grants" th:value="${grant}"
+                                       th:checked="${rules.qualifyingSassaGrant.value.contains(grant)}">
+                                <span th:text="${#strings.replace(grant.name(), '_', ' ')}"></span>
+                            </label>
+                        </fieldset>
+                        <button type="submit" class="btn btn-primary">Save as new draft</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xl-5">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h2>Preview a synthetic case</h2>
+                    <p>Leave an input blank when its evidence is unverified.</p>
+                    <form method="post" th:action="@{/policies/nsfas-2025/preview}" th:object="${screen}">
+                        <input type="hidden" name="version" th:value="${version.versionLabel}">
+                        <p class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('*')}">
+                            Enter a nonnegative income and select a listed grant and pathway.
+                        </p>
+                        <label class="form-label" for="income">Annual gross household income (ZAR)</label>
+                        <input class="form-control mb-3" type="number" min="0" step="0.01" th:field="*{income}">
+                        <label class="form-label" for="grant">Verified SASSA grant</label>
+                        <select class="form-select mb-3" th:field="*{grant}">
+                            <option value="">Unverified</option>
+                            <option value="NONE_OR_NON_QUALIFYING">None or non-qualifying</option>
+                            <option value="FOSTER_CARE">Foster Care</option>
+                            <option value="CARE_DEPENDENCY">Care Dependency</option>
+                            <option value="CHILD_SUPPORT">Child Support</option>
+                        </select>
+                        <label class="form-label" for="pathway">Verified income pathway</label>
+                        <select class="form-select mb-3" th:field="*{pathway}">
+                            <option value="">Unverified</option>
+                            <option value="STANDARD">Standard</option>
+                            <option value="DISABILITY">Disability</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary">Run financial screen</button>
+                    </form>
+                    <div class="alert alert-info mt-3 mb-0" role="status" th:if="${result != null}">
+                        <strong th:switch="${result.outcome.name()}">
+                            <span th:case="'PASSES_FINANCIAL_SCREEN'">Passes financial screen</span>
+                            <span th:case="'FAILS_FINANCIAL_SCREEN'">Fails financial screen</span>
+                            <span th:case="*">Needs review</span>
+                        </strong>
+                        <p class="mb-0" th:text="${result.reason}"></p>
+                        <small th:if="${result.sourceSection != null}" th:text="|Section ${result.sourceSection}|"></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script defer th:src="@{/js/policy-builder.js}"></script>
+</section>
+</body>
+</html>

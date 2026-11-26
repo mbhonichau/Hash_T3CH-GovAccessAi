@@ -4,10 +4,10 @@ GovAccess AI provides a configurable eligibility assessment engine for governmen
 
 ## Build and test
 
-Install JDK 25 and point `JAVA_HOME` to it. Run the Maven wrapper from the repository root.
+Install JDK 25 and point `JAVA_HOME` to it. Run the offline tests from the repository root before and after a change.
 
 ```powershell
-.\mvnw.cmd clean package
+mvn -o test
 ```
 
 On macOS or Linux, use `./mvnw clean package`. The Maven smoke tests use an in-memory database. The running application uses Supabase PostgreSQL.
@@ -27,9 +27,7 @@ The script creates the local `govaccess` database if needed, applies every check
 
 ## Run with Supabase PostgreSQL
 
-Flyway is enabled on application startup and owns the schema; Hibernate uses `ddl-auto=validate`. A fresh database applies the checked-in migrations, including the NSFAS policy draft and synthetic intake cases. Existing installs with Flyway history upgrade normally. If version 5 is the only validation issue and its account tables still match the expected schema, startup repairs the stored checksum and continues without replaying that migration; unrelated validation errors still stop startup. Existing non-empty schemas without Flyway history are baselined at their latest complete legacy migration, then receive only the remaining migrations. This avoids replaying the original NSFAS draft insert over existing policy data.
-
-Staff with `APPLICATION_READ` can open `/applications` and reopen cases by selecting their reference. Staff with `APPLICATION_CREATE` can open `/applications/new` and submit a case; case writes and their audit events are committed together. The intake migrations seed three synthetic NSFAS examples: likely eligible, missing evidence/manual review, and not eligible. The detail screen shows evidence, assessment, decision, and audit history. Synthetic recommendations are not official decisions; every case still requires an authorised human decision workflow before a result becomes final.
+Flyway creates and upgrades the `govaccess` schema at startup. Hibernate uses `ddl-auto=validate`.
 
 The `supabase` profile defaults to the configured project’s IPv4 session pooler on port 5432. Confirm the host and username under **Connect → Session pooler** in the Supabase dashboard. To target a different project, set `SUPABASE_POOLER_HOST` and `SUPABASE_PROJECT_REF` to its values. [Supabase connection modes](https://supabase.com/docs/guides/database/connecting-to-postgres)
 
@@ -38,30 +36,20 @@ In PowerShell, enter the database password when prompted. Use `SESSION_COOKIE_SE
 ```powershell
 $dbCredential = Get-Credential -UserName 'postgres.dsexqqtwerhhilfkjkyn' -Message 'Enter the Supabase database password'
 $env:SUPABASE_DB_USERNAME = $dbCredential.UserName
-$env:SUPABASE_DB_PASSWORD = $dbCredential.GetNetworkCredential().Password
+$env:DB_PASSWORD = $dbCredential.GetNetworkCredential().Password
 $env:SESSION_COOKIE_SECURE = 'false'
 .\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=supabase'
 ```
 
-The profile accepts `SUPABASE_DB_URL`, `SUPABASE_DB_USERNAME`, and `SUPABASE_DB_PASSWORD`. Existing `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD` values take precedence. The default URL uses `sslmode=require` to encrypt the connection. For hostname and certificate verification, download the project CA from **Database Settings → SSL Configuration** and set a JDBC URL override such as the following. [Supabase SSL configuration](https://supabase.com/docs/guides/platform/ssl-enforcement)
+The default URL uses `sslmode=require` to encrypt the connection. For hostname and certificate verification, download the project CA from **Database Settings → SSL Configuration** and set a JDBC URL override such as the following. [Supabase SSL configuration](https://supabase.com/docs/guides/platform/ssl-enforcement)
 
 ```powershell
 $env:SUPABASE_DB_URL = 'jdbc:postgresql://<session-pooler-host>:5432/postgres?sslmode=verify-full&sslrootcert=C:/certs/supabase-ca.crt'
 ```
 
-Hibernate uses the dedicated `govaccess` schema. Keep it outside the Supabase Data API’s exposed schemas. The application’s PostgreSQL role needs permission to create the schema if it is missing and to manage the tables inside it.
+Keep the dedicated `govaccess` schema outside the Supabase Data API’s exposed schemas. The migration role must be able to create schemas and manage the tables.
 
-When the user table is empty, the first startup creates an `admin` account automatically. It generates a strong one-time password and prints the username and password in a clearly marked startup log block. Copy the password immediately; it is not stored in plaintext and cannot be displayed again after startup. Set `GOVACCESS_BOOTSTRAP_USERNAME` to choose a different initial username, or set both `GOVACCESS_BOOTSTRAP_USERNAME` and `GOVACCESS_BOOTSTRAP_PASSWORD` to supply your own credentials (passwords must contain at least 12 characters). The initial account receives all permissions. Later runs keep the same account and do not rotate its password; use the protected Staff access page to create other accounts and assign permissions. Passwords are stored as BCrypt hashes. Accounts and permissions persist in the `user_account` tables.
-
-For a demo database, activate the `demo` profile together with the database profile. The demo seeder creates `demo-admin`, `policy-officer`, `case-reviewer`, and `read-only` accounts with different permission sets, and prints each newly generated password once. It never resets credentials for accounts that already exist. Use this only with a demo database; the seeder writes these accounts to the configured database.
-
-```powershell
-.\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=supabase,demo'
-```
-
-Confirm [application health](http://localhost:8080/actuator/health) returns `{"status":"UP"}`. Open [GovAccess AI](http://localhost:8080) and sign in with the bootstrap credentials. The session expires after 30 minutes of inactivity, uses an HTTP-only SameSite=Lax cookie, and enables Secure by default. Set `SESSION_COOKIE_SECURE=false` only for local HTTP. Spring Security rotates the session ID at sign in. HTML forms receive CSRF tokens automatically; Fetch clients can read the `_csrf` and `_csrf_header` meta tags from the shared layout and send that header with state-changing requests. Sign out uses POST with CSRF protection.
-
-The demo machine must have JDK 25 and Tesseract OCR installed and available on `PATH` (`tesseract --version`). The current checked environment has no Tesseract executable on `PATH`; install it before demonstrating OCR-backed document intake. Verify `java -version` reports Java 25 before packaging or running the executable JAR.
+Confirm [application health](http://localhost:8080/actuator/health) returns `{"status":"UP"}`. Open [GovAccess AI](http://localhost:8080) and sign in as `user` with the generated application password in the startup log.
 
 After building, the same environment supports running the executable JAR.
 
@@ -70,3 +58,53 @@ java -jar target/govaccessai-0.0.1-SNAPSHOT.jar --spring.profiles.active=supabas
 ```
 
 See the [AI implementation plan](AI_IMPLEMENTATION_PLAN.md) for the policy-drafting workflow.
+
+### Environment variables
+
+| Variable | Required when | Purpose |
+| --- | --- | --- |
+| `DB_PASSWORD` | Every Supabase launch | Password for the PostgreSQL role. Startup rejects a missing or blank value. |
+| `DB_URL` or `SUPABASE_DB_URL` | Connecting to a database outside the configured Supabase project | PostgreSQL JDBC URL. `DB_URL` takes precedence. You can also supply `SUPABASE_POOLER_HOST` and `SUPABASE_PROJECT_REF` for the configured pooler URL format. |
+| `DB_USERNAME` or `SUPABASE_DB_USERNAME` | Connecting as a role other than the configured Supabase role | Database login. `DB_USERNAME` takes precedence and is required for the local database initializer. |
+| `AI_BASE_URL` and `AI_MODEL` | Making a live AI call | OpenAI-compatible provider base URL and exact model ID. The app adds `/chat/completions`. |
+| `AI_API_KEY` | Calling Groq or another authenticated provider | Provider API key. Keep it in the launch environment. |
+| `GOVACCESS_AI_ENABLED` | Optional | Defaults to `true`. Set to `false` for a startup-level kill switch. |
+| `SPRING_SECURITY_USER_ROLES` | Using the built-in account for AI administration | Set to `POLICY_EDIT,AI_ADMIN` in a local verification environment. |
+| `SPRING_SECURITY_USER_PASSWORD` | Optional for the built-in account | Supply a password through the environment to use a stable login. Otherwise Spring Security generates one at startup. |
+| `SESSION_COOKIE_SECURE` | Optional | Set to `false` only for local HTTP. It defaults to `true`. |
+
+The runtime AI toggle applies to the running instance and resets on restart. A startup-level disable remains in force when an administrator tries to enable AI at runtime.
+
+### Secret scanning
+
+Run `.\scripts\Test-RepositorySecrets.ps1 -Staged` before committing, or run it without arguments to check `HEAD`. Use `-Revision <commit>` to check another commit. The script prints matching file paths and exits with an error for known credential formats or embedded password fallbacks. Rotate any exposed credentials separately.
+
+### Verify Flyway on PostgreSQL
+
+1. Prepare two disposable PostgreSQL databases. Start with a fresh database and a copy of a pre-hardening database containing at least one saved policy or audit row. Include a copy of the Hibernate-created policy tables if that is how the existing deployment was provisioned.
+2. Back up the existing copy, stop old application instances, and launch this version against each database in turn. Use the schema-owning role. Keep Flyway enabled and Hibernate in validation mode.
+3. Check that `govaccess.flyway_schema_history` ends at version `10` with successful entries. For a legacy schema containing the AI tables and no Flyway history, startup records a V2 baseline. If V3 is pending and Hibernate already created the policy tables, Flyway stages them and restores their rows while adopting the versioned schema. V10 converts the saved NSFAS rule JSON into canonical content and preserves the legacy JSON for the existing editor.
+4. Compare schema-only dumps of `govaccess` using `pg_dump --schema-only --schema=govaccess --no-owner --no-privileges` or compare the table definitions in the SQL Editor. Check that `ai_call_log.request_id` is non-null and references `ai_request_log.id`. Confirm the existing policy rows and hashes are preserved. Each legacy attempt is linked to its own historical request because the original rows lacked a correlation ID.
+5. Restart both databases' application instances and confirm Flyway has no pending migrations and Hibernate validation succeeds. The migration callback for previously Hibernate-created policy tables is part of Spring Boot startup. Use app startup for that upgrade path.
+
+The deployed intake project already used versions V5–V7. Application startup recognises those exact historical entries by version, description, script and checksum, and applies this branch's V8–V10 afterward. Its history rows remain intact. Use Spring Boot startup for that deployment, since the standalone Flyway Maven goal does not run the application-specific validation strategy.
+
+For the hosted-provider test, follow the [live Groq verification checklist](docs/live-verification.md).
+
+## NSFAS Policy Studio
+
+Open **Policy Studio** after signing in and load the bundled 2025 draft if the workspace is empty. The financial preview uses synthetic facts and the selected version's stored rule contract.
+
+The built-in user has Policy Edit permission. From **Workspace access**, select **Switch to Policy Edit** and then **Open Policy Studio**. Accounts with that permission can switch back to Review from the same screen. New sessions start in Review.
+
+Configure the AI provider with `AI_BASE_URL`, `AI_API_KEY`, and `AI_MODEL`. The import uses the bundled synthetic financial excerpt. The restricted pathway is copied from the local draft fixture. Imported and edited versions are saved as new drafts.
+
+To start with Groq on Windows, stop the existing app, keep your normal Supabase connection settings, and run `.\scripts\Start-GovAccessWithGroq.ps1` from PowerShell. The launcher prompts for a key, checks model access, and starts Maven with the provider variables in the same session.
+
+## Canonical rules
+
+Policy versions store a versioned rule document in `policy_version.content`. Open **Rule catalogue** to see the field types, units and allowed evidence sources. Switch to **Policy Edit** to add field definitions and document types. `RulePolicyService` creates programmes and drafts from the catalogue. `RuleEvaluator` evaluates verified evidence and `RecommendationService` checks rule coverage before issuing a recommendation. Callers of the former `FinancialScreenEvaluator` can use the existing NSFAS preview service or the canonical evaluator.
+
+Numeric and date ranges use inclusive bounds. `DATE_WITHIN` takes two ISO dates. `govaccess.rules.max-group-depth` defaults to 5. Group results drive recommendations and their child evaluations remain available for review. A missing-evidence rule with `NEEDS_REVIEW` sets the manual-review flag.
+
+The seeded programmes are demo records. The bundled NSFAS draft carries citations and a notice to verify figures against the official policy. The Social Support Grant and Housing Support Subsidy currently have programme records awaiting their policy rules.

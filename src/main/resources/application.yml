@@ -1,5 +1,6 @@
 govaccess:
   ai:
+    enabled: true
     # Profiles can replace this ordered list. Keep each provider's connection settings in environment variables.
     providers:
       - name: primary
@@ -7,7 +8,9 @@ govaccess:
         api-key: ${AI_API_KEY:}
         model: ${AI_MODEL:}
         hosted: true
-    prompts: {}
+    prompts:
+      policy-interpretation: 2
+      provider-probe: 1
     cache-mode: OFF
     redaction-mode: BLOCK
     kill-switch: false

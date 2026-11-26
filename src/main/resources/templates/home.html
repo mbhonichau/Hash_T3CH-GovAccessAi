@@ -69,7 +69,7 @@
                 <span class="guidance-icon"><i class="bi-shield-check" aria-hidden="true"></i></span>
                 <h2>Policy review</h2>
                 <p>Review a draft against its source policy before publishing. Eligibility recommendations use the published rules and verified evidence.</p>
-                <a href="#policy-versions">See policy versions <i class="bi-arrow-right" aria-hidden="true"></i></a>
+                <a th:href="@{/policies/nsfas-2025}">Open Policy Studio <i class="bi-arrow-right" aria-hidden="true"></i></a>
             </div>
             <div class="card dashboard-card" th:unless="${canReadPolicies}" role="status">
                 <div class="card-body">

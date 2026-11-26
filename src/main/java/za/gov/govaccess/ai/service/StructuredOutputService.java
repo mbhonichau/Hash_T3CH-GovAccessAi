@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -36,16 +37,33 @@ public class StructuredOutputService {
     }
 
     public <T> T generate(AiRequest request, Class<T> type) {
+        return generate(request, type, value -> {});
+    }
+
+    public <T> T generate(AiRequest request, Class<T> type, Consumer<T> verify) {
+        JsonSchema schema = schema(request, type);
+        return provider.inRequest(request, () -> generate(request, type, verify, schema));
+    }
+
+    public <T> T probe(AiRequest request, Class<T> type) {
+        JsonSchema schema = schema(request, type);
+        return provider.probe(request, response -> validate(response.rawText(), type, schema, value -> {}));
+    }
+
+    private <T> JsonSchema schema(AiRequest request, Class<T> type) {
         JsonNode definition = request.jsonSchema();
         if (!type.isRecord() || definition == null || !definition.isObject()) {
             throw new IllegalArgumentException("Structured AI output requires a record and a JSON schema object");
         }
         requireLocalReferences(definition);
-        JsonSchema schema = schemas.getSchema(definition);
+        return schemas.getSchema(definition);
+    }
+
+    private <T> T generate(AiRequest request, Class<T> type, Consumer<T> verify, JsonSchema schema) {
         AiRequest structured = request.withContent(request.systemPrompt() + "\n\nReturn a JSON object.",
                 request.userContent(), request.attachments());
         try {
-            return provider.completeValidated(structured, response -> validate(response.rawText(), type, schema));
+            return provider.completeValidated(structured, response -> validate(response.rawText(), type, schema, verify));
         } catch (AiOutputInvalidException invalid) {
             if (provider.replayOnly()) {
                 throw invalid;
@@ -53,7 +71,7 @@ public class StructuredOutputService {
             var repair = structured.withContent(structured.systemPrompt(),
                     structured.userContent() + "\n\nReturn a corrected JSON response. Validation errors:\n"
                             + String.join("\n", invalid.errors()), structured.attachments());
-            return provider.completeRepair(repair, structured, response -> validate(response.rawText(), type, schema));
+            return provider.completeRepair(repair, structured, response -> validate(response.rawText(), type, schema, verify));
         }
     }
 
@@ -73,7 +91,7 @@ public class StructuredOutputService {
         node.forEach(StructuredOutputService::requireLocalReferences);
     }
 
-    private <T> T validate(String raw, Class<T> type, JsonSchema schema) {
+    private <T> T validate(String raw, Class<T> type, JsonSchema schema, Consumer<T> verify) {
         try {
             String json = raw.strip();
             var fenced = FENCE.matcher(json);
@@ -100,6 +118,7 @@ public class StructuredOutputService {
                         .map(v -> "Bean Validation " + v.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName()
                                 + " on " + propertyNames(v.getPropertyPath())).sorted().toList());
             }
+            verify.accept(value);
             return value;
         } catch (IOException e) {
             throw invalid("Malformed JSON or incompatible record fields");

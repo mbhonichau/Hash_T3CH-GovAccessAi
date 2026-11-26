@@ -134,6 +134,7 @@
                     <baselineVersion>5</baselineVersion>
                     <locations>
                         <location>filesystem:${project.basedir}/src/main/resources/db/migration</location>
+                        <location>classpath:za/gov/govaccess/rules/migration</location>
                     </locations>
                 </configuration>
                 <dependencies>

@@ -7,13 +7,21 @@ import java.util.UUID;
 
 public record AiRequest(String promptId, int promptVersion, String systemPrompt, String userContent,
                         List<AiAttachment> attachments, JsonNode jsonSchema, double temperature,
-                        boolean synthetic, UUID userId, String relatedEntityType, UUID relatedEntityId) {
+                        boolean synthetic, AiCallContext context) {
     public AiRequest {
         Objects.requireNonNull(promptId);
         Objects.requireNonNull(systemPrompt);
         Objects.requireNonNull(userContent);
         attachments = attachments == null ? List.of() : List.copyOf(attachments);
         jsonSchema = jsonSchema == null ? null : jsonSchema.deepCopy();
+        context = context == null ? new AiCallContext(null, null, null) : context;
+    }
+
+    public AiRequest(String promptId, int promptVersion, String systemPrompt, String userContent,
+                     List<AiAttachment> attachments, JsonNode jsonSchema, double temperature,
+                     boolean synthetic, UUID userId, String relatedEntityType, UUID relatedEntityId) {
+        this(promptId, promptVersion, systemPrompt, userContent, attachments, jsonSchema, temperature,
+                synthetic, new AiCallContext(userId, relatedEntityType, relatedEntityId));
     }
 
     public AiRequest(String promptId, int promptVersion, String systemPrompt, String userContent,
@@ -29,6 +37,10 @@ public record AiRequest(String promptId, int promptVersion, String systemPrompt,
 
     public AiRequest withContent(String system, String user, List<AiAttachment> content) {
         return new AiRequest(promptId, promptVersion, system, user, content, jsonSchema, temperature,
-                synthetic, userId, relatedEntityType, relatedEntityId);
+                synthetic, context);
     }
+
+    public UUID userId() { return context.userId(); }
+    public String relatedEntityType() { return context.relatedEntityType(); }
+    public UUID relatedEntityId() { return context.relatedEntityId(); }
 }

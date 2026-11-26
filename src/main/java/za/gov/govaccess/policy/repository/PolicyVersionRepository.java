@@ -10,6 +10,8 @@ import za.gov.govaccess.policy.entity.PolicyVersion;
 public interface PolicyVersionRepository extends JpaRepository<PolicyVersion, UUID> {
     Optional<PolicyVersion> findByProgrammeCodeAndVersionLabel(String programmeCode, String versionLabel);
 
+    List<PolicyVersion> findByProgrammeCodeAndStatusOrderByVersionLabel(String programmeCode, String status);
+
     long countByStatus(String status);
 
     @EntityGraph(attributePaths = "programme")
