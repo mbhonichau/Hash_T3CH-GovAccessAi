@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <title th:text="${title}">GovAccess AI</title>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/vendor/mazer/icons/bootstrap-icons.css}">
@@ -27,6 +29,7 @@
                 </div>
             </div>
             <main id="main-content" tabindex="-1">
+                <div th:replace="~{fragments/alerts :: alerts}"></div>
                 <th:block th:replace="${content}"></th:block>
             </main>
         </div>

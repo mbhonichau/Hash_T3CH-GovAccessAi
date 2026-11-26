@@ -1,4 +1,4 @@
-<header id="sidebar" class="active" xmlns:th="http://www.thymeleaf.org" th:fragment="siteHeader">
+<header id="sidebar" class="active" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:fragment="siteHeader">
     <div class="sidebar-wrapper">
         <div class="sidebar-header">
             <a class="site-name" href="/" th:href="@{/}">
@@ -13,6 +13,9 @@
         <nav class="sidebar-menu" id="primary-navigation" aria-label="Primary">
             <ul class="menu">
                 <li class="sidebar-title">Workspace</li>
+                <li class="sidebar-item" sec:authorize="hasAuthority('PERM_DASHBOARD_READ')" th:classappend="${currentPath == '/' ? 'active' : ''}">
+                    <a class="sidebar-link" href="/" th:href="@{/}"
+                       th:attr="aria-current=${currentPath == '/' ? 'page' : null}">
                 <li class="sidebar-item" th:classappend="${screen == null and workspaceAccessPage == null and cataloguePage == null ? 'active' : null}">
                     <a class="sidebar-link" href="/" th:href="@{/}"
                        th:attr="aria-current=${screen == null and workspaceAccessPage == null and cataloguePage == null ? 'page' : null}">
@@ -34,10 +37,22 @@
                         <span>Policy Studio</span>
                     </a>
                 </li>
-                <li class="sidebar-item">
-                    <a class="sidebar-link" th:href="@{/actuator/health}">
-                        <i class="bi-speedometer2" aria-hidden="true"></i>
-                        <span>System status</span>
+                <li class="sidebar-item" sec:authorize="hasAuthority('PERM_APPLICATION_READ')"
+                    th:classappend="${#strings.startsWith(currentPath, '/applications') ? 'active' : ''}">
+                    <a class="sidebar-link" th:href="@{/applications}">
+                        <i class="bi-inbox" aria-hidden="true"></i><span>Application queue</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" sec:authorize="hasAuthority('PERM_APPLICATION_CREATE')">
+                    <a class="sidebar-link" th:href="@{/applications/new}">
+                        <i class="bi-plus-square" aria-hidden="true"></i><span>New application</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" sec:authorize="hasAuthority('PERM_USER_ADMIN')"
+                    th:classappend="${#strings.startsWith(currentPath, '/admin/staff') ? 'active' : ''}">
+                    <a class="sidebar-link" th:href="@{/admin/staff}"
+                       th:attr="aria-current=${#strings.startsWith(currentPath, '/admin/staff') ? 'page' : null}">
+                        <i class="bi-people" aria-hidden="true"></i><span>Staff access</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${workspaceAccessPage == true ? 'active' : null}">

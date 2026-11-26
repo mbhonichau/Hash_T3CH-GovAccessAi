@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Staff access', ~{::#staff-admin})}">
+<body>
+<section id="staff-admin" aria-labelledby="staff-heading">
+    <div class="overview-heading">
+        <h1 id="staff-heading">Staff access</h1>
+        <p>Create accounts and grant only the permissions each staff member needs.</p>
+    </div>
+    <div class="dashboard-grid">
+        <section class="card dashboard-card" aria-labelledby="create-heading">
+            <div class="card-header"><h2 id="create-heading">Add staff account</h2></div>
+            <div class="card-body">
+                <form th:action="@{/admin/staff}" method="post">
+                    <label class="form-label" for="new-username">Username</label>
+                    <input class="form-control mb-3" id="new-username" name="username" required maxlength="100" autocomplete="off">
+                    <label class="form-label" for="new-password">Temporary password</label>
+                    <input class="form-control mb-3" id="new-password" name="password" type="password" required minlength="12" autocomplete="new-password">
+                    <fieldset class="mb-3">
+                        <legend class="form-label">Permissions</legend>
+                        <div class="form-check" th:each="permission : ${permissions}">
+                            <input class="form-check-input" type="checkbox" name="permissions"
+                                   th:id="${'new-' + permission.name()}" th:value="${permission.name()}">
+                            <label class="form-check-label" th:for="${'new-' + permission.name()}" th:text="${permission}">Permission</label>
+                        </div>
+                    </fieldset>
+                    <button class="btn btn-primary" type="submit">Create account</button>
+                </form>
+            </div>
+        </section>
+        <section class="card dashboard-card" aria-labelledby="accounts-heading">
+            <div class="card-header"><h2 id="accounts-heading">Existing accounts</h2></div>
+            <div class="card-body" th:if="${#lists.isEmpty(accounts)}">No staff accounts found.</div>
+            <div class="list-group list-group-flush" th:unless="${#lists.isEmpty(accounts)}">
+                <details class="list-group-item" th:each="account, row : ${accounts}">
+                    <summary><strong th:text="${account.username}">Username</strong></summary>
+                    <form class="mt-3" th:action="@{/admin/staff/permissions}" method="post">
+                        <input type="hidden" name="username" th:value="${account.username}">
+                        <fieldset>
+                            <legend class="form-label">Permissions</legend>
+                            <div class="form-check" th:each="permission : ${permissions}">
+                                <input class="form-check-input" type="checkbox" name="permissions"
+                                       th:id="${'account-' + row.index + '-' + permission.name()}"
+                                       th:value="${permission.name()}" th:checked="${account.permissions.contains(permission)}">
+                                <label class="form-check-label" th:for="${'account-' + row.index + '-' + permission.name()}" th:text="${permission}">Permission</label>
+                            </div>
+                        </fieldset>
+                        <button class="btn btn-outline-primary mt-2" type="submit">Save permissions</button>
+                    </form>
+                </details>
+            </div>
+        </section>
+    </div>
+</section>
+</body>
+</html>

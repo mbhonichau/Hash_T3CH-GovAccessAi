@@ -1,0 +1,3 @@
+<span xmlns:th="http://www.thymeleaf.org" th:fragment="status(value)"
+      class="badge rounded-pill" th:classappend="${value == 'PUBLISHED' ? 'text-bg-success' : 'text-bg-secondary'}"
+      th:text="${value == 'PUBLISHED' ? 'Published' : value}">Status</span>
