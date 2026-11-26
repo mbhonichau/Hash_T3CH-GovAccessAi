@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Create case', ~{::#application-create})}">
+<body>
+<section id="application-create" aria-labelledby="create-heading">
+    <div class="overview-heading"><h1 id="create-heading">Create application case</h1><p>Record the minimum information needed to open an intake case.</p></div>
+    <div class="card dashboard-card"><div class="card-body">
+        <form th:action="@{/applications}" th:object="${applicationForm}" method="post">
+            <div class="mb-3">
+                <label class="form-label" for="applicantName">Applicant name</label>
+                <input class="form-control" id="applicantName" type="text" th:field="*{applicantName}" maxlength="200" autocomplete="off" required>
+                <div class="text-danger" th:errors="*{applicantName}"></div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="programmeCode">Programme</label>
+                <select class="form-select" id="programmeCode" th:field="*{programmeCode}" required>
+                    <option value="">Choose a programme</option>
+                    <option th:each="programme : ${programmes}" th:value="${programme.code()}" th:text="${programme.name()}">Programme</option>
+                </select>
+                <div class="text-danger" th:errors="*{programmeCode}"></div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="summary">Intake notes</label>
+                <textarea class="form-control" id="summary" rows="4" th:field="*{summary}" maxlength="2000" required></textarea>
+                <div class="text-danger" th:errors="*{summary}"></div>
+            </div>
+            <button class="btn btn-primary" type="submit">Create case</button>
+            <a class="btn btn-outline-secondary" th:href="@{/applications}">Cancel</a>
+        </form>
+    </div></div>
+</section>
+</body>
+</html>

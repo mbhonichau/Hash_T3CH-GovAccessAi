@@ -7,7 +7,7 @@
             <h1 id="overview-heading">Eligibility overview</h1>
             <p>Track policy versions for grants and bursaries.</p>
         </div>
-        <dl class="metric-grid">
+        <dl class="metric-grid" th:if="${canReadPolicies}">
             <div class="metric-card">
                 <span class="metric-icon metric-purple" aria-hidden="true"><i class="bi-layers-fill"></i></span>
                 <div><dt>Policy versions</dt><dd th:text="${policyCount}">0</dd></div>
@@ -22,8 +22,28 @@
             </div>
         </dl>
 
+        <section class="card dashboard-card mb-4" th:if="${canReadApplications}" aria-labelledby="case-dashboard-heading">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div><h2 id="case-dashboard-heading">Application cases</h2>
+                    <p th:text="|${applicationDashboard.total()} cases · ${applicationDashboard.needsEvidence()} need evidence|">0 cases</p></div>
+                <a class="btn btn-primary" th:href="@{/applications}">Open case queue</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table policy-table mb-0">
+                    <thead><tr><th scope="col">Reference</th><th scope="col">Applicant</th><th scope="col">Programme</th><th scope="col">Status</th><th scope="col">Recommendation</th></tr></thead>
+                    <tbody><tr th:each="case : ${applicationDashboard.recent()}">
+                        <td><a th:href="@{/applications/{id}(id=${case.id()})}" th:text="${case.reference()}">Case</a></td>
+                        <td th:text="${case.applicantName()}">Applicant</td><td th:text="${case.programmeName()}">Programme</td>
+                        <td th:text="${#strings.replace(case.status().name(), '_', ' ')}">Status</td>
+                        <td th:text="${case.recommendation() == null ? 'Pending' : #strings.replace(case.recommendation().name(), '_', ' ')}">Outcome</td>
+                    </tr></tbody>
+                </table>
+            </div>
+            <div class="card-body" th:if="${#lists.isEmpty(applicationDashboard.recent())}">No cases are available yet.</div>
+        </section>
+
         <div class="dashboard-grid">
-            <section class="card dashboard-card" id="policy-versions" aria-labelledby="policy-heading">
+            <section class="card dashboard-card" id="policy-versions" aria-labelledby="policy-heading" th:if="${canReadPolicies}">
                 <div class="card-header">
                     <h2 id="policy-heading">Policy versions</h2>
                     <p>Up to five versions, ordered by version label.</p>
@@ -35,9 +55,7 @@
                             <tr th:each="version : ${policyVersions}">
                                 <td th:text="${version.programme.name}">Programme</td>
                                 <td th:text="${version.versionLabel}">Version</td>
-                                <td><span class="policy-status"
-                                    th:classappend="${version.status == 'PUBLISHED' ? 'status-published' : 'status-draft'}"
-                                    th:text="${version.status == 'PUBLISHED' ? 'Published' : 'Draft'}">Draft</span></td>
+                                <td><span th:replace="~{fragments/status :: status(${version.status})}"></span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -47,11 +65,17 @@
                     <p>No policy versions are available yet.</p>
                 </div>
             </section>
-            <div class="guidance-card">
+            <div class="guidance-card" th:if="${canReadPolicies}">
                 <span class="guidance-icon"><i class="bi-shield-check" aria-hidden="true"></i></span>
                 <h2>Policy review</h2>
                 <p>Review a draft against its source policy before publishing. Eligibility recommendations use the published rules and verified evidence.</p>
                 <a th:href="@{/policies/nsfas-2025}">Open Policy Studio <i class="bi-arrow-right" aria-hidden="true"></i></a>
+            </div>
+            <div class="card dashboard-card" th:unless="${canReadPolicies}" role="status">
+                <div class="card-body">
+                    <h2>Officer workspace</h2>
+                    <p>Your account can access the overview. Policy records require additional permission.</p>
+                </div>
             </div>
         </div>
     </section>

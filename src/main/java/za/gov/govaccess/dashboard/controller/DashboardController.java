@@ -1,17 +1,21 @@
 package za.gov.govaccess.dashboard.controller;
 
-import java.security.Principal;
 import org.springframework.stereotype.Controller;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import za.gov.govaccess.policy.repository.PolicyVersionRepository;
+import org.springframework.security.core.Authentication;
+import za.gov.govaccess.policy.service.PolicyRecordAccessService;
+import za.gov.govaccess.application.service.ApplicationIntakeService;
 
 @Controller
 class DashboardController {
-    private final PolicyVersionRepository policies;
+    private final PolicyRecordAccessService policyAccess;
+    private final ApplicationIntakeService applicationIntake;
 
-    DashboardController(PolicyVersionRepository policies) {
-        this.policies = policies;
+    DashboardController(PolicyRecordAccessService policyAccess, ApplicationIntakeService applicationIntake) {
+        this.policyAccess = policyAccess;
+        this.applicationIntake = applicationIntake;
     }
 
     @GetMapping("/")
