@@ -27,15 +27,7 @@ The script creates the local `govaccess` database if needed, applies every check
 
 ## Run with Supabase PostgreSQL
 
-For SQL Editor setup on a fresh project, paste and run [supabase-bootstrap.sql](scripts/supabase-bootstrap.sql). It creates the `govaccess` schema and the two Phase 0 tables in the project's existing database. Keep `govaccess` outside the Data API's exposed schemas.
-
-After running the SQL manually, set `DB_URL` to the project's PostgreSQL JDBC connection URL and set `DB_USERNAME` and `DB_PASSWORD` for the schema-owning role. Register the SQL as Flyway baseline version 2 once, before the first application startup.
-
-```powershell
-.\mvnw.cmd '-Dflyway.baselineVersion=2' flyway:baseline
-```
-
-On a fresh project you can also let Flyway create the schema during application startup by following the connection steps below.
+Hibernate creates missing tables from the JPA entities on startup using `ddl-auto=update`. Flyway is disabled for normal startup. Seed rows such as the NSFAS draft require a separate data-loading step when they are absent.
 
 The `supabase` profile defaults to the configured project’s IPv4 session pooler on port 5432. Confirm the host and username under **Connect → Session pooler** in the Supabase dashboard. To target a different project, set `SUPABASE_POOLER_HOST` and `SUPABASE_PROJECT_REF` to its values. [Supabase connection modes](https://supabase.com/docs/guides/database/connecting-to-postgres)
 
@@ -55,7 +47,7 @@ The profile accepts `SUPABASE_DB_URL`, `SUPABASE_DB_USERNAME`, and `SUPABASE_DB_
 $env:SUPABASE_DB_URL = 'jdbc:postgresql://<session-pooler-host>:5432/postgres?sslmode=verify-full&sslrootcert=C:/certs/supabase-ca.crt'
 ```
 
-Flyway and Hibernate use the dedicated `govaccess` schema. Keep it outside the Supabase Data API’s exposed schemas. The database role needs to own the schema or have permission to create it on first startup. With automatic baselining enabled, Flyway treats an existing non-empty schema without migration history as already at version 1. Verify that such a schema matches that baseline before starting the app.
+Hibernate uses the dedicated `govaccess` schema. Keep it outside the Supabase Data API’s exposed schemas. The application’s PostgreSQL role needs permission to create the schema if it is missing and to manage the tables inside it.
 
 Confirm [application health](http://localhost:8080/actuator/health) returns `{"status":"UP"}`. Open [GovAccess AI](http://localhost:8080) and sign in as `user` with the generated application password in the startup log.
 

@@ -37,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static za.gov.govaccess.ai.enums.AiOutcome.*;
 
 @SpringBootTest(classes = GovaccessaiApplication.class, properties = {
+        "spring.profiles.active=test",
         "spring.datasource.url=jdbc:h2:mem:ai-foundation;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE",
         "spring.datasource.username=sa", "spring.datasource.password="
 })
