@@ -7,6 +7,7 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
+import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +19,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import za.gov.govaccess.policy.repository.PolicyVersionRepository;
+import za.gov.govaccess.application.repository.ApplicationRecordRepository;
 import za.gov.govaccess.policy.service.FinancialPolicyPreviewService;
+import za.gov.govaccess.security.AccountBootstrap;
+import za.gov.govaccess.security.UserAccountRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import za.gov.govaccess.rules.dto.FinancialScreenFacts;
 import za.gov.govaccess.rules.enums.IncomePathway;
 import za.gov.govaccess.rules.enums.VerifiedSassaGrant;
@@ -39,7 +44,8 @@ import static za.gov.govaccess.rules.dto.FinancialScreenResult.Outcome.PASSES_FI
         "spring.profiles.active=test",
         "spring.flyway.enabled=true",
         "spring.jpa.hibernate.ddl-auto=validate",
-        "spring.security.user.password=login-test-password",
+        "govaccess.bootstrap.username=user",
+        "govaccess.bootstrap.password=login-test-password",
         "spring.datasource.url=jdbc:h2:mem:govaccess;DATABASE_TO_LOWER=TRUE",
         "spring.datasource.username=sa",
         "spring.datasource.password="
@@ -49,6 +55,28 @@ class GovaccessaiApplicationTests {
 
     @Autowired
     private MockMvc mvc;
+
+    @Autowired
+    private UserAccountRepository userAccounts;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AccountBootstrap accountBootstrap;
+
+    @Test
+    void bootstrapPersistsBcryptCredentialsAndDoesNotRotateThemOnRestart() {
+        var account = userAccounts.findByUsernameIgnoreCase("user").orElseThrow();
+        var storedHash = account.getPasswordHash();
+        assertThat(storedHash).startsWith("$2");
+        assertThat(passwordEncoder.matches("login-test-password", storedHash)).isTrue();
+
+        accountBootstrap.run(new DefaultApplicationArguments(new String[0]));
+
+        assertThat(userAccounts.findByUsernameIgnoreCase("user").orElseThrow().getPasswordHash())
+                .isEqualTo(storedHash);
+    }
 
     @Test
     void rendersTheSignInPageAndItsStylesBeforeAuthentication() throws Exception {
@@ -65,6 +93,7 @@ class GovaccessaiApplicationTests {
         var session = new MockHttpSession();
         mvc.perform(get("/error").session(session))
                 .andExpect(status().is3xxRedirection());
+        var originalSessionId = session.getId();
 
         mvc.perform(post("/login").session(session).with(csrf())
                         .param("username", "user")
@@ -72,10 +101,22 @@ class GovaccessaiApplicationTests {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
 
+        assertThat(session.getId()).isNotEqualTo(originalSessionId);
+
         mvc.perform(get("/").session(session))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Eligibility overview")))
                 .andExpect(content().string(containsString("2025 financial screening")));
+    }
+
+    @Test
+    @WithMockUser(authorities = "PERM_DASHBOARD_READ")
+    void logoutRequiresCsrfAndUsesPost() throws Exception {
+        var session = new MockHttpSession();
+        mvc.perform(post("/logout").session(session)).andExpect(status().isForbidden());
+        mvc.perform(post("/logout").session(session).with(csrf().asHeader()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/login?logout"));
     }
 
     @Autowired
@@ -83,6 +124,36 @@ class GovaccessaiApplicationTests {
 
     @Autowired
     private FinancialPolicyPreviewService financialPreview;
+
+    @Autowired
+    private ApplicationRecordRepository applicationRecords;
+
+    @Test
+    @WithMockUser(username = "intake-officer", authorities = {
+            "PERM_DASHBOARD_READ", "PERM_APPLICATION_READ", "PERM_APPLICATION_CREATE"})
+    void staffCanCreateARecordAndReopenItFromTheQueue() throws Exception {
+        assertThat(applicationRecords.count()).isEqualTo(3);
+        mvc.perform(get("/applications"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("DEMO-NSFAS-ELIGIBLE-001")))
+                .andExpect(content().string(containsString("DEMO-NSFAS-REVIEW-001")))
+                .andExpect(content().string(containsString("DEMO-NSFAS-INELIGIBLE-001")));
+
+        var createResult = mvc.perform(post("/applications").with(csrf())
+                        .param("applicantName", "Synthetic New Applicant")
+                        .param("programmeCode", "NSFAS_BURSARY")
+                        .param("summary", "Synthetic case created in the intake test."))
+                .andExpect(status().is3xxRedirection())
+                .andReturn();
+
+        var detailUrl = createResult.getResponse().getRedirectedUrl();
+        assertThat(detailUrl).startsWith("/applications/");
+        mvc.perform(get(detailUrl))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Synthetic New Applicant")))
+                .andExpect(content().string(containsString("Synthetic case created in the intake test.")));
+        assertThat(applicationRecords.count()).isEqualTo(4);
+    }
 
     @Test
     void previewsTheSeededNsfasFinancialDraft() {
@@ -115,7 +186,45 @@ class GovaccessaiApplicationTests {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "PERM_DASHBOARD_READ")
+    void dashboardOnlyAccountDoesNotReceivePolicyRecordsOrNavigation() throws Exception {
+        mvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Officer workspace")))
+                .andExpect(content().string(org.hamcrest.Matchers.not(containsString("2025 financial screening"))))
+                .andExpect(content().string(org.hamcrest.Matchers.not(containsString("Policy versions</span>"))));
+    }
+
+    @Test
+    @WithMockUser(authorities = "PERM_POLICY_READ")
+    void accountWithoutDashboardPermissionCannotOpenOverview() throws Exception {
+        mvc.perform(get("/" )).andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(authorities = "PERM_APPLICATION_CREATE")
+    void createOnlyStaffCannotReadTheApplicationQueue() throws Exception {
+        mvc.perform(get("/applications")).andExpect(status().isForbidden());
+        mvc.perform(get("/applications/new")).andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(authorities = "PERM_USER_ADMIN")
+    void onlyAdministratorsCanManageStaffPermissions() throws Exception {
+        mvc.perform(get("/admin/staff"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Add staff account")))
+                .andExpect(content().string(containsString("APPLICATION_REVIEW")));
+    }
+
+    @Test
+    @WithMockUser(authorities = "PERM_DASHBOARD_READ")
+    void dashboardStaffCannotManageAccounts() throws Exception {
+        mvc.perform(get("/admin/staff")).andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(authorities = {"PERM_DASHBOARD_READ", "PERM_POLICY_READ"})
     void rendersThymeleafAndServesLocalBootstrap() throws Exception {
         mvc.perform(get("/"))
                 .andExpect(status().isOk())

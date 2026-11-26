@@ -27,7 +27,9 @@ The script creates the local `govaccess` database if needed, applies every check
 
 ## Run with Supabase PostgreSQL
 
-Hibernate creates missing tables from the JPA entities on startup using `ddl-auto=update`. Flyway is disabled for normal startup. Seed rows such as the NSFAS draft require a separate data-loading step when they are absent.
+Flyway is enabled on application startup and owns the schema; Hibernate uses `ddl-auto=validate`. A fresh database applies the checked-in migrations, including the NSFAS policy draft and synthetic intake cases. Existing installs with Flyway history upgrade normally. If version 5 is the only validation issue and its account tables still match the expected schema, startup repairs the stored checksum and continues without replaying that migration; unrelated validation errors still stop startup. Existing non-empty schemas without Flyway history are baselined at their latest complete legacy migration, then receive only the remaining migrations. This avoids replaying the original NSFAS draft insert over existing policy data.
+
+Staff with `APPLICATION_READ` can open `/applications` and reopen cases by selecting their reference. Staff with `APPLICATION_CREATE` can open `/applications/new` and submit a case; case writes and their audit events are committed together. The intake migrations seed three synthetic NSFAS examples: likely eligible, missing evidence/manual review, and not eligible. The detail screen shows evidence, assessment, decision, and audit history. Synthetic recommendations are not official decisions; every case still requires an authorised human decision workflow before a result becomes final.
 
 The `supabase` profile defaults to the configured project’s IPv4 session pooler on port 5432. Confirm the host and username under **Connect → Session pooler** in the Supabase dashboard. To target a different project, set `SUPABASE_POOLER_HOST` and `SUPABASE_PROJECT_REF` to its values. [Supabase connection modes](https://supabase.com/docs/guides/database/connecting-to-postgres)
 
@@ -49,7 +51,17 @@ $env:SUPABASE_DB_URL = 'jdbc:postgresql://<session-pooler-host>:5432/postgres?ss
 
 Hibernate uses the dedicated `govaccess` schema. Keep it outside the Supabase Data API’s exposed schemas. The application’s PostgreSQL role needs permission to create the schema if it is missing and to manage the tables inside it.
 
-Confirm [application health](http://localhost:8080/actuator/health) returns `{"status":"UP"}`. Open [GovAccess AI](http://localhost:8080) and sign in as `user` with the generated application password in the startup log.
+When the user table is empty, the first startup creates an `admin` account automatically. It generates a strong one-time password and prints the username and password in a clearly marked startup log block. Copy the password immediately; it is not stored in plaintext and cannot be displayed again after startup. Set `GOVACCESS_BOOTSTRAP_USERNAME` to choose a different initial username, or set both `GOVACCESS_BOOTSTRAP_USERNAME` and `GOVACCESS_BOOTSTRAP_PASSWORD` to supply your own credentials (passwords must contain at least 12 characters). The initial account receives all permissions. Later runs keep the same account and do not rotate its password; use the protected Staff access page to create other accounts and assign permissions. Passwords are stored as BCrypt hashes. Accounts and permissions persist in the `user_account` tables.
+
+For a demo database, activate the `demo` profile together with the database profile. The demo seeder creates `demo-admin`, `policy-officer`, `case-reviewer`, and `read-only` accounts with different permission sets, and prints each newly generated password once. It never resets credentials for accounts that already exist. Use this only with a demo database; the seeder writes these accounts to the configured database.
+
+```powershell
+.\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=supabase,demo'
+```
+
+Confirm [application health](http://localhost:8080/actuator/health) returns `{"status":"UP"}`. Open [GovAccess AI](http://localhost:8080) and sign in with the bootstrap credentials. The session expires after 30 minutes of inactivity, uses an HTTP-only SameSite=Lax cookie, and enables Secure by default. Set `SESSION_COOKIE_SECURE=false` only for local HTTP. Spring Security rotates the session ID at sign in. HTML forms receive CSRF tokens automatically; Fetch clients can read the `_csrf` and `_csrf_header` meta tags from the shared layout and send that header with state-changing requests. Sign out uses POST with CSRF protection.
+
+The demo machine must have JDK 25 and Tesseract OCR installed and available on `PATH` (`tesseract --version`). The current checked environment has no Tesseract executable on `PATH`; install it before demonstrating OCR-backed document intake. Verify `java -version` reports Java 25 before packaging or running the executable JAR.
 
 After building, the same environment supports running the executable JAR.
 

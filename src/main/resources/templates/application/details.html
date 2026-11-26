@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Case details', ~{::#application-details})}">
+<body>
+<section id="application-details" aria-labelledby="case-heading">
+    <div class="overview-heading d-flex justify-content-between align-items-start gap-3 flex-wrap">
+        <div><a th:href="@{/applications}">← Application queue</a>
+            <h1 id="case-heading" th:text="${caseDetail.application().reference()}">Case reference</h1>
+            <p>Case details and workflow history.</p></div>
+        <span class="badge rounded-pill text-bg-secondary" th:text="${#strings.replace(caseDetail.application().status().name(), '_', ' ')}">Received</span>
+    </div>
+    <div class="dashboard-grid">
+        <section class="card dashboard-card" aria-labelledby="intake-heading">
+            <div class="card-header"><h2 id="intake-heading">Intake</h2></div>
+            <dl class="card-body row mb-0">
+                <dt class="col-sm-4">Applicant</dt><dd class="col-sm-8" th:text="${caseDetail.application().applicantName()}">Applicant</dd>
+                <dt class="col-sm-4">Programme</dt><dd class="col-sm-8" th:text="${caseDetail.application().programmeName()}">Programme</dd>
+                <dt class="col-sm-4">Created by</dt><dd class="col-sm-8" th:text="${caseDetail.application().createdBy()}">Officer</dd>
+                <dt class="col-sm-4">Created</dt><dd class="col-sm-8" th:text="${#temporals.format(caseDetail.application().createdAt(), 'd MMM yyyy HH:mm')}">Date</dd>
+                <dt class="col-sm-4">Intake notes</dt><dd class="col-sm-8 text-break" th:text="${caseDetail.application().summary()}">Summary</dd>
+                <dt class="col-sm-4">Recommendation</dt><dd class="col-sm-8" th:text="${caseDetail.application().recommendation() == null ? 'Pending assessment' : #strings.replace(caseDetail.application().recommendation().name(), '_', ' ')}">Pending</dd>
+            </dl>
+        </section>
+        <section class="card dashboard-card" aria-labelledby="evidence-heading">
+            <div class="card-header"><h2 id="evidence-heading">Evidence</h2></div>
+            <div class="list-group list-group-flush" th:if="${!#lists.isEmpty(caseDetail.evidence())}">
+                <div class="list-group-item" th:each="item : ${caseDetail.evidence()}">
+                    <strong th:text="${item.evidenceType}">Evidence type</strong>
+                    <span class="badge text-bg-secondary ms-2" th:text="${#strings.replace(item.verificationStatus, '_', ' ')}">Unverified</span>
+                    <p class="mb-0 mt-1" th:text="${item.valueSummary}">Evidence summary</p>
+                </div>
+            </div>
+            <div class="card-body" th:if="${#lists.isEmpty(caseDetail.evidence())}">No evidence has been recorded.</div>
+        </section>
+        <section class="card dashboard-card" aria-labelledby="assessment-heading">
+            <div class="card-header"><h2 id="assessment-heading">Latest assessment</h2></div>
+            <div class="card-body" th:if="${caseDetail.latestAssessment() != null}">
+                <p><strong th:text="${#strings.replace(caseDetail.latestAssessment().recommendation, '_', ' ')}">Needs review</strong>
+                    <span th:if="${caseDetail.latestAssessment().confidence != null}" th:text="${#numbers.formatPercent(caseDetail.latestAssessment().confidence, 0, 1)}">Confidence</span></p>
+                <p th:text="${caseDetail.latestAssessment().summary}">Assessment summary</p>
+            </div>
+            <div class="card-body" th:if="${caseDetail.latestAssessment() == null}">No assessment has been run.</div>
+        </section>
+        <section class="card dashboard-card" aria-labelledby="decision-heading">
+            <div class="card-header"><h2 id="decision-heading">Official decisions</h2></div>
+            <div class="card-body" th:if="${#lists.isEmpty(caseDetail.decisions())}">No official decision recorded. A staff decision is required before an outcome is final.</div>
+            <div class="list-group list-group-flush" th:unless="${#lists.isEmpty(caseDetail.decisions())}">
+                <div class="list-group-item" th:each="decision : ${caseDetail.decisions()}">
+                    <strong th:text="${decision.decision}">Decision</strong> · <span th:text="${decision.decidedBy}">Officer</span>
+                    <p class="mb-0" th:text="${decision.rationale}">Rationale</p>
+                </div>
+            </div>
+        </section>
+        <section class="card dashboard-card" aria-labelledby="audit-heading">
+            <div class="card-header"><h2 id="audit-heading">Case history</h2></div>
+            <div class="list-group list-group-flush" th:if="${!#lists.isEmpty(caseDetail.auditEvents())}">
+                <div class="list-group-item" th:each="event : ${caseDetail.auditEvents()}">
+                    <strong th:text="${event.action}">Action</strong> · <span th:text="${event.actorUsername}">Officer</span>
+                    <p class="mb-0" th:text="${event.detail}">Detail</p>
+                </div>
+            </div>
+            <div class="card-body" th:if="${#lists.isEmpty(caseDetail.auditEvents())}">No case events recorded.</div>
+        </section>
+    </div>
+</section>
+</body>
+</html>
