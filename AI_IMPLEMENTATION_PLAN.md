@@ -8,7 +8,7 @@ Deliver a policy-to-assessment workflow in the existing Java 25 monolith. AI pro
 
 - Work in the supplied repository on `codex/ai-implementation`, using the existing `com.hashtech.govaccessai` namespace.
 - Run the Maven wrapper with JDK 25. The current POM declares Spring Boot 4.2.0 and Spring AI 2.1.0, while the agreed architecture specifies Spring Boot 3.5.x. Validate the current dependency resolution, then align with the agreed 3.5.x baseline and verify a compatible Spring AI release. Use a direct REST adapter if a compatible starter adds avoidable integration work.
-- Confirm the wrapper can test, package and start the executable JAR against local PostgreSQL with Flyway. Record the validated dependency versions and run commands.
+- Confirm the wrapper can test, package and start the executable JAR against Supabase PostgreSQL with Flyway. Record the validated dependency versions and run commands.
 
 ## 2. Deliver the first vertical slice
 
@@ -22,7 +22,7 @@ Choose one programme using a synthetic policy, an income threshold and a small s
 
 ## 3. Implement processing, provenance and provider boundaries
 
-- Use PostgreSQL and Flyway for ingestion jobs, draft proposals and evidence lineage. Link the assessment to the exact policy version, evidence snapshot and rules engine version so it can be reproduced. Capture provider, model, prompt and schema versions for AI runs.
+- Use Supabase PostgreSQL and Flyway for ingestion jobs, draft proposals and evidence lineage. Link the assessment to the exact policy version, evidence snapshot and rules engine version so it can be reproduced. Capture provider, model, prompt and schema versions for AI runs.
 - Track queued, running, review-required, completed and failed states. Scope idempotency to the record, operation, input hash and processor version. Test repeat submissions and concurrent claims. Retry transient provider errors with a bounded backoff and route invalid output to manual review.
 - Feature-flag the live provider and provide a fixture-backed demo mode. Use provider schema enforcement when available and always validate locally. Treat document content as untrusted data and give the model zero tools or write access.
 - Keep applicant documents and identifiers in local storage and out of provider payloads and logs. Limit live calls to approved policy excerpts. Store credentials in environment configuration. Enforce record-level authorisation on evidence access, separate policy publication from draft creation, and audit reviews, publications and decisions.

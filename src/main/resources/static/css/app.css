@@ -1,0 +1,76 @@
+body {
+    font-family: "Nunito", system-ui, sans-serif;
+}
+
+#main #main-content {
+    padding: 0;
+}
+
+.site-name {
+    color: #25396f;
+    font-size: 1.5rem;
+    line-height: 1.25;
+}
+
+.dashboard-icon {
+    display: grid;
+    flex: 0 0 3rem;
+    height: 3rem;
+    place-items: center;
+    font-size: 1.25rem;
+}
+
+:focus-visible {
+    outline: 3px solid #935314;
+    outline-offset: 3px;
+}
+
+.sidebar-link:focus-visible {
+    outline-offset: -3px;
+}
+
+.skip-link {
+    position: fixed;
+    z-index: 20;
+    inset-block-start: 0.5rem;
+    inset-inline-start: 1rem;
+    padding: 0.5rem 1rem;
+    background: #fff;
+    transform: translateY(calc(-100% - 1rem));
+}
+
+.skip-link:focus {
+    transform: none;
+}
+
+@media (min-width: 1200px) {
+    .navigation-toggle {
+        display: none;
+    }
+}
+
+@media (max-width: 1199.98px) {
+    #sidebar.active .sidebar-wrapper {
+        position: static;
+        width: auto;
+        height: auto;
+    }
+
+    .sidebar-wrapper .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+
+    .sidebar-wrapper .menu {
+        margin: 0;
+        padding: 0 1rem 1rem;
+    }
+
+    #main {
+        margin-left: 0;
+        padding: clamp(1rem, 4vw, 2rem);
+    }
+}
