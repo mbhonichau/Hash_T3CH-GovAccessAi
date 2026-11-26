@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Policy lifecycle', ~{::#policy-lifecycle-list})}">
+<body>
+<section id="policy-lifecycle-list">
+    <div class="overview-heading">
+        <h1>Policy lifecycle</h1>
+        <p>Submit a draft for review, test it with synthetic cases, and publish a verified version.</p>
+    </div>
+    <div class="card dashboard-card">
+        <p class="card-body mb-0" th:if="${#lists.isEmpty(versions)}">No policy versions are available.</p>
+        <div class="table-responsive" th:unless="${#lists.isEmpty(versions)}">
+            <table class="table policy-table">
+                <thead><tr><th scope="col">Programme</th><th scope="col">Version</th><th scope="col">Status</th></tr></thead>
+                <tbody>
+                <tr th:each="version : ${versions}">
+                    <td th:text="${version.programme.name}"></td>
+                    <td><a th:href="@{/policies/lifecycle/{id}(id=${version.id})}" th:text="${version.versionLabel}"></a></td>
+                    <td th:text="${version.status}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+</body>
+</html>

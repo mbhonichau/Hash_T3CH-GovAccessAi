@@ -16,18 +16,20 @@ public class PromptRepository {
 
     public PromptRepository(AiProperties properties) {
         var prompts = new HashMap<String, Prompt>();
-        properties.prompts().forEach((id, version) -> {
-            if (!id.matches("[a-zA-Z0-9_-]+") || version < 1) {
-                throw new IllegalArgumentException("Invalid prompt identifier or version: " + id);
-            }
-            String path = "prompts/" + id + "/v" + version + ".md";
-            try (var input = new ClassPathResource(path).getInputStream()) {
-                prompts.put(id, new Prompt(id, version, new String(input.readAllBytes(), StandardCharsets.UTF_8)));
-            } catch (IOException e) {
-                throw new IllegalStateException("Cannot load configured prompt " + path, e);
-            }
-        });
+        properties.prompts().forEach((id, version) -> prompts.put(id, version(id, version)));
         active = Map.copyOf(prompts);
+    }
+
+    public Prompt version(String id, int version) {
+        if (!id.matches("[a-zA-Z0-9_-]+") || version < 1) {
+            throw new IllegalArgumentException("Invalid prompt identifier or version: " + id);
+        }
+        String path = "prompts/" + id + "/v" + version + ".md";
+        try (var input = new ClassPathResource(path).getInputStream()) {
+            return new Prompt(id, version, new String(input.readAllBytes(), StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot load configured prompt " + path, e);
+        }
     }
 
     public Prompt active(String id) {

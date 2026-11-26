@@ -7,6 +7,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import za.gov.govaccess.ai.dto.AiRequest;
 import za.gov.govaccess.ai.dto.AiResponse;
 import za.gov.govaccess.ai.entity.AiCallLog;
@@ -14,6 +15,10 @@ import za.gov.govaccess.ai.entity.AiRequestLog;
 import za.gov.govaccess.ai.enums.AiOutcome;
 import za.gov.govaccess.ai.repository.AiCallLogRepository;
 import za.gov.govaccess.ai.repository.AiRequestLogRepository;
+import za.gov.govaccess.audit.service.BusinessAuditService;
+import za.gov.govaccess.audit.service.BusinessAuditService.Change;
+import za.gov.govaccess.audit.service.CanonicalJson;
+import za.gov.govaccess.security.ManagedUserService;
 
 @Service
 public class AiAuditService {
@@ -21,11 +26,18 @@ public class AiAuditService {
     private final AiRequestLogRepository requests;
     private final TransactionTemplate independentTransaction;
     private final ThreadLocal<RequestScope> active = new ThreadLocal<>();
+    private final BusinessAuditService businessAudit;
+    private final ManagedUserService users;
+    private final JdbcTemplate jdbc;
 
     public AiAuditService(AiCallLogRepository logs, AiRequestLogRepository requests,
-                          PlatformTransactionManager transactions) {
+                          PlatformTransactionManager transactions, BusinessAuditService businessAudit,
+                          ManagedUserService users, JdbcTemplate jdbc) {
         this.logs = logs;
         this.requests = requests;
+        this.businessAudit = businessAudit;
+        this.users = users;
+        this.jdbc = jdbc;
         independentTransaction = new TransactionTemplate(transactions);
         independentTransaction.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
     }
@@ -45,7 +57,17 @@ public class AiAuditService {
             active.remove();
             long latency = Duration.ofNanos(System.nanoTime() - start).toMillis();
             entry.finish(scope.provider, scope.model, scope.outcome, scope.attempts, latency, scope.outputHash);
-            independentTransaction.executeWithoutResult(status -> requests.saveAndFlush(entry));
+            independentTransaction.executeWithoutResult(status -> {
+                var policyId = "POLICY_VERSION".equals(request.relatedEntityType()) ? request.relatedEntityId() : null;
+                String hash = policyId == null ? null : jdbc.query(
+                        "SELECT content FROM govaccess.policy_version WHERE id=?",
+                        (rs, index) -> CanonicalJson.sha256(CanonicalJson.document(rs.getString(1))), policyId)
+                        .stream().findFirst().orElse(null);
+                entry.linkAuditEvent(businessAudit.append(new Change(null, request.userId(), users.roleOf(request.userId()),
+                        "AI_REQUEST_COMPLETED", policyId, hash, null, null, null,
+                        request.promptId(), request.promptVersion(), scope.model)));
+                requests.saveAndFlush(entry);
+            });
         }
     }
 

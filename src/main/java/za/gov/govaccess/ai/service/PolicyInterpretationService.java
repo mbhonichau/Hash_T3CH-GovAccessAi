@@ -9,11 +9,14 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
+import java.util.function.IntConsumer;
 import org.springframework.stereotype.Service;
 import za.gov.govaccess.ai.dto.AiRequest;
 import za.gov.govaccess.ai.dto.AiCallContext;
 import za.gov.govaccess.ai.repository.PromptRepository;
 import za.gov.govaccess.policy.service.NsfasDemoPolicyService;
+import za.gov.govaccess.document.service.PolicySourceReader.Chunk;
+import za.gov.govaccess.policy.dto.PolicyImportReview;
 import za.gov.govaccess.rules.enums.VerifiedSassaGrant;
 import za.gov.govaccess.rules.enums.RuleOperator;
 import za.gov.govaccess.rules.model.FinancialScreenPolicy;
@@ -26,13 +29,15 @@ public class PolicyInterpretationService {
     private final StructuredOutputService structured;
     private final NsfasDemoPolicyService policies;
     private final JsonNode schema;
+    private final DocumentPolicyInterpreter documents;
 
     public PolicyInterpretationService(PromptRepository prompts, StructuredOutputService structured,
-                                       NsfasDemoPolicyService policies, ObjectMapper mapper)
+                                       NsfasDemoPolicyService policies, ObjectMapper mapper, DocumentPolicyInterpreter documents)
             throws JsonProcessingException {
         this.prompts = prompts;
         this.structured = structured;
         this.policies = policies;
+        this.documents = documents;
         schema = mapper.readTree("""
                 {"type":"object","additionalProperties":false,
                  "required":["qualifyingSassaGrant","standardIncome","grantOperator","incomeOperator"],
@@ -44,6 +49,11 @@ public class PolicyInterpretationService {
                    "incomeOperator":{"type":"string","enum":["%s"]}
                  }}
                 """.formatted(RuleOperator.IN_SET, RuleOperator.LESS_THAN_OR_EQUAL));
+    }
+
+    public PolicyImportReview interpretDocument(String sourceLabel, List<Chunk> chunks,
+                                                 AiCallContext context, IntConsumer progress) {
+        return documents.interpret(sourceLabel, chunks, context, progress);
     }
 
     public FinancialScreenPolicy interpretBundledSample(AiCallContext context) {

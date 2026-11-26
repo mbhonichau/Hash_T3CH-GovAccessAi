@@ -334,6 +334,7 @@ class AiFoundationTests {
     private void logicalOutcomes(AiOutcome... expected) {
         var requests = requestRows.findAll();
         assertThat(requests).extracting(AiRequestLog::getOutcome).containsExactlyInAnyOrder(expected);
+        assertThat(requests).extracting(AiRequestLog::getAuditEventId).doesNotContainNull().doesNotHaveDuplicates();
         var attempts = auditRows.findAll();
         requests.forEach(request -> assertThat(request.getAttemptCount())
                 .isEqualTo(Math.toIntExact(attempts.stream()

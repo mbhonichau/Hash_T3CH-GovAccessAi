@@ -7,6 +7,7 @@
         <h1 id="studio-heading">NSFAS financial screening</h1>
         <p>Review the 2025 policy citations and preview the financial screen with synthetic facts.</p>
         <p class="mt-2"><strong>DEMO DATA ONLY.</strong> Verify figures against the official policy before use.</p>
+        <a th:href="@{/policies/imports}">Import a PDF or policy text</a>
     </div>
     <div class="alert alert-success" role="status" th:if="${importedDraftLabel != null}">
         AI import complete. Draft <strong th:text="${importedDraftLabel}"></strong> was saved for review.

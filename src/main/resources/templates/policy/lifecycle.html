@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Policy lifecycle', ~{::#policy-lifecycle})}">
+<body>
+<section id="policy-lifecycle">
+    <div class="overview-heading">
+        <p><a th:href="@{/policies/lifecycle}">Policy lifecycle</a></p>
+        <h1 th:text="${version.versionLabel}"></h1>
+        <span class="policy-status status-draft" th:text="${version.status}"></span>
+    </div>
+    <p class="alert alert-info" role="status" th:if="${message}" th:text="${message}"></p>
+    <p class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></p>
+    <p th:if="${version.status == 'DRAFT' and !canEditPolicy and navLifecycle}">
+        <a th:href="@{/workspace/access}">Enter Policy Edit</a> to edit or submit a draft.
+    </p>
+    <div class="card dashboard-card mb-3">
+        <div class="card-header"><h2>Policy content</h2></div>
+        <div class="card-body">
+            <form th:if="${canEditPolicy and version.status == 'DRAFT' and version.origin == 'MANUAL' and version.ruleJson == null}"
+                  method="post" th:action="@{/policies/lifecycle/{id}/edit(id=${version.id})}">
+                <label for="draft-content" class="form-label">Canonical rule JSON</label>
+                <textarea id="draft-content" class="form-control mb-3" name="content" rows="13"
+                          maxlength="200000" required th:text="${version.content}"></textarea>
+                <button class="btn btn-primary" type="submit">Save draft content</button>
+            </form>
+            <pre class="mb-0" th:unless="${canEditPolicy and version.status == 'DRAFT' and version.origin == 'MANUAL' and version.ruleJson == null}"
+                 th:text="${version.content}"></pre>
+        </div>
+    </div>
+    <div class="card dashboard-card" th:if="${version.status == 'DRAFT' and canEditPolicy}">
+        <div class="card-body">
+            <h2>Submit for review</h2>
+            <p>Submitting freezes the draft content for testing.</p>
+            <form method="post" th:action="@{/policies/lifecycle/{id}/review(id=${version.id})}">
+                <button class="btn btn-primary" type="submit">Submit for review</button>
+            </form>
+        </div>
+    </div>
+    <div class="card dashboard-card" th:if="${version.status == 'REVIEW' and canTestPolicy}">
+        <div class="card-body">
+            <h2>Run synthetic tests</h2>
+            <form method="post" th:action="@{/policies/lifecycle/{id}/test(id=${version.id})}">
+                <label for="synthetic-cases" class="form-label">Synthetic test cases (JSON)</label>
+                <textarea class="form-control mb-3" id="synthetic-cases" name="cases" rows="8" required
+                          aria-describedby="fixture-help"
+                          placeholder='[{"label":"Missing evidence","synthetic":true,"expected":"NEEDS_REVIEW","manualReview":false,"evidence":[]}]'></textarea>
+                <p id="fixture-help">Supply synthetic evidence, never applicant records. Include expected results for your cases.</p>
+                <button class="btn btn-primary" type="submit">Run tests</button>
+            </form>
+        </div>
+    </div>
+    <div class="card dashboard-card" th:if="${version.status == 'TESTED' and canPublishPolicy}">
+        <div class="card-body">
+            <h2>Publish this version</h2>
+            <p>Publishing permanently freezes this version.</p>
+            <form method="post" th:action="@{/policies/lifecycle/{id}/publish(id=${version.id})}">
+                <label for="effective-from" class="form-label">Effective from</label>
+                <input class="form-control mb-3" id="effective-from" name="effectiveFrom" type="date" required>
+                <label for="supersedes" class="form-label">Supersedes version ID (optional)</label>
+                <input class="form-control mb-3" id="supersedes" name="supersedes" maxlength="36">
+                <button class="btn btn-primary" type="submit">Publish tested policy</button>
+            </form>
+        </div>
+    </div>
+    <div class="card dashboard-card" th:if="${version.status == 'PUBLISHED'}">
+        <div class="card-body">
+            <h2>Published snapshot</h2>
+            <dl>
+                <dt>Version ID</dt><dd th:text="${version.id}"></dd>
+                <dt>Content SHA-256</dt><dd><code th:text="${version.contentHash}"></code></dd>
+                <dt>Effective from</dt><dd th:text="${version.effectiveFrom}"></dd>
+                <dt>Published at</dt><dd th:text="${version.publishedAt}"></dd>
+                <dt th:if="${version.publisherName != null}">Publisher</dt>
+                <dd th:if="${version.publisherName != null}" th:text="${version.publisherName}"></dd>
+                <dt>Publisher ID</dt><dd th:text="${version.publisherId}"></dd>
+                <dt th:if="${version.supersedesId}">Supersedes</dt>
+                <dd th:if="${version.supersedesId}" th:text="${version.supersedesId}"></dd>
+            </dl>
+            <form th:if="${canEditPolicy}" method="post" th:action="@{/policies/lifecycle/{id}/fork(id=${version.id})}">
+                <label for="fork-label" class="form-label">New draft label</label>
+                <div class="d-flex gap-2">
+                    <input class="form-control" id="fork-label" name="label" maxlength="100" required>
+                    <button class="btn btn-outline-primary" type="submit">Create editable draft</button>
+                </div>
+            </form>
+            <form class="mt-3" th:if="${canPublishPolicy}" method="post"
+                  th:action="@{/policies/lifecycle/{id}/transition(id=${version.id})}">
+                <h3 class="h6">Add transitional date window</h3>
+                <div class="row g-2 align-items-end">
+                    <div class="col-md">
+                        <label class="form-label" for="transition-start">Start date</label>
+                        <input class="form-control" id="transition-start" name="startsOn" type="date" required>
+                    </div>
+                    <div class="col-md">
+                        <label class="form-label" for="transition-end">End date</label>
+                        <input class="form-control" id="transition-end" name="endsOn" type="date" required>
+                    </div>
+                    <div class="col-md">
+                        <label class="form-label" for="transition-priority">Priority</label>
+                        <input class="form-control" id="transition-priority" name="priority" type="number" value="0" required>
+                    </div>
+                    <div class="col-md-auto"><button class="btn btn-outline-primary" type="submit">Add window</button></div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+</body>
+</html>

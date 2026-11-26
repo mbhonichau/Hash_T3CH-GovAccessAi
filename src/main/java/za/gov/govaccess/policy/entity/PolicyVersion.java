@@ -9,6 +9,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.util.UUID;
+import java.time.Instant;
+import java.time.LocalDate;
 import za.gov.govaccess.programme.entity.Programme;
 
 @Entity
@@ -35,6 +37,15 @@ public class PolicyVersion {
 
     @Column(nullable = false, columnDefinition = "text")
     private String content;
+
+    private UUID authorId;
+    private UUID publisherId;
+    private String publisherName;
+    private Instant publishedAt;
+    private LocalDate effectiveFrom;
+    private UUID supersedesId;
+    @Column(length = 64)
+    private String contentHash;
 
     protected PolicyVersion() {}
 
@@ -64,9 +75,70 @@ public class PolicyVersion {
     public String getOrigin() { return origin; }
     public String getRuleJson() { return ruleJson; }
     public String getContent() { return content; }
+    public UUID getAuthorId() { return authorId; }
+    public UUID getPublisherId() { return publisherId; }
+    public String getPublisherName() { return publisherName; }
+    public Instant getPublishedAt() { return publishedAt; }
+    public LocalDate getEffectiveFrom() { return effectiveFrom; }
+    public UUID getSupersedesId() { return supersedesId; }
+    public String getContentHash() { return contentHash; }
+
+    public void recordAuthor(UUID author) {
+        if (!"DRAFT".equals(status) || authorId != null) {
+            throw new IllegalStateException("Policy author is already recorded");
+        }
+        authorId = author;
+    }
+
+    public void submitForReview(UUID actor) {
+        requireStatus("DRAFT");
+        if (authorId == null) {
+            recordAuthor(java.util.Objects.requireNonNull(actor));
+        }
+        status = "REVIEW";
+    }
+
+    public void markTested() {
+        requireStatus("REVIEW");
+        status = "TESTED";
+    }
+
+    public void publish(UUID publisher, String publisherName, Instant time, LocalDate effectiveDate, UUID supersedes,
+                        String canonicalContent, String hash) {
+        requireStatus("TESTED");
+        publisherId = java.util.Objects.requireNonNull(publisher);
+        this.publisherName = java.util.Objects.requireNonNull(publisherName);
+        publishedAt = java.util.Objects.requireNonNull(time);
+        effectiveFrom = java.util.Objects.requireNonNull(effectiveDate);
+        supersedesId = supersedes;
+        content = java.util.Objects.requireNonNull(canonicalContent);
+        contentHash = java.util.Objects.requireNonNull(hash);
+        status = "PUBLISHED";
+    }
+
+    private void requireStatus(String expected) {
+        if (!expected.equals(status)) {
+            throw new IllegalStateException("Policy must be in " + expected + " to perform this action");
+        }
+    }
     public void setContent(String content) {
         if (!"DRAFT".equals(status) || this.content != null) {
             throw new IllegalStateException("Canonical policy content may only be assigned to a new draft");
+        }
+        this.content = java.util.Objects.requireNonNull(content);
+    }
+
+    public void reviseImportedDraft(String content) {
+        if (!"DRAFT".equals(status) || !"AI_GENERATED".equals(origin) || ruleJson != null || this.content == null) {
+            throw new IllegalStateException("Only a canonical AI-imported draft can be revised");
+        }
+        this.content = java.util.Objects.requireNonNull(content);
+    }
+
+    public void reviseManualCanonicalDraft(String content) {
+        requireStatus("DRAFT");
+        if (!"MANUAL".equals(origin) || ruleJson != null) {
+            throw new IllegalStateException("Use the original review screen to edit this draft");
         }
         this.content = java.util.Objects.requireNonNull(content);
     }

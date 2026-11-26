@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Import progress', ~{::#import-progress})}">
+<body>
+<section id="import-progress" aria-labelledby="progress-heading">
+    <div class="overview-heading">
+        <h1 id="progress-heading" th:text="${job.versionLabel}">Import progress</h1>
+        <p th:text="${job.sourceLabel}"></p>
+    </div>
+    <div class="card dashboard-card">
+        <div class="card-body">
+            <h2>Import progress</h2>
+            <p role="status" data-import-status
+               th:attr="data-poll-url=${job.status.name() == 'QUEUED' or job.status.name() == 'RUNNING'} ? @{/api/policies/imports/{id}(id=${job.id})} : null"
+               th:text="|${job.status} · ${job.completedChunks}/${job.totalChunks} sections processed|"></p>
+            <p th:if="${job.failure}" class="alert alert-danger" role="alert" th:text="${job.failure}"></p>
+            <a th:if="${job.status.name() == 'SUCCEEDED'}" class="btn btn-primary"
+               th:href="@{/policies/imports/{id}/review(id=${job.id})}">Review AI draft</a>
+            <a class="btn btn-outline-primary" th:href="@{/policies/imports}">Back to imports</a>
+        </div>
+    </div>
+    <script defer th:src="@{/js/document-import.js}"></script>
+</section>
+</body>
+</html>

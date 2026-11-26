@@ -99,7 +99,8 @@ public class StructuredOutputService {
                 json = fenced.group(1);
             }
             JsonNode tree = mapper.reader().with(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
-                    .with(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY).readTree(json);
+                    .with(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY,
+                            DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS).readTree(json);
             if (tree == null || !tree.isObject()) {
                 throw invalid("Expected a JSON object");
             }

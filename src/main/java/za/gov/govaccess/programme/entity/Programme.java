@@ -36,6 +36,7 @@ public class Programme {
     }
 
     public String getCode() { return code; }
+    public UUID getId() { return id; }
     public String getName() { return name; }
     public boolean isDemoData() { return demoData; }
 }

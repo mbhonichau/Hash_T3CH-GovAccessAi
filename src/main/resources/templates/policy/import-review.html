@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Review imported draft', ~{::#import-review})}">
+<body>
+<section id="import-review" aria-labelledby="review-heading">
+    <div class="overview-heading">
+        <h1 id="review-heading" th:text="${job.versionLabel}">Imported draft</h1>
+        <p th:text="${job.sourceLabel}"></p>
+        <span class="policy-status status-draft">AI-generated draft</span>
+    </div>
+    <p class="alert alert-success" role="status" th:if="${editSaved}" th:text="${editSaved}"></p>
+    <p class="alert alert-danger" role="alert" th:if="${editError}" th:text="${editError}"></p>
+    <div class="card dashboard-card mb-3">
+        <div class="card-header"><h2>Rules and citations</h2></div>
+        <p class="card-body" th:if="${#lists.isEmpty(review.rows)}">No proposed rules passed validation.</p>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item px-4 py-3" th:each="row : ${review.rows}"
+                th:classappend="${row.lowConfidence ? 'list-group-item-warning' : ''}">
+                <div class="row g-3">
+                    <div class="col-12 col-lg-6">
+                        <h3 class="h6" th:text="${row.rule.name}"></h3>
+                        <p class="mb-1"><code th:text="${row.rule.ruleCode}"></code> ·
+                            <span th:text="${row.rule.operator}"></span>
+                            <span th:if="${row.depth > 0}" th:text="| · Group depth ${row.depth}|"></span>
+                        </p>
+                        <p class="mb-1" th:if="${row.rule.expectedValue != null}">
+                            Expected value <code th:text="${row.rule.expectedValue}"></code>
+                            <small th:text="${row.rule.unit}"></small>
+                        </p>
+                        <span th:if="${row.confidence != null}" th:text="|Confidence ${row.confidence}|"></span>
+                        <strong th:if="${row.lowConfidence}" class="ms-2">Low confidence</strong>
+                        <div class="mt-2" th:if="${row.note != null}">
+                            <span class="policy-status status-draft" th:if="${row.note.requiresHumanReview}">Human review required</span>
+                            <p class="mb-0 mt-1" th:if="${row.note.ambiguityNote}" th:text="${row.note.ambiguityNote}"></p>
+                        </div>
+                        <div th:if="${row.edit != null}" class="mt-2">
+                            <span class="policy-status status-draft">Modified from source</span>
+                            <p class="mb-0">Original value <code th:text="${row.edit.originalValue}"></code>.
+                                Edited by <span th:text="${row.edit.editor}"></span>.</p>
+                        </div>
+                        <form class="mt-2" method="post" th:if="${canEditPolicy and row.rule.group == null}"
+                              th:action="@{/policies/imports/{id}/edit(id=${job.id})}">
+                            <input type="hidden" name="ruleCode" th:value="${row.rule.ruleCode}">
+                            <label class="form-label" th:for="|value-${rowStat.index}|">Expected value (JSON)</label>
+                            <input class="form-control mb-2" th:id="|value-${rowStat.index}|"
+                                   name="expectedValue" maxlength="2000" required th:value="${row.rule.expectedValue}">
+                            <button class="btn btn-outline-primary btn-sm" type="submit">Save rule value</button>
+                        </form>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <p class="mb-1" th:text="|Page ${row.rule.source.page} · ${row.rule.source.section}|"></p>
+                        <blockquote class="mb-0" th:text="${row.rule.source.quote}"></blockquote>
+                        <p class="mb-0 mt-2 text-muted" th:if="${row.edit != null}">
+                            This quote is from the original policy. Verify the edited value separately.
+                        </p>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="row g-3">
+        <div class="col-12 col-lg-6">
+            <div class="card dashboard-card">
+                <div class="card-header"><h2>Rejected rules</h2></div>
+                <div class="card-body">
+                    <p class="mb-0" th:if="${#lists.isEmpty(review.imported.rejectedRules)}">No rules were rejected.</p>
+                    <ul th:unless="${#lists.isEmpty(review.imported.rejectedRules)}" class="mb-0">
+                        <li th:each="item : ${review.imported.rejectedRules}">
+                            <strong th:text="${item.ruleCode}"></strong>
+                            <p class="mb-1" th:text="${item.reason}"></p>
+                            <details><summary>View proposed rule</summary><pre th:text="${item.suggestion}"></pre></details>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="card dashboard-card">
+                <div class="card-header"><h2>Unmapped requirements</h2></div>
+                <div class="card-body">
+                    <p class="mb-0" th:if="${#lists.isEmpty(review.imported.unmappedRequirements)}">No unmapped requirements.</p>
+                    <ul th:unless="${#lists.isEmpty(review.imported.unmappedRequirements)}" class="mb-0">
+                        <li th:each="item : ${review.imported.unmappedRequirements}" th:text="${item}"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card dashboard-card mt-3">
+        <div class="card-header"><h2>Policy details</h2></div>
+        <div class="card-body">
+            <p th:if="${review.imported.effectiveFrom}" th:text="|Effective from ${review.imported.effectiveFrom}|"></p>
+            <dl class="mb-0">
+                <dt>Exceptions</dt><dd th:text="${#strings.listJoin(review.imported.exceptions, ', ')}"></dd>
+                <dt>Exemptions</dt><dd th:text="${#strings.listJoin(review.imported.exemptions, ', ')}"></dd>
+                <dt>Calculation methods</dt><dd th:text="${#strings.listJoin(review.imported.calculationMethods, ', ')}"></dd>
+                <dt>Definitions</dt><dd th:text="${#strings.listJoin(review.imported.definitions, ', ')}"></dd>
+                <dt>Required documents</dt><dd th:text="${#strings.listJoin(review.imported.requiredDocuments, ', ')}"></dd>
+                <dt>Ambiguities</dt><dd th:text="${#strings.listJoin(review.imported.ambiguities, ', ')}"></dd>
+            </dl>
+        </div>
+    </div>
+</section>
+</body>
+</html>

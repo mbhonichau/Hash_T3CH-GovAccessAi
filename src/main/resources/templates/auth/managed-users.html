@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Managed users', ~{::#managed-users})}">
+<body>
+<section id="managed-users">
+    <div class="overview-heading"><h1>Managed users</h1><p>Assign an account role and configure limited audit access.</p></div>
+    <p class="alert alert-success" role="status" th:if="${message}" th:text="${message}"></p>
+    <p class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></p>
+    <div class="card dashboard-card mb-3">
+        <div class="card-body">
+            <h2>Create an account</h2>
+            <form method="post" th:action="@{/admin/users}" class="row g-2 align-items-end">
+                <div class="col-md">
+                    <label class="form-label" for="managed-username">Username</label>
+                    <input id="managed-username" class="form-control" name="username" maxlength="100" autocomplete="off" required>
+                </div>
+                <div class="col-md">
+                    <label class="form-label" for="managed-password">Initial password</label>
+                    <input id="managed-password" class="form-control" name="password" type="password" minlength="12"
+                           autocomplete="new-password" required>
+                </div>
+                <div class="col-md">
+                    <label class="form-label" for="managed-role">Role</label>
+                    <select id="managed-role" class="form-select" name="role" required>
+                        <option th:each="role : ${roles}" th:value="${role.name()}" th:text="${role.label}"></option>
+                    </select>
+                </div>
+                <div class="col-md-auto"><button class="btn btn-primary" type="submit">Create account</button></div>
+            </form>
+        </div>
+    </div>
+    <div class="card dashboard-card">
+        <div class="card-header"><h2>Accounts</h2></div>
+        <p class="card-body mb-0" th:if="${#lists.isEmpty(accounts)}">No managed accounts yet.</p>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" th:each="account : ${accounts}">
+                <div class="d-flex gap-3 align-items-center">
+                    <span th:text="|${account.username} · ${account.role.label}|"></span>
+                    <form method="post" th:action="@{/admin/users/{id}/enabled(id=${account.id})}">
+                        <button class="btn btn-outline-primary btn-sm" type="submit" name="enabled"
+                                th:value="${!account.enabled}" th:text="${account.enabled ? 'Disable' : 'Enable'}"></button>
+                    </form>
+                </div>
+                <form class="mt-2" method="post" th:action="@{/admin/users/{id}/audit-scope(id=${account.id})}"
+                      th:if="${account.role.name() == 'ASSESSMENT_OFFICER' or account.role.name() == 'POLICY_ADMINISTRATOR'}">
+                    <label class="form-label" th:for="|scope-${accountStat.index}|"
+                           th:text="${account.role.name() == 'ASSESSMENT_OFFICER' ? 'Assigned application ID' : 'Managed programme ID'}"></label>
+                    <div class="d-flex gap-2">
+                        <input class="form-control" th:id="|scope-${accountStat.index}|"
+                               th:name="${account.role.name() == 'ASSESSMENT_OFFICER' ? 'applicationId' : 'programmeId'}"
+                               maxlength="36" required>
+                        <button class="btn btn-outline-primary" type="submit">Add scope</button>
+                    </div>
+                </form>
+            </li>
+        </ul>
+    </div>
+</section>
+</body>
+</html>

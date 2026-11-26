@@ -1,0 +1,211 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "rules",
+    "effectiveFrom",
+    "exceptions",
+    "definitions",
+    "requiredDocuments",
+    "unmappedRequirements",
+    "ambiguities",
+    "exemptions",
+    "calculationMethods"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/rule"
+      }
+    },
+    "effectiveFrom": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "exceptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "definitions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "requiredDocuments": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "unmappedRequirements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ambiguities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "exemptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "calculationMethods": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ruleCode",
+        "name",
+        "operator",
+        "mandatory",
+        "requiredEvidence",
+        "onMissingEvidence",
+        "source",
+        "confidence",
+        "ambiguityNote",
+        "requiresHumanReview"
+      ],
+      "properties": {
+        "ruleCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "name": {
+          "type": "string"
+        },
+        "fieldKey": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "operator": {
+          "type": "string"
+        },
+        "expectedValue": {},
+        "unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mandatory": {
+          "type": "boolean"
+        },
+        "requiredEvidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "onMissingEvidence": {
+          "type": "string"
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "page",
+            "section",
+            "quote"
+          ],
+          "properties": {
+            "document": {
+              "type": "string"
+            },
+            "page": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "section": {
+              "type": "string"
+            },
+            "quote": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "group": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "rules"
+          ],
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "rules": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/rule"
+              }
+            }
+          }
+        },
+        "condition": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": false,
+          "required": [
+            "fieldKey",
+            "expectedValue"
+          ],
+          "properties": {
+            "fieldKey": {
+              "type": "string"
+            },
+            "expectedValue": {}
+          }
+        },
+        "ambiguityNote": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "requiresHumanReview": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

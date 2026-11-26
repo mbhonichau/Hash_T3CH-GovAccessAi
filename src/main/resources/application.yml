@@ -7,7 +7,7 @@ govaccess:
         base-url: ${AI_BASE_URL:}
         api-key: ${AI_API_KEY:}
         model: ${AI_MODEL:}
-        hosted: true
+        hosted: ${AI_HOSTED:true}
     prompts:
       policy-interpretation: 2
       provider-probe: 1

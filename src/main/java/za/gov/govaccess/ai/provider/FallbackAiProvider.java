@@ -1,6 +1,7 @@
 package za.gov.govaccess.ai.provider;
 
 import java.util.List;
+import java.net.URI;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.springframework.stereotype.Component;
@@ -78,7 +79,7 @@ public class FallbackAiProvider implements AiProvider {
         for (Target target : targets) {
             Provider settings = target.settings();
             AiRequest request = settings.hosted() ? redactor.redact(original, properties.redactionMode()) : original;
-            if (request == null || settings.hosted() && !original.synthetic()) {
+            if (request == null || !original.synthetic() && (settings.hosted() || !loopback(settings.baseUrl()))) {
                 blocked = true;
                 if (lastFailure == null) {
                     audit.logicalOutcome(event(settings, null, 0), AiOutcome.BLOCKED_PII);
@@ -144,6 +145,14 @@ public class FallbackAiProvider implements AiProvider {
             throw new AiProviderException(Reason.BLOCKED, "Hosted AI input was blocked");
         }
         throw new AiProviderException(Reason.NOT_CONFIGURED, "No AI provider configured");
+    }
+
+    private static boolean loopback(String baseUrl) {
+        if (baseUrl == null) {
+            return false;
+        }
+        String host = URI.create(baseUrl).getHost();
+        return "localhost".equalsIgnoreCase(host) || "127.0.0.1".equals(host) || "[::1]".equals(host);
     }
 
     private <T> T validated(AiRequest request, AiResponse response, Function<AiResponse, T> validate,

@@ -32,7 +32,7 @@ class FlywayLegacySchemaTests {
                 .locations("classpath:db/migration", "classpath:za/gov/govaccess/rules/migration")
                 .callbacks(adoption.adoptLegacyPolicyTables()).load();
         adoption.migrateGovAccess().migrate(current);
-        assertThat(current.info().current().getVersion().getVersion()).isEqualTo("10");
+        assertThat(current.info().current().getVersion().getVersion()).isEqualTo("14");
         assertThat(jdbc.queryForObject("SELECT request_id FROM govaccess.ai_call_log WHERE id = ?", UUID.class, attemptId))
                 .isEqualTo(attemptId);
         assertThat(jdbc.queryForObject("SELECT attempt_count FROM govaccess.ai_request_log WHERE id = ?", Integer.class, attemptId))
@@ -51,11 +51,11 @@ class FlywayLegacySchemaTests {
         var flyway = settings.load();
         adoption.migrateGovAccess().migrate(flyway);
         var jdbc = new JdbcTemplate(flyway.getConfiguration().getDataSource());
-        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("10");
+        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("14");
         assertThat(jdbc.queryForObject("SELECT checksum FROM govaccess.flyway_schema_history WHERE version = '6'",
                 Integer.class)).isEqualTo(1487642100);
         adoption.migrateGovAccess().migrate(flyway);
-        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM govaccess.flyway_schema_history WHERE version = '10'",
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM govaccess.flyway_schema_history WHERE version = '14'",
                 Integer.class)).isEqualTo(1);
     }
 
@@ -80,7 +80,7 @@ class FlywayLegacySchemaTests {
         addHistory(jdbc, 50, "5", "persistent user accounts", "V5__ai_request_audit.sql", 1555748309);
         addHistory(jdbc, 51, "6", "application intake and workflow", "V6__application_intake_and_workflow.sql", 1487642100);
         addHistory(jdbc, 52, "7", "synthetic intake cases", "V7__synthetic_intake_cases.sql", 2096334706);
-        return settings.target("10");
+        return settings.target("14");
     }
 
     private static void addHistory(JdbcTemplate jdbc, int rank, String version, String description, String script,

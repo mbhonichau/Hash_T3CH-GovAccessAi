@@ -13,11 +13,18 @@
         <nav class="sidebar-menu" id="primary-navigation" aria-label="Primary">
             <ul class="menu">
                 <li class="sidebar-title">Workspace</li>
-                <li class="sidebar-item" th:classappend="${screen == null and workspaceAccessPage == null and cataloguePage == null ? 'active' : null}">
+                <li class="sidebar-item" th:classappend="${screen == null and workspaceAccessPage == null and cataloguePage == null and documentImportPage == null ? 'active' : null}">
                     <a class="sidebar-link" href="/" th:href="@{/}"
-                       th:attr="aria-current=${screen == null and workspaceAccessPage == null and cataloguePage == null ? 'page' : null}">
+                       th:attr="aria-current=${screen == null and workspaceAccessPage == null and cataloguePage == null and documentImportPage == null ? 'page' : null}">
                         <i class="bi-grid-fill" aria-hidden="true"></i>
                         <span>Overview</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${documentImportPage == true ? 'active' : null}">
+                    <a class="sidebar-link" th:href="@{/policies/imports}"
+                       th:attr="aria-current=${documentImportPage == true ? 'page' : null}">
+                        <i class="bi-file-earmark-text" aria-hidden="true"></i>
+                        <span>Policy imports</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${cataloguePage == true ? 'active' : null}">

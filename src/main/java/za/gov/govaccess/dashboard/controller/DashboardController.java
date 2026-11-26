@@ -16,6 +16,11 @@ class DashboardController {
 
     @GetMapping("/")
     String overview(Principal principal, Model model) {
+        if (principal instanceof org.springframework.security.core.Authentication authentication
+                && authentication.getPrincipal() instanceof za.gov.govaccess.security.ManagedPrincipal user
+                && user.role() == za.gov.govaccess.security.ManagedRole.APPLICANT) {
+            return "auth/applicant-workspace";
+        }
         model.addAttribute("username", principal.getName());
         model.addAttribute("policyCount", policies.count());
         model.addAttribute("draftCount", policies.countByStatus("DRAFT"));

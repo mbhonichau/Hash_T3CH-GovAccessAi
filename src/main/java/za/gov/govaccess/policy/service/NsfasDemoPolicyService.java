@@ -16,6 +16,8 @@ import za.gov.govaccess.programme.entity.Programme;
 import za.gov.govaccess.programme.repository.ProgrammeRepository;
 import za.gov.govaccess.rules.model.FinancialScreenPolicy;
 import za.gov.govaccess.rules.service.FinancialRuleConverter;
+import za.gov.govaccess.security.ActorIdentity;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 public class NsfasDemoPolicyService {
@@ -43,11 +45,13 @@ public class NsfasDemoPolicyService {
     }
 
     public Optional<PolicyVersion> findVersion(String label) {
-        return versions.findByProgrammeCodeAndVersionLabel(PROGRAMME_CODE, label);
+        return versions.findByProgrammeCodeAndVersionLabel(PROGRAMME_CODE, label)
+                .filter(version -> version.getRuleJson() != null);
     }
 
     public List<PolicyVersion> drafts() {
-        return versions.findByProgrammeCodeAndStatusOrderByVersionLabel(PROGRAMME_CODE, "DRAFT");
+        return versions.findByProgrammeCodeAndStatusOrderByVersionLabel(PROGRAMME_CODE, "DRAFT").stream()
+                .filter(version -> version.getRuleJson() != null).toList();
     }
 
     public FinancialScreenPolicy bundledRules() {
@@ -61,7 +65,8 @@ public class NsfasDemoPolicyService {
 
     @Transactional
     public void saveDraft(UUID id, String label, FinancialScreenPolicy rules, boolean aiGenerated) {
-        if (label == null || label.isBlank() || label.length() > 100 || findVersion(label).isPresent()) {
+        if (label == null || label.isBlank() || label.length() > 100
+                || versions.findByProgrammeCodeAndVersionLabel(PROGRAMME_CODE, label).isPresent()) {
             throw new IllegalArgumentException("Choose a new policy version label of up to 100 characters.");
         }
         var programme = getOrCreateProgramme();
@@ -70,6 +75,7 @@ public class NsfasDemoPolicyService {
             var draft = aiGenerated ? PolicyVersion.aiDraft(id, programme, label, json)
                     : PolicyVersion.manualDraft(id, programme, label, json);
             draft.setContent(mapper.writeValueAsString(FinancialRuleConverter.convert(rules)));
+            draft.recordAuthor(ActorIdentity.of(SecurityContextHolder.getContext().getAuthentication()).id());
             versions.saveAndFlush(draft);
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Cannot save financial screening rules", e);
@@ -83,6 +89,7 @@ public class NsfasDemoPolicyService {
         }
         var programme = getOrCreateProgramme();
         var version = PolicyVersion.manualDraft(VERSION_ID, programme, VERSION_LABEL, readDraftJson());
+        version.recordAuthor(ActorIdentity.of(SecurityContextHolder.getContext().getAuthentication()).id());
         try {
             version.setContent(mapper.writeValueAsString(FinancialRuleConverter.convert(preview.readRules(version))));
         } catch (JsonProcessingException e) {
