@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Workspace access', ~{::#workspace-access})}">
+<body>
+<section id="workspace-access" aria-labelledby="access-heading">
+    <div class="overview-heading">
+        <h1 id="access-heading">Workspace access</h1>
+        <p>Choose how you want to use Policy Studio for this session.</p>
+    </div>
+    <div class="row g-3">
+        <div class="col-12 col-lg-6">
+            <div class="card dashboard-card h-100">
+                <div class="card-body">
+                    <h2>Review</h2>
+                    <p>Read policy citations and preview a draft with synthetic cases.</p>
+                    <span class="policy-status status-published" th:unless="${editing}">Current mode</span>
+                    <form method="post" th:action="@{/workspace/access}" th:if="${editing}">
+                        <button class="btn btn-outline-primary" type="submit" name="mode" value="REVIEW">Switch to Review</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="card dashboard-card h-100">
+                <div class="card-body">
+                    <h2>Policy Edit</h2>
+                    <p>Load the bundled draft, import with AI, or edit rules and save a new draft.</p>
+                    <span class="policy-status status-published" th:if="${editing}">Current mode</span>
+                    <form method="post" th:action="@{/workspace/access}" th:if="${canSwitchToEdit and !editing}">
+                        <button class="btn btn-primary" type="submit" name="mode" value="POLICY_EDIT">
+                            Switch to Policy Edit
+                        </button>
+                    </form>
+                    <p class="mb-0 text-muted" th:unless="${canSwitchToEdit}">Your account has Review access.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a class="btn btn-outline-primary mt-3" th:href="@{/policies/nsfas-2025}">Open Policy Studio</a>
+</section>
+</body>
+</html>

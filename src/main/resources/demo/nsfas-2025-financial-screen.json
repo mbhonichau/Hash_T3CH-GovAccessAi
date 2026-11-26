@@ -1,0 +1,24 @@
+{
+  "qualifyingSassaGrant": {
+    "ruleKey": "qualifying-sassa-grant",
+    "value": [
+      "FOSTER_CARE",
+      "CARE_DEPENDENCY",
+      "CHILD_SUPPORT"
+    ],
+    "sourceSection": "4.4.2.1–4.4.2.2",
+    "sourceQuote": "SASSA grant recipients that are eligible for funding include the Foster Care, Care Dependency and Child Support grants."
+  },
+  "standardIncome": {
+    "ruleKey": "standard-income-cap",
+    "value": 350000,
+    "sourceSection": "4.4.3.1",
+    "sourceQuote": "the applicant's combined annual household income is R350,000 or less."
+  },
+  "disabilityIncome": {
+    "ruleKey": "disability-income-cap",
+    "value": 600000,
+    "sourceSection": "4.4.3.2",
+    "sourceQuote": "the applicant's combined annual household income is R600,000 or less."
+  }
+}

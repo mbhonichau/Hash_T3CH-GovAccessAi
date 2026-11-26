@@ -18,7 +18,24 @@ public class Programme {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private boolean demoData;
+
     protected Programme() {}
 
+    public Programme(UUID id, String code, String name) {
+        this.id = id;
+        this.code = code;
+        this.name = name;
+    }
+
+    public static Programme demo(UUID id, String code, String name) {
+        var programme = new Programme(id, code, name);
+        programme.demoData = true;
+        return programme;
+    }
+
+    public String getCode() { return code; }
     public String getName() { return name; }
+    public boolean isDemoData() { return demoData; }
 }

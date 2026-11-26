@@ -14,6 +14,8 @@ public class AiCallLog {
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     @Column(nullable = false)
+    private UUID requestId;
+    @Column(nullable = false)
     private Instant createdAt;
     private UUID userId;
     @Column(nullable = false)
@@ -37,8 +39,9 @@ public class AiCallLog {
 
     protected AiCallLog() {}
 
-    public AiCallLog(AiRequest request, String provider, String model, String inputSha256,
+    public AiCallLog(UUID requestId, AiRequest request, String provider, String model, String inputSha256,
                      String outputSha256, long latencyMs, Integer tokensIn, Integer tokensOut, AiOutcome outcome) {
+        this.requestId = requestId;
         this.createdAt = Instant.now();
         this.userId = request.userId();
         this.promptId = request.promptId();
@@ -59,4 +62,5 @@ public class AiCallLog {
     public String getInputSha256() { return inputSha256; }
     public String getOutputSha256() { return outputSha256; }
     public String getProvider() { return provider; }
+    public UUID getRequestId() { return requestId; }
 }

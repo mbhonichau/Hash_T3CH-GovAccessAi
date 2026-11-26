@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Rule catalogue', ~{::#rule-catalogue})}">
+<body>
+<section id="rule-catalogue" aria-labelledby="catalogue-heading">
+    <div class="overview-heading">
+        <h1 id="catalogue-heading">Rule catalogue</h1>
+        <p>Define the fields and verified document types that policy rules may use.</p>
+    </div>
+    <p class="alert alert-success" role="status" th:if="${success}" th:text="${success}"></p>
+    <p class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></p>
+    <p th:unless="${canEditPolicy}"><a th:href="@{/workspace/access}">Switch to Policy Edit</a> to add catalogue entries.</p>
+    <div class="row g-3">
+        <div class="col-12 col-xl-7">
+            <div class="card dashboard-card">
+                <div class="card-header"><h2>Field definitions</h2></div>
+                <div class="table-responsive">
+                    <table class="table policy-table">
+                        <thead><tr><th scope="col">Field</th><th scope="col">Type and unit</th><th scope="col">Allowed documents</th></tr></thead>
+                        <tbody>
+                        <tr th:each="field : ${fields}">
+                            <td><span th:text="${field.label}"></span><br><code th:text="${field.key}"></code></td>
+                            <td><span th:text="${field.valueType}"></span><br><small th:text="${field.unit}"></small></td>
+                            <td><ul class="list-unstyled mb-0"><li th:each="document : ${field.sourceDocumentTypes}"
+                                                                     th:text="${document.label}"></li></ul></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-body" th:if="${canEditPolicy}">
+                    <h3 class="h6">Add field</h3>
+                    <form method="post" th:action="@{/rules/catalogue/fields}">
+                        <label for="field-key" class="form-label">Field key</label>
+                        <input id="field-key" class="form-control mb-2" name="key" maxlength="100" required>
+                        <label for="field-label" class="form-label">Label</label>
+                        <input id="field-label" class="form-control mb-2" name="label" maxlength="255" required>
+                        <label for="field-type" class="form-label">Value type</label>
+                        <select id="field-type" class="form-select mb-2" name="valueType" required>
+                            <option th:each="type : ${fieldTypes}" th:value="${type}" th:text="${type}"></option>
+                        </select>
+                        <label for="field-unit" class="form-label">Unit (optional)</label>
+                        <input id="field-unit" class="form-control mb-2" name="unit" maxlength="64">
+                        <fieldset class="mb-3">
+                            <legend class="h6">Allowed source documents</legend>
+                            <label class="form-check" th:each="document : ${documents}">
+                                <input type="checkbox" class="form-check-input" name="sources" th:value="${document.key}">
+                                <span th:text="${document.label}"></span>
+                            </label>
+                        </fieldset>
+                        <button class="btn btn-primary" type="submit">Add field</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xl-5">
+            <div class="card dashboard-card mb-3">
+                <div class="card-header"><h2>Document types</h2></div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item" th:each="document : ${documents}">
+                        <span th:text="${document.label}"></span><br><code th:text="${document.key}"></code>
+                    </li>
+                </ul>
+                <div class="card-body" th:if="${canEditPolicy}">
+                    <h3 class="h6">Add document type</h3>
+                    <form method="post" th:action="@{/rules/catalogue/documents}">
+                        <label for="document-key" class="form-label">Document key</label>
+                        <input id="document-key" class="form-control mb-2" name="key" maxlength="100" required>
+                        <label for="document-label" class="form-label">Label</label>
+                        <input id="document-label" class="form-control mb-3" name="label" maxlength="255" required>
+                        <button class="btn btn-primary" type="submit">Add document type</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card dashboard-card">
+                <div class="card-header"><h2>Demo programmes</h2><p>DEMO DATA ONLY</p></div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item" th:each="programme : ${demoProgrammes}" th:text="${programme.name}"></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

@@ -15,6 +15,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiConsumer;
+import java.util.function.BooleanSupplier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
@@ -48,9 +49,16 @@ public class OpenAiCompatibleProvider implements AiProvider {
     }
 
     AiResponse complete(AiRequest request, BiConsumer<Long, String> onFailure) {
+        return complete(request, onFailure, false, () -> true);
+    }
+
+    AiResponse complete(AiRequest request, BiConsumer<Long, String> onFailure, boolean probe, BooleanSupplier enabled) {
         var payload = new LinkedHashMap<String, Object>();
         payload.put("model", settings.model());
         payload.put("temperature", request.temperature());
+        if (probe) {
+            payload.put("max_completion_tokens", 128);
+        }
         payload.put("messages", List.of(Map.of("role", "system", "content", request.systemPrompt()),
                 Map.of("role", "user", "content", userContent(request))));
         JsonNode schema = request.jsonSchema();
@@ -61,6 +69,9 @@ public class OpenAiCompatibleProvider implements AiProvider {
         }
         int retries = 0;
         while (true) {
+            if (!enabled.getAsBoolean()) {
+                throw new AiProviderException(AiProviderException.Reason.DISABLED, "AI calls are disabled");
+            }
             long start = System.nanoTime();
             try {
                 JsonNode body = client.post().uri("/chat/completions").contentType(MediaType.APPLICATION_JSON)
@@ -84,16 +95,16 @@ public class OpenAiCompatibleProvider implements AiProvider {
             } catch (RestClientResponseException e) {
                 onFailure.accept(elapsed(start), e.getResponseBodyAsString());
                 int status = e.getStatusCode().value();
-                if (schemaMode && rejectsSchema(status, e.getResponseBodyAsString())) {
+                if (!probe && schemaMode && rejectsSchema(status, e.getResponseBodyAsString())) {
                     schemaMode = false;
                     payload.put("response_format", Map.of("type", "json_object"));
                     continue;
                 }
-                if ((status == 429 || status >= 500 && status < 600) && retries < 3) {
-                    backoff(retries++, e.getResponseHeaders());
+                if (!probe && (status == 429 || status >= 500 && status < 600) && retries < 3) {
+                    backoff(retries++, e.getResponseHeaders(), enabled);
                     continue;
                 }
-                throw new AiProviderException("AI provider returned HTTP " + status);
+                throw new AiProviderException(status);
             } catch (RestClientException e) {
                 onFailure.accept(elapsed(start), null);
                 throw new AiProviderException("AI provider response unavailable");
@@ -127,14 +138,19 @@ public class OpenAiCompatibleProvider implements AiProvider {
                 && (message.contains("json_schema") || message.contains("response_format"));
     }
 
-    private static void backoff(int retry, HttpHeaders headers) {
+    private static void backoff(int retry, HttpHeaders headers, BooleanSupplier enabled) {
         long delay = (250L << retry) + ThreadLocalRandom.current().nextLong(100);
         String retryAfter = headers == null ? null : headers.getFirst(HttpHeaders.RETRY_AFTER);
         if (retryAfter != null) {
             delay = Math.max(delay, retryAfterMillis(retryAfter.strip()));
         }
+        long started = System.nanoTime();
         try {
-            Thread.sleep(delay);
+            long remaining = delay;
+            while (remaining > 0 && enabled.getAsBoolean()) {
+                Thread.sleep(Math.min(remaining, 100));
+                remaining = delay - elapsed(started);
+            }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new AiProviderException("AI provider retry interrupted");

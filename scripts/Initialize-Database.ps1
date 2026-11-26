@@ -36,7 +36,7 @@ $previousDbUrl = $env:DB_URL
 $env:DB_URL = "jdbc:postgresql://127.0.0.1:${Port}/$Database"
 Push-Location -LiteralPath $repositoryRoot
 try {
-    & .\mvnw.cmd flyway:migrate
+    & .\mvnw.cmd compile flyway:migrate
     if ($LASTEXITCODE -ne 0) {
         throw 'Flyway migration failed.'
     }

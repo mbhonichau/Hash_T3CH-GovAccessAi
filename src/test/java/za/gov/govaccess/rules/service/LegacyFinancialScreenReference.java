@@ -1,6 +1,5 @@
 package za.gov.govaccess.rules.service;
 
-import org.springframework.stereotype.Component;
 import za.gov.govaccess.rules.dto.FinancialScreenFacts;
 import za.gov.govaccess.rules.dto.FinancialScreenResult;
 import za.gov.govaccess.rules.enums.IncomePathway;
@@ -10,8 +9,7 @@ import static za.gov.govaccess.rules.dto.FinancialScreenResult.Outcome.FAILS_FIN
 import static za.gov.govaccess.rules.dto.FinancialScreenResult.Outcome.NEEDS_REVIEW;
 import static za.gov.govaccess.rules.dto.FinancialScreenResult.Outcome.PASSES_FINANCIAL_SCREEN;
 
-@Component
-public class FinancialScreenEvaluator {
+public class LegacyFinancialScreenReference {
     public FinancialScreenResult evaluate(FinancialScreenPolicy policy, FinancialScreenFacts facts) {
         var grantRule = policy.qualifyingSassaGrant();
         var grant = facts.verifiedSassaGrant();
