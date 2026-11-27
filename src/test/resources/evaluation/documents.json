@@ -1,0 +1,569 @@
+{
+  "label": "DEMO DATA ONLY",
+  "cases": [
+    {
+      "id": "DOC-1-1",
+      "type": "IDENTITY_DOCUMENT",
+      "actualType": "IDENTITY_DOCUMENT",
+      "variant": "clean",
+      "text": "Identity document",
+      "fields": [],
+      "ocrConfidence": 1,
+      "asset": "documents/DOC-1-1.png"
+    },
+    {
+      "id": "DOC-1-2",
+      "type": "IDENTITY_DOCUMENT",
+      "actualType": "IDENTITY_DOCUMENT",
+      "variant": "degraded-scan",
+      "text": "Identity document",
+      "fields": [],
+      "ocrConfidence": 0.42,
+      "asset": "documents/DOC-1-2.png"
+    },
+    {
+      "id": "DOC-1-3",
+      "type": "IDENTITY_DOCUMENT",
+      "actualType": "IDENTITY_DOCUMENT",
+      "variant": "photo-like",
+      "text": "Identity document\n  DEMO capture / tilted crop  \n",
+      "fields": [],
+      "ocrConfidence": 0.74,
+      "asset": "documents/DOC-1-3.png"
+    },
+    {
+      "id": "DOC-1-4",
+      "type": "IDENTITY_DOCUMENT",
+      "actualType": "PAYSLIP",
+      "variant": "wrong-type",
+      "text": "Payslip",
+      "fields": [],
+      "ocrConfidence": 1,
+      "asset": "documents/DOC-1-4.png"
+    },
+    {
+      "id": "SYN-PAY-0001",
+      "type": "PAYSLIP",
+      "actualType": "PAYSLIP",
+      "variant": "clean",
+      "text": "Payslip\nGross income: 15000\nNet income: 12500\nDeductions: 2500",
+      "fields": [
+        {
+          "key": "grossIncome",
+          "label": "Gross income",
+          "type": "MONEY",
+          "expected": 15000
+        },
+        {
+          "key": "netIncome",
+          "label": "Net income",
+          "type": "MONEY",
+          "expected": 12500
+        },
+        {
+          "key": "deductions",
+          "label": "Deductions",
+          "type": "MONEY",
+          "expected": 2500
+        }
+      ],
+      "ocrConfidence": 1,
+      "asset": "documents/SYN-PAY-0001.png"
+    },
+    {
+      "id": "DOC-2-2",
+      "type": "PAYSLIP",
+      "actualType": "PAYSLIP",
+      "variant": "degraded-scan",
+      "text": "Payslip\nGr?ss ?nc?m?: 15000\nNet income: 12500\nDeductions: 2500",
+      "fields": [
+        {
+          "key": "grossIncome",
+          "label": "Gross income",
+          "type": "MONEY",
+          "expected": null
+        },
+        {
+          "key": "netIncome",
+          "label": "Net income",
+          "type": "MONEY",
+          "expected": 12500
+        },
+        {
+          "key": "deductions",
+          "label": "Deductions",
+          "type": "MONEY",
+          "expected": 2500
+        }
+      ],
+      "ocrConfidence": 0.42,
+      "asset": "documents/DOC-2-2.png"
+    },
+    {
+      "id": "DOC-2-3",
+      "type": "PAYSLIP",
+      "actualType": "PAYSLIP",
+      "variant": "photo-like",
+      "text": "Payslip\n  DEMO capture / tilted crop  \n\nGross income: 15000\nNet income: 12500\nDeductions: 2500",
+      "fields": [
+        {
+          "key": "grossIncome",
+          "label": "Gross income",
+          "type": "MONEY",
+          "expected": 15000
+        },
+        {
+          "key": "netIncome",
+          "label": "Net income",
+          "type": "MONEY",
+          "expected": 12500
+        },
+        {
+          "key": "deductions",
+          "label": "Deductions",
+          "type": "MONEY",
+          "expected": 2500
+        }
+      ],
+      "ocrConfidence": 0.74,
+      "asset": "documents/DOC-2-3.png"
+    },
+    {
+      "id": "DOC-2-4",
+      "type": "PAYSLIP",
+      "actualType": "BANK_STATEMENT",
+      "variant": "wrong-type",
+      "text": "Bank statement",
+      "fields": [
+        {
+          "key": "grossIncome",
+          "label": "Gross income",
+          "type": "MONEY",
+          "expected": null
+        },
+        {
+          "key": "netIncome",
+          "label": "Net income",
+          "type": "MONEY",
+          "expected": null
+        },
+        {
+          "key": "deductions",
+          "label": "Deductions",
+          "type": "MONEY",
+          "expected": null
+        }
+      ],
+      "ocrConfidence": 1,
+      "asset": "documents/DOC-2-4.png"
+    },
+    {
+      "id": "DOC-3-1",
+      "type": "BANK_STATEMENT",
+      "actualType": "BANK_STATEMENT",
+      "variant": "clean",
+      "text": "Bank statement\nGross income: 12000",
+      "fields": [
+        {
+          "key": "grossIncome",
+          "label": "Gross income",
+          "type": "MONEY",
+          "expected": 12000
+        }
+      ],
+      "ocrConfidence": 1,
+      "asset": "documents/DOC-3-1.png"
+    },
+    {
+      "id": "DOC-3-2",
+      "type": "BANK_STATEMENT",
+      "actualType": "BANK_STATEMENT",
+      "variant": "degraded-scan",
+      "text": "Bank statement\nGr?ss ?nc?m?: 12000",
+      "fields": [
+        {
+          "key": "grossIncome",
+          "label": "Gross income",
+          "type": "MONEY",
+          "expected": null
+        }
+      ],
+      "ocrConfidence": 0.42,
+      "asset": "documents/DOC-3-2.png"
+    },
+    {
+      "id": "DOC-3-3",
+      "type": "BANK_STATEMENT",
+      "actualType": "BANK_STATEMENT",
+      "variant": "photo-like",
+      "text": "Bank statement\n  DEMO capture / tilted crop  \n\nGross income: 12000",
+      "fields": [
+        {
+          "key": "grossIncome",
+          "label": "Gross income",
+          "type": "MONEY",
+          "expected": 12000
+        }
+      ],
+      "ocrConfidence": 0.74,
+      "asset": "documents/DOC-3-3.png"
+    },
+    {
+      "id": "DOC-3-4",
+      "type": "BANK_STATEMENT",
+      "actualType": "PROOF_OF_RESIDENCE",
+      "variant": "wrong-type",
+      "text": "Proof of residence",
+      "fields": [
+        {
+          "key": "grossIncome",
+          "label": "Gross income",
+          "type": "MONEY",
+          "expected": null
+        }
+      ],
+      "ocrConfidence": 1,
+      "asset": "documents/DOC-3-4.png"
+    },
+    {
+      "id": "DOC-4-1",
+      "type": "PROOF_OF_RESIDENCE",
+      "actualType": "PROOF_OF_RESIDENCE",
+      "variant": "clean",
+      "text": "Proof of residence\nResidence confirmed: true",
+      "fields": [
+        {
+          "key": "residenceConfirmed",
+          "label": "Residence confirmed",
+          "type": "BOOLEAN",
+          "expected": true
+        }
+      ],
+      "ocrConfidence": 1,
+      "asset": "documents/DOC-4-1.png"
+    },
+    {
+      "id": "DOC-4-2",
+      "type": "PROOF_OF_RESIDENCE",
+      "actualType": "PROOF_OF_RESIDENCE",
+      "variant": "degraded-scan",
+      "text": "Proof of residence\nR?s?d?nc? c?nf?rm?d: true",
+      "fields": [
+        {
+          "key": "residenceConfirmed",
+          "label": "Residence confirmed",
+          "type": "BOOLEAN",
+          "expected": null
+        }
+      ],
+      "ocrConfidence": 0.42,
+      "asset": "documents/DOC-4-2.png"
+    },
+    {
+      "id": "DOC-4-3",
+      "type": "PROOF_OF_RESIDENCE",
+      "actualType": "PROOF_OF_RESIDENCE",
+      "variant": "photo-like",
+      "text": "Proof of residence\n  DEMO capture / tilted crop  \n\nResidence confirmed: true",
+      "fields": [
+        {
+          "key": "residenceConfirmed",
+          "label": "Residence confirmed",
+          "type": "BOOLEAN",
+          "expected": true
+        }
+      ],
+      "ocrConfidence": 0.74,
+      "asset": "documents/DOC-4-3.png"
+    },
+    {
+      "id": "DOC-4-4",
+      "type": "PROOF_OF_RESIDENCE",
+      "actualType": "ACADEMIC_TRANSCRIPT",
+      "variant": "wrong-type",
+      "text": "Academic transcript",
+      "fields": [
+        {
+          "key": "residenceConfirmed",
+          "label": "Residence confirmed",
+          "type": "BOOLEAN",
+          "expected": null
+        }
+      ],
+      "ocrConfidence": 1,
+      "asset": "documents/DOC-4-4.png"
+    },
+    {
+      "id": "DOC-5-1",
+      "type": "ACADEMIC_TRANSCRIPT",
+      "actualType": "ACADEMIC_TRANSCRIPT",
+      "variant": "clean",
+      "text": "Academic transcript\nAcademic average: 75",
+      "fields": [
+        {
+          "key": "academicAverage",
+          "label": "Academic average",
+          "type": "DECIMAL",
+          "expected": 75
+        }
+      ],
+      "ocrConfidence": 1,
+      "asset": "documents/DOC-5-1.png"
+    },
+    {
+      "id": "DOC-5-2",
+      "type": "ACADEMIC_TRANSCRIPT",
+      "actualType": "ACADEMIC_TRANSCRIPT",
+      "variant": "degraded-scan",
+      "text": "Academic transcript\n?c?d?m?c ?v?r?g?: 75",
+      "fields": [
+        {
+          "key": "academicAverage",
+          "label": "Academic average",
+          "type": "DECIMAL",
+          "expected": null
+        }
+      ],
+      "ocrConfidence": 0.42,
+      "asset": "documents/DOC-5-2.png"
+    },
+    {
+      "id": "DOC-5-3",
+      "type": "ACADEMIC_TRANSCRIPT",
+      "actualType": "ACADEMIC_TRANSCRIPT",
+      "variant": "photo-like",
+      "text": "Academic transcript\n  DEMO capture / tilted crop  \n\nAcademic average: 75",
+      "fields": [
+        {
+          "key": "academicAverage",
+          "label": "Academic average",
+          "type": "DECIMAL",
+          "expected": 75
+        }
+      ],
+      "ocrConfidence": 0.74,
+      "asset": "documents/DOC-5-3.png"
+    },
+    {
+      "id": "DOC-5-4",
+      "type": "ACADEMIC_TRANSCRIPT",
+      "actualType": "ACCEPTANCE_LETTER",
+      "variant": "wrong-type",
+      "text": "Acceptance letter",
+      "fields": [
+        {
+          "key": "academicAverage",
+          "label": "Academic average",
+          "type": "DECIMAL",
+          "expected": null
+        }
+      ],
+      "ocrConfidence": 1,
+      "asset": "documents/DOC-5-4.png"
+    },
+    {
+      "id": "DOC-6-1",
+      "type": "ACCEPTANCE_LETTER",
+      "actualType": "ACCEPTANCE_LETTER",
+      "variant": "clean",
+      "text": "Acceptance letter\nInstitutional acceptance: true",
+      "fields": [
+        {
+          "key": "institutionalAcceptance",
+          "label": "Institutional acceptance",
+          "type": "BOOLEAN",
+          "expected": true
+        }
+      ],
+      "ocrConfidence": 1,
+      "asset": "documents/DOC-6-1.png"
+    },
+    {
+      "id": "DOC-6-2",
+      "type": "ACCEPTANCE_LETTER",
+      "actualType": "ACCEPTANCE_LETTER",
+      "variant": "degraded-scan",
+      "text": "Acceptance letter\n?nst?t?t??n?l ?cc?pt?nc?: true",
+      "fields": [
+        {
+          "key": "institutionalAcceptance",
+          "label": "Institutional acceptance",
+          "type": "BOOLEAN",
+          "expected": null
+        }
+      ],
+      "ocrConfidence": 0.42,
+      "asset": "documents/DOC-6-2.png"
+    },
+    {
+      "id": "DOC-6-3",
+      "type": "ACCEPTANCE_LETTER",
+      "actualType": "ACCEPTANCE_LETTER",
+      "variant": "photo-like",
+      "text": "Acceptance letter\n  DEMO capture / tilted crop  \n\nInstitutional acceptance: true",
+      "fields": [
+        {
+          "key": "institutionalAcceptance",
+          "label": "Institutional acceptance",
+          "type": "BOOLEAN",
+          "expected": true
+        }
+      ],
+      "ocrConfidence": 0.74,
+      "asset": "documents/DOC-6-3.png"
+    },
+    {
+      "id": "DOC-6-4",
+      "type": "ACCEPTANCE_LETTER",
+      "actualType": "INCOME_DECLARATION",
+      "variant": "wrong-type",
+      "text": "Income declaration",
+      "fields": [
+        {
+          "key": "institutionalAcceptance",
+          "label": "Institutional acceptance",
+          "type": "BOOLEAN",
+          "expected": null
+        }
+      ],
+      "ocrConfidence": 1,
+      "asset": "documents/DOC-6-4.png"
+    },
+    {
+      "id": "DOC-7-1",
+      "type": "INCOME_DECLARATION",
+      "actualType": "INCOME_DECLARATION",
+      "variant": "clean",
+      "text": "Income declaration\nAnnual household income: 180000",
+      "fields": [
+        {
+          "key": "annualHouseholdIncome",
+          "label": "Annual household income",
+          "type": "MONEY",
+          "expected": 180000
+        }
+      ],
+      "ocrConfidence": 1,
+      "asset": "documents/DOC-7-1.png"
+    },
+    {
+      "id": "DOC-7-2",
+      "type": "INCOME_DECLARATION",
+      "actualType": "INCOME_DECLARATION",
+      "variant": "degraded-scan",
+      "text": "Income declaration\n?nn??l h??s?h?ld ?nc?m?: 180000",
+      "fields": [
+        {
+          "key": "annualHouseholdIncome",
+          "label": "Annual household income",
+          "type": "MONEY",
+          "expected": null
+        }
+      ],
+      "ocrConfidence": 0.42,
+      "asset": "documents/DOC-7-2.png"
+    },
+    {
+      "id": "DOC-7-3",
+      "type": "INCOME_DECLARATION",
+      "actualType": "INCOME_DECLARATION",
+      "variant": "photo-like",
+      "text": "Income declaration\n  DEMO capture / tilted crop  \n\nAnnual household income: 180000",
+      "fields": [
+        {
+          "key": "annualHouseholdIncome",
+          "label": "Annual household income",
+          "type": "MONEY",
+          "expected": 180000
+        }
+      ],
+      "ocrConfidence": 0.74,
+      "asset": "documents/DOC-7-3.png"
+    },
+    {
+      "id": "DOC-7-4",
+      "type": "INCOME_DECLARATION",
+      "actualType": "UNEMPLOYMENT_DECLARATION",
+      "variant": "wrong-type",
+      "text": "Unemployment declaration",
+      "fields": [
+        {
+          "key": "annualHouseholdIncome",
+          "label": "Annual household income",
+          "type": "MONEY",
+          "expected": null
+        }
+      ],
+      "ocrConfidence": 1,
+      "asset": "documents/DOC-7-4.png"
+    },
+    {
+      "id": "DOC-8-1",
+      "type": "UNEMPLOYMENT_DECLARATION",
+      "actualType": "UNEMPLOYMENT_DECLARATION",
+      "variant": "clean",
+      "text": "Unemployment declaration\nUnemployment confirmed: true",
+      "fields": [
+        {
+          "key": "unemploymentConfirmed",
+          "label": "Unemployment confirmed",
+          "type": "BOOLEAN",
+          "expected": true
+        }
+      ],
+      "ocrConfidence": 1,
+      "asset": "documents/DOC-8-1.png"
+    },
+    {
+      "id": "DOC-8-2",
+      "type": "UNEMPLOYMENT_DECLARATION",
+      "actualType": "UNEMPLOYMENT_DECLARATION",
+      "variant": "degraded-scan",
+      "text": "Unemployment declaration\n?n?mpl?ym?nt c?nf?rm?d: true",
+      "fields": [
+        {
+          "key": "unemploymentConfirmed",
+          "label": "Unemployment confirmed",
+          "type": "BOOLEAN",
+          "expected": null
+        }
+      ],
+      "ocrConfidence": 0.42,
+      "asset": "documents/DOC-8-2.png"
+    },
+    {
+      "id": "DOC-8-3",
+      "type": "UNEMPLOYMENT_DECLARATION",
+      "actualType": "UNEMPLOYMENT_DECLARATION",
+      "variant": "photo-like",
+      "text": "Unemployment declaration\n  DEMO capture / tilted crop  \n\nUnemployment confirmed: true",
+      "fields": [
+        {
+          "key": "unemploymentConfirmed",
+          "label": "Unemployment confirmed",
+          "type": "BOOLEAN",
+          "expected": true
+        }
+      ],
+      "ocrConfidence": 0.74,
+      "asset": "documents/DOC-8-3.png"
+    },
+    {
+      "id": "DOC-8-4",
+      "type": "UNEMPLOYMENT_DECLARATION",
+      "actualType": "IDENTITY_DOCUMENT",
+      "variant": "wrong-type",
+      "text": "Identity document",
+      "fields": [
+        {
+          "key": "unemploymentConfirmed",
+          "label": "Unemployment confirmed",
+          "type": "BOOLEAN",
+          "expected": null
+        }
+      ],
+      "ocrConfidence": 1,
+      "asset": "documents/DOC-8-4.png"
+    }
+  ]
+}

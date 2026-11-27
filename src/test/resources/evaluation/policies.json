@@ -1,0 +1,323 @@
+{
+  "label": "DEMO DATA ONLY",
+  "cases": [
+    {
+      "id": "POL-1",
+      "programme": "BUR",
+      "text": "Annual household income must not exceed R350,000.",
+      "rules": [
+        [
+          "annualHouseholdIncome",
+          "LESS_THAN_OR_EQUAL",
+          350000
+        ]
+      ],
+      "ambiguities": []
+    },
+    {
+      "id": "POL-2",
+      "programme": "BUR",
+      "text": "Applicants must be at least 18 years old.",
+      "rules": [
+        [
+          "age",
+          "GREATER_THAN_OR_EQUAL",
+          18
+        ]
+      ],
+      "ambiguities": []
+    },
+    {
+      "id": "POL-3",
+      "programme": "BUR",
+      "text": "Academic average must be at least 60%.",
+      "rules": [
+        [
+          "academicAverage",
+          "GREATER_THAN_OR_EQUAL",
+          60
+        ]
+      ],
+      "ambiguities": []
+    },
+    {
+      "id": "POL-4",
+      "programme": "BUR",
+      "text": "Institutional acceptance is required.",
+      "rules": [
+        [
+          "institutionalAcceptance",
+          "IS_TRUE",
+          true
+        ]
+      ],
+      "ambiguities": []
+    },
+    {
+      "id": "POL-5",
+      "programme": "BUR",
+      "text": "Residence evidence is optional.",
+      "rules": [
+        [
+          null,
+          "DOCUMENT_REQUIRED",
+          "PROOF_OF_RESIDENCE",
+          false
+        ]
+      ],
+      "ambiguities": []
+    },
+    {
+      "id": "ADDENDUM-POLICY",
+      "programme": "BUR",
+      "text": "Applicants must be at least 18 years old, have an annual household income not exceeding R350,000, have proof of acceptance at an approved institution and have an academic average of at least 60%.",
+      "rules": [
+        [
+          "age",
+          "GREATER_THAN_OR_EQUAL",
+          18
+        ],
+        [
+          "annualHouseholdIncome",
+          "LESS_THAN_OR_EQUAL",
+          350000
+        ],
+        [
+          "institutionalAcceptance",
+          "IS_TRUE",
+          true
+        ],
+        [
+          "academicAverage",
+          "GREATER_THAN_OR_EQUAL",
+          60
+        ]
+      ],
+      "ambiguities": []
+    },
+    {
+      "id": "POL-7",
+      "programme": "BUR",
+      "text": "The applicant should demonstrate adequate progress.",
+      "rules": [],
+      "ambiguities": [
+        "Adequate progress lacks a defined threshold."
+      ]
+    },
+    {
+      "id": "POL-8",
+      "programme": "GRA",
+      "text": "Individual annual income must not exceed R96,000.",
+      "rules": [
+        [
+          "annualIndividualIncome",
+          "LESS_THAN_OR_EQUAL",
+          96000
+        ]
+      ],
+      "ambiguities": []
+    },
+    {
+      "id": "POL-9",
+      "programme": "GRA",
+      "text": "Applicants must be aged 18 or older.",
+      "rules": [
+        [
+          "age",
+          "GREATER_THAN_OR_EQUAL",
+          18
+        ]
+      ],
+      "ambiguities": []
+    },
+    {
+      "id": "POL-10",
+      "programme": "GRA",
+      "text": "An identity document is required.",
+      "rules": [
+        [
+          null,
+          "DOCUMENT_REQUIRED",
+          "IDENTITY_DOCUMENT"
+        ]
+      ],
+      "ambiguities": []
+    },
+    {
+      "id": "POL-11",
+      "programme": "GRA",
+      "text": "Proof of residence is required.",
+      "rules": [
+        [
+          null,
+          "DOCUMENT_REQUIRED",
+          "PROOF_OF_RESIDENCE"
+        ]
+      ],
+      "ambiguities": []
+    },
+    {
+      "id": "POL-12",
+      "programme": "GRA",
+      "text": "A payslip or an income declaration is required.",
+      "rules": [
+        [
+          null,
+          "OR",
+          null,
+          true,
+          [
+            [
+              null,
+              "DOCUMENT_REQUIRED",
+              "PAYSLIP"
+            ],
+            [
+              null,
+              "DOCUMENT_REQUIRED",
+              "INCOME_DECLARATION"
+            ]
+          ]
+        ]
+      ],
+      "ambiguities": []
+    },
+    {
+      "id": "POL-13",
+      "programme": "GRA",
+      "text": "Identity and residence evidence are both required.",
+      "rules": [
+        [
+          null,
+          "AND",
+          null,
+          true,
+          [
+            [
+              null,
+              "DOCUMENT_REQUIRED",
+              "IDENTITY_DOCUMENT"
+            ],
+            [
+              null,
+              "DOCUMENT_REQUIRED",
+              "PROOF_OF_RESIDENCE"
+            ]
+          ]
+        ]
+      ],
+      "ambiguities": []
+    },
+    {
+      "id": "POL-14",
+      "programme": "GRA",
+      "text": "Individual annual income must not exceed R96,000. Individual annual income must be at least R100,000.",
+      "rules": [
+        [
+          "annualIndividualIncome",
+          "LESS_THAN_OR_EQUAL",
+          96000
+        ],
+        [
+          "annualIndividualIncome",
+          "GREATER_THAN_OR_EQUAL",
+          100000
+        ]
+      ],
+      "ambiguities": [
+        "Income clauses conflict."
+      ]
+    },
+    {
+      "id": "POL-15",
+      "programme": "HOU",
+      "text": "Annual household income must not exceed R180,000.",
+      "rules": [
+        [
+          "annualHouseholdIncome",
+          "LESS_THAN_OR_EQUAL",
+          180000
+        ]
+      ],
+      "ambiguities": []
+    },
+    {
+      "id": "POL-16",
+      "programme": "HOU",
+      "text": "Applicants must not have received a prior housing benefit.",
+      "rules": [
+        [
+          "priorHousingBenefit",
+          "EQUALS",
+          false
+        ]
+      ],
+      "ambiguities": []
+    },
+    {
+      "id": "POL-17",
+      "programme": "HOU",
+      "text": "Applicants must be at least 18 years old.",
+      "rules": [
+        [
+          "age",
+          "GREATER_THAN_OR_EQUAL",
+          18
+        ]
+      ],
+      "ambiguities": []
+    },
+    {
+      "id": "POL-18",
+      "programme": "HOU",
+      "text": "Proof of residence must be provided.",
+      "rules": [
+        [
+          null,
+          "DOCUMENT_REQUIRED",
+          "PROOF_OF_RESIDENCE"
+        ]
+      ],
+      "ambiguities": []
+    },
+    {
+      "id": "POL-19",
+      "programme": "HOU",
+      "text": "An identity document must be provided.",
+      "rules": [
+        [
+          null,
+          "DOCUMENT_REQUIRED",
+          "IDENTITY_DOCUMENT"
+        ]
+      ],
+      "ambiguities": []
+    },
+    {
+      "id": "POL-20",
+      "programme": "HOU",
+      "text": "Annual household income must not exceed R180,000 and the applicant must not have received a prior housing benefit.",
+      "rules": [
+        [
+          null,
+          "AND",
+          null,
+          true,
+          [
+            [
+              "annualHouseholdIncome",
+              "LESS_THAN_OR_EQUAL",
+              180000
+            ],
+            [
+              "priorHousingBenefit",
+              "EQUALS",
+              false
+            ]
+          ]
+        ]
+      ],
+      "ambiguities": []
+    }
+  ]
+}

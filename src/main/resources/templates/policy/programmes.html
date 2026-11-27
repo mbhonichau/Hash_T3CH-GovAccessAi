@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Programmes and drafts', ~{::#programmes})}">
+<body>
+<section id="programmes">
+    <div class="overview-heading">
+        <a th:href="@{/policies/lifecycle}">Back to policy lifecycle</a>
+        <h1>Programmes and drafts</h1>
+    </div>
+    <p th:unless="${canEditPolicy}"><a th:href="@{/workspace/access}">Enter Policy Edit</a> to create programmes and drafts.</p>
+    <div class="row g-3 mb-3" th:if="${canEditPolicy}">
+        <div class="col-md-6"><div class="card dashboard-card"><div class="card-body">
+            <h2>New programme</h2>
+            <form method="post" th:action="@{/policies/lifecycle/programmes}">
+                <label class="form-label" for="programme-code">Code</label>
+                <input class="form-control mb-3" id="programme-code" name="code" maxlength="100"
+                       pattern="[A-Za-z][A-Za-z0-9_\-]*" required>
+                <label class="form-label" for="programme-name">Name</label>
+                <input class="form-control mb-3" id="programme-name" name="name" maxlength="255" required>
+                <button type="submit" class="btn btn-primary">Create programme</button>
+            </form>
+        </div></div></div>
+        <div class="col-md-6"><div class="card dashboard-card"><div class="card-body">
+            <h2>New policy draft</h2>
+            <form method="post" th:action="@{/policies/lifecycle/drafts}">
+                <label class="form-label" for="draft-programme">Programme</label>
+                <select class="form-select mb-3" id="draft-programme" name="programme" required>
+                    <option th:each="programme : ${programmes}" th:value="${programme.code}" th:text="${programme.name}"></option>
+                </select>
+                <label class="form-label" for="draft-label">Version label</label>
+                <input class="form-control mb-3" id="draft-label" name="label" maxlength="100" required>
+                <button type="submit" class="btn btn-primary">Create draft</button>
+            </form>
+        </div></div></div>
+    </div>
+    <div class="card dashboard-card"><div class="card-body">
+        <h2>Existing programmes</h2>
+        <p th:if="${#lists.isEmpty(programmes)}">No programmes have been created.</p>
+        <ul th:unless="${#lists.isEmpty(programmes)}">
+            <li th:each="programme : ${programmes}" th:text="|${programme.name} · ${programme.code}|"></li>
+        </ul>
+    </div></div>
+</section>
+</body>
+</html>

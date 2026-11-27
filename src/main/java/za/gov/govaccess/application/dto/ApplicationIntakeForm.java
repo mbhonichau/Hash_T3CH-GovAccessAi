@@ -10,6 +10,8 @@ public class ApplicationIntakeForm {
     private String programmeCode = "NSFAS_BURSARY";
     @NotBlank @Size(max = 2000)
     private String summary;
+    @Size(max = 5000)
+    private String declarations;
 
     public String getApplicantName() { return applicantName; }
     public void setApplicantName(String applicantName) { this.applicantName = applicantName; }
@@ -17,4 +19,6 @@ public class ApplicationIntakeForm {
     public void setProgrammeCode(String programmeCode) { this.programmeCode = programmeCode; }
     public String getSummary() { return summary; }
     public void setSummary(String summary) { this.summary = summary; }
+    public String getDeclarations() { return declarations; }
+    public void setDeclarations(String declarations) { this.declarations = declarations; }
 }

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Programme notice configuration', ~{::#notice-configuration})}">
+<body>
+<section id="notice-configuration">
+    <div class="overview-heading">
+        <a th:href="@{/policies/lifecycle}">Back to policy lifecycle</a>
+        <h1>Programme notice configuration</h1>
+    </div>
+    <form method="get" th:action="@{/policies/lifecycle/notice-configuration}" class="mb-3">
+        <label class="form-label" for="programme">Programme</label>
+        <select class="form-select mb-2" id="programme" name="programme" required>
+            <option th:each="item : ${programmes}" th:value="${item.id}" th:selected="${item.id == selectedProgramme}" th:text="${item.name}"></option>
+        </select>
+        <button class="btn btn-outline-primary">View configuration</button>
+    </form>
+    <form method="post" th:if="${selectedProgramme != null}" th:action="@{/policies/lifecycle/notice-configuration}">
+        <input type="hidden" name="programme" th:value="${selectedProgramme}">
+        <label class="form-label" for="procedure">Authorised review or appeal wording</label>
+        <p class="form-text" id="procedure-help">Enter the official period and procedure as they should appear in a notice.</p>
+        <textarea class="form-control mb-2" id="procedure" name="procedure" rows="8" maxlength="4000" required
+                  aria-describedby="procedure-help" th:text="${procedure == null ? '' : procedure.text}"></textarea>
+        <button class="btn btn-primary">Approve programme wording</button>
+    </form>
+</section>
+</body>
+</html>

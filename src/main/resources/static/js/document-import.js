@@ -13,7 +13,7 @@ async function pollImport() {
         }
         importStatus.textContent = job.totalChunks
             ? `${job.status} · ${job.completedChunks}/${job.totalChunks} sections processed`
-            : `${job.status} · Waiting for the import worker`;
+            : `${job.status} · ${importStatus.dataset.waitLabel || "Waiting for the import worker"}`;
     } catch {
         importStatus.textContent = "Could not refresh the import status. Retrying…";
     }

@@ -8,31 +8,40 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.csrf.CsrfException;
 
 @Configuration(proxyBeanMethods = false)
 @EnableMethodSecurity
 class WebSecurityConfiguration {
     @Bean
-    PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
-
-    @Bean
-    SecurityFilterChain webSecurity(HttpSecurity http) throws Exception {
+    SecurityFilterChain webSecurity(HttpSecurity http, ManagedUserService users) throws Exception {
+        var defaultDeniedHandler = new AccessDeniedHandlerImpl();
         return http
                 .addFilterBefore(new ManagedAccountFilter(users), AuthorizationFilter.class)
+                .exceptionHandling(errors -> errors.accessDeniedHandler((request, response, denied) -> {
+                    String loginPath = request.getContextPath() + "/login";
+                    if (denied instanceof CsrfException && "POST".equals(request.getMethod())
+                            && loginPath.equals(request.getRequestURI())) {
+                        response.sendRedirect(loginPath + "?expired");
+                        return;
+                    }
+                    defaultDeniedHandler.handle(request, response, denied);
+                }))
                 .authorizeHttpRequests(requests -> requests
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.GET, "/login", "/vendor/mazer/**").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
-                        .requestMatchers("/api/admin/ai/**").hasAnyAuthority("AI_ADMIN", "ROLE_AI_ADMIN")
+                        .requestMatchers("/api/admin/ai/**", "/admin/ai", "/admin/ai/**")
+                        .hasAnyAuthority("AI_ADMIN", "ROLE_AI_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/assessments/*/explanation").hasAnyAuthority("CASE_REVIEW", "ROLE_CASE_REVIEW")
                         .requestMatchers("/api/assessments", "/api/assessments/**")
                         .hasAnyAuthority("ASSESSMENT_RUN", "ROLE_ASSESSMENT_RUN")
                         .requestMatchers("/admin/users/**").hasAnyAuthority("USER_MANAGE", "ROLE_USER_MANAGE")
-                        .requestMatchers("/audit").hasAnyAuthority("AUDIT_VERIFY", "ROLE_AUDIT_VERIFY")
+                        .requestMatchers("/audit", "/audit/ai").hasAnyAuthority("AUDIT_VERIFY", "ROLE_AUDIT_VERIFY")
                         .requestMatchers("/audit/history").hasAnyAuthority("AUDIT_VIEW_ALL", "ROLE_AUDIT_VIEW_ALL",
                                 "AUDIT_VIEW_LIMITED", "ROLE_AUDIT_VIEW_LIMITED")
                         .requestMatchers(HttpMethod.POST, "/policies/lifecycle/*/test")
@@ -42,7 +51,8 @@ class WebSecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/api/policies/interpret",
                                 "/policies/nsfas-2025/edit", "/policies/nsfas-2025/load", "/rules/catalogue/**",
                                 "/policies/imports", "/policies/imports/*/edit", "/policies/lifecycle/*/review",
-                                "/policies/lifecycle/*/fork", "/policies/lifecycle/*/edit")
+                                "/policies/lifecycle/*/fork", "/policies/lifecycle/*/edit",
+                                "/policies/lifecycle/programmes", "/policies/lifecycle/drafts")
                         .access((authentication, context) -> new AuthorizationDecision(
                                 PolicyWorkspaceAccess.isEditing(authentication.get(), context.getRequest())))
                         .requestMatchers("/policies/lifecycle/**").hasAnyAuthority("POLICY_EDIT", "ROLE_POLICY_EDIT",

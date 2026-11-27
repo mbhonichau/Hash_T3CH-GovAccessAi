@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · System status', ~{::#system-status})}">
+<body>
+<section id="system-status">
+    <div class="overview-heading"><h1>System status</h1></div>
+    <div class="card dashboard-card">
+        <div class="card-body">
+            <h2>Application health</h2>
+            <p role="status" th:text="${systemStatus}"></p>
+            <a class="btn btn-outline-primary" th:href="@{/system/status}">Refresh status</a>
+        </div>
+    </div>
+</section>
+</body>
+</html>

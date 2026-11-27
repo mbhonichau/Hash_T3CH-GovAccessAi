@@ -15,14 +15,20 @@ public class PolicySourceReader {
     public static final int MAX_TEXT_LENGTH = 200_000;
     static final int MAX_PAGES = 100;
     private static final Pattern HEADING = Pattern.compile(
-            "^(?:#{1,6}\\s+.+|\\d+(?:\\.\\d+)+\\.?\\s+.{1,100}|(?:SECTION|CHAPTER)\\s+.{1,95}|[A-Z][A-Z0-9 \\-/]{3,79})$");
+            "^(?:#{1,6}\\s+.+|\\d+(?:\\.\\d+)+\\.?\\s+.{1,100}|(?:SECTION|CHAPTER)\\s+.{1,95})$");
     private final int chunkSize;
+    private final int maxChunks;
 
-    public PolicySourceReader(@Value("${govaccess.policy-import.chunk-characters:6000}") int chunkSize) {
+    public PolicySourceReader(@Value("${govaccess.policy-import.chunk-characters:12000}") int chunkSize,
+                              @Value("${govaccess.policy-import.max-chunks:500}") int maxChunks) {
         if (chunkSize < 128 || chunkSize > 30_000) {
             throw new IllegalArgumentException("Policy import chunk size must be between 128 and 30000 characters");
         }
+        if (maxChunks < 1 || maxChunks > 2000) {
+            throw new IllegalArgumentException("Policy import maximum chunks must be between 1 and 2000");
+        }
         this.chunkSize = chunkSize;
+        this.maxChunks = maxChunks;
     }
 
     public record Chunk(int page, String section, String text) {}
@@ -78,8 +84,9 @@ public class PolicySourceReader {
             }
             append(result, index + 1, section, segment.toString());
         }
-        if (result.size() > MAX_PAGES) {
-            throw new IllegalArgumentException("The document exceeds the import chunk limit");
+        if (result.size() > maxChunks) {
+            throw new IllegalArgumentException("The policy produces more than " + maxChunks
+                    + " import sections. Increase govaccess.policy-import.chunk-characters or simplify the source.");
         }
         return List.copyOf(result);
     }

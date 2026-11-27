@@ -13,45 +13,47 @@
         <nav class="sidebar-menu" id="primary-navigation" aria-label="Primary">
             <ul class="menu">
                 <li class="sidebar-title">Workspace</li>
-                <li class="sidebar-item" th:classappend="${screen == null and workspaceAccessPage == null and cataloguePage == null and documentImportPage == null ? 'active' : null}">
-                <li class="sidebar-item" sec:authorize="hasAuthority('PERM_DASHBOARD_READ')" th:classappend="${currentPath == '/' ? 'active' : ''}">
+                <li class="sidebar-item" th:classappend="${currentPath == '/' ? 'active' : null}">
                     <a class="sidebar-link" href="/" th:href="@{/}"
                        th:attr="aria-current=${currentPath == '/' ? 'page' : null}">
-                <li class="sidebar-item" th:classappend="${screen == null and workspaceAccessPage == null and cataloguePage == null ? 'active' : null}">
-                    <a class="sidebar-link" href="/" th:href="@{/}"
-                       th:attr="aria-current=${screen == null and workspaceAccessPage == null and cataloguePage == null and documentImportPage == null ? 'page' : null}">
                         <i class="bi-grid-fill" aria-hidden="true"></i>
                         <span>Overview</span>
                     </a>
                 </li>
-                <li class="sidebar-item" th:classappend="${documentImportPage == true ? 'active' : null}">
+                <li class="sidebar-item" th:if="${navPolicyWorkspace}" th:classappend="${documentImportPage == true ? 'active' : null}">
                     <a class="sidebar-link" th:href="@{/policies/imports}"
                        th:attr="aria-current=${documentImportPage == true ? 'page' : null}">
                         <i class="bi-file-earmark-text" aria-hidden="true"></i>
                         <span>Policy imports</span>
                     </a>
                 </li>
-                <li class="sidebar-item" th:classappend="${cataloguePage == true ? 'active' : null}">
+                <li class="sidebar-item" th:if="${navPolicyWorkspace}" th:classappend="${cataloguePage == true ? 'active' : null}">
                     <a class="sidebar-link" th:href="@{/rules/catalogue}"
                        th:attr="aria-current=${cataloguePage == true ? 'page' : null}">
                         <i class="bi-list-check" aria-hidden="true"></i>
                         <span>Rule catalogue</span>
                     </a>
                 </li>
-                <li class="sidebar-item" th:classappend="${screen != null ? 'active' : null}">
+                <li class="sidebar-item" th:if="${navPolicyWorkspace}" th:classappend="${screen != null ? 'active' : null}">
                     <a class="sidebar-link" th:href="@{/policies/nsfas-2025}"
                        th:attr="aria-current=${screen != null ? 'page' : null}">
                         <i class="bi-file-earmark-text" aria-hidden="true"></i>
                         <span>Policy Studio</span>
                     </a>
                 </li>
-                <li class="sidebar-item" sec:authorize="hasAuthority('PERM_APPLICATION_READ')"
+                <li class="sidebar-item" th:if="${navLifecycle}" th:classappend="${lifecyclePage == true ? 'active' : null}">
+                    <a class="sidebar-link" th:href="@{/policies/lifecycle}"
+                       th:attr="aria-current=${lifecyclePage == true ? 'page' : null}">
+                        <i class="bi-list-check" aria-hidden="true"></i><span>Policy lifecycle</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" sec:authorize="hasAnyAuthority('PERM_APPLICATION_READ','CASE_REVIEW','APPLICATION_VIEW_OWN','AUDIT_VERIFY')"
                     th:classappend="${#strings.startsWith(currentPath, '/applications') ? 'active' : ''}">
                     <a class="sidebar-link" th:href="@{/applications}">
                         <i class="bi-inbox" aria-hidden="true"></i><span>Application queue</span>
                     </a>
                 </li>
-                <li class="sidebar-item" sec:authorize="hasAuthority('PERM_APPLICATION_CREATE')">
+                <li class="sidebar-item" sec:authorize="hasAnyAuthority('PERM_APPLICATION_CREATE','APPLICATION_SUBMIT')">
                     <a class="sidebar-link" th:href="@{/applications/new}">
                         <i class="bi-plus-square" aria-hidden="true"></i><span>New application</span>
                     </a>
@@ -63,11 +65,41 @@
                         <i class="bi-people" aria-hidden="true"></i><span>Staff access</span>
                     </a>
                 </li>
-                <li class="sidebar-item" th:classappend="${workspaceAccessPage == true ? 'active' : null}">
+                <li class="sidebar-item" th:if="${navPolicyWorkspace}" th:classappend="${workspaceAccessPage == true ? 'active' : null}">
                     <a class="sidebar-link" th:href="@{/workspace/access}"
                        th:attr="aria-current=${workspaceAccessPage == true ? 'page' : null}">
                         <i class="bi-shield-check" aria-hidden="true"></i>
                         <span>Workspace access</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:if="${navUsers}" th:classappend="${managedUsersPage == true ? 'active' : null}">
+                    <a class="sidebar-link" th:href="@{/admin/users}"
+                       th:attr="aria-current=${managedUsersPage == true ? 'page' : null}">
+                        <i class="bi-people" aria-hidden="true"></i><span>Managed users</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:if="${navAudit}" th:classappend="${auditPage == true ? 'active' : null}">
+                    <a class="sidebar-link" th:href="@{/audit/history}"
+                       th:attr="aria-current=${currentPath == '/audit/history' ? 'page' : null}">
+                        <i class="bi-shield-check" aria-hidden="true"></i><span>Audit history</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:if="${navAiGovernance}" th:classappend="${currentPath == '/audit/ai' ? 'active' : null}">
+                    <a class="sidebar-link" th:href="@{/audit/ai}" th:attr="aria-current=${currentPath == '/audit/ai' ? 'page' : null}">
+                        <i class="bi-clipboard-data" aria-hidden="true"></i><span>AI governance</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" sec:authorize="hasAnyAuthority('AI_ADMIN','ROLE_AI_ADMIN')"
+                    th:classappend="${currentPath == '/admin/ai' ? 'active' : null}">
+                    <a class="sidebar-link" th:href="@{/admin/ai}"
+                       th:attr="aria-current=${currentPath == '/admin/ai' ? 'page' : null}">
+                        <i class="bi-sliders" aria-hidden="true"></i><span>AI administration</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${currentPath == '/system/status' ? 'active' : null}">
+                    <a class="sidebar-link" th:href="@{/system/status}"
+                       th:attr="aria-current=${currentPath == '/system/status' ? 'page' : null}">
+                        <i class="bi-speedometer2" aria-hidden="true"></i><span>System status</span>
                     </a>
                 </li>
             </ul>

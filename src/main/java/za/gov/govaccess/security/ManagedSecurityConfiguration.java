@@ -17,7 +17,8 @@ class ManagedSecurityConfiguration {
     }
 
     @Bean
-    UserDetailsService govAccessUsers(SecurityProperties properties, ManagedUserService users, PasswordEncoder encoder) {
+    UserDetailsService govAccessUsers(SecurityProperties properties, ManagedUserService users, PasswordEncoder encoder,
+                                      UserAccountRepository accounts) {
         var bootstrap = properties.getUser();
         if (bootstrap.isPasswordGenerated()) {
             Logger.getLogger(ManagedSecurityConfiguration.class.getName())
@@ -28,12 +29,13 @@ class ManagedSecurityConfiguration {
                 : password.startsWith("$2") ? password : encoder.encode(password);
         var fallback = User.withUsername(bootstrap.getName()).password(hash)
                 .roles(bootstrap.getRoles().toArray(String[]::new)).build();
+        var legacyUsers = new PersistentUserDetailsService(accounts);
         return username -> {
             if (fallback.getUsername().equals(username)) {
                 return User.withUserDetails(fallback).build();
             }
-            return users.principal(username).orElseThrow(() ->
-                    new org.springframework.security.core.userdetails.UsernameNotFoundException("Account not found"));
+            var managed = users.principal(username);
+            return managed.isPresent() ? managed.get() : legacyUsers.loadUserByUsername(username);
         };
     }
 }

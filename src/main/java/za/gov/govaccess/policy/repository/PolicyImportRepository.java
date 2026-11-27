@@ -102,6 +102,11 @@ public class PolicyImportRepository {
         return jdbc.queryForObject("SELECT review_json FROM govaccess.policy_import_job WHERE id=?", String.class, id);
     }
 
+    public boolean instructionLike(UUID id) {
+        return Boolean.TRUE.equals(jdbc.queryForObject(
+                "SELECT instruction_like_content FROM govaccess.policy_import_job WHERE id=?", Boolean.class, id));
+    }
+
     public void addEdit(UUID jobId, UUID editorId, Edit edit) {
         jdbc.update("""
                 INSERT INTO govaccess.policy_import_rule_edit

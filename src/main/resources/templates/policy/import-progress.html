@@ -14,6 +14,9 @@
                th:attr="data-poll-url=${job.status.name() == 'QUEUED' or job.status.name() == 'RUNNING'} ? @{/api/policies/imports/{id}(id=${job.id})} : null"
                th:text="|${job.status} · ${job.completedChunks}/${job.totalChunks} sections processed|"></p>
             <p th:if="${job.failure}" class="alert alert-danger" role="alert" th:text="${job.failure}"></p>
+            <p th:if="${instructionLikeContent}" class="alert alert-warning" role="status">
+                INSTRUCTION_LIKE_CONTENT. Review the source carefully.
+            </p>
             <a th:if="${job.status.name() == 'SUCCEEDED'}" class="btn btn-primary"
                th:href="@{/policies/imports/{id}/review(id=${job.id})}">Review AI draft</a>
             <a class="btn btn-outline-primary" th:href="@{/policies/imports}">Back to imports</a>

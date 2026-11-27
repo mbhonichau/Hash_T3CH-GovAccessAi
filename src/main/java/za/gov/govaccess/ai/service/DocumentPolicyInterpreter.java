@@ -75,12 +75,11 @@ public class DocumentPolicyInterpreter {
         String fields = catalogueText(definitions);
         for (int index = 0; index < chunks.size(); index++) {
             var chunk = chunks.get(index);
-            var request = new AiRequest(prompt.id(), prompt.version(), prompt.text(),
-                    fields + "\n<Page>" + chunk.page() + "</Page>\n<Section>" + chunk.section()
-                            + "</Section>\n<policy>\n" + escapePolicyTags(chunk.text()) + "\n</policy>",
-                    List.of(), schema, 0, false, context);
+            var request = AiPromptBuilder.build(prompt, AiPromptBuilder.Data.POLICY,
+                    fields + "\n<Page>" + chunk.page() + "</Page>\n<Section>" + chunk.section().replace("<", "&lt;")
+                            + "</Section>", chunk.text(), List.of(), schema, false, context);
             // Uploaded sources are never attested synthetic. The hosted-provider gate stays in force.
-            if (redactor.redact(request, AiRedactionMode.BLOCK) == null) {
+            if (AiPromptBuilder.forProvider(request, true, AiRedactionMode.BLOCK, redactor) == null) {
                 throw new IllegalArgumentException("The source contains an identifier. Redact it before importing.");
             }
             var output = outputs.generate(request, ChunkOutput.class);
@@ -97,10 +96,6 @@ public class DocumentPolicyInterpreter {
                 Map.copyOf(merged.ruleNotes));
     }
 
-    private static String escapePolicyTags(String text) {
-        return text.replaceAll("(?i)<(/?policy)\\s*>", "&lt;$1&gt;");
-    }
-
     private String catalogueText(RuleCatalogueService.Catalogue definitions) {
         var fields = mapper.createObjectNode();
         new TreeMap<>(definitions.fields()).forEach((key, field) -> {
@@ -109,6 +104,7 @@ public class DocumentPolicyInterpreter {
             var sources = details.putArray("sourceDocumentTypes");
             field.getSourceDocumentTypes().stream().map(DocumentType::getKey).sorted().forEach(sources::add);
         });
+        AiPromptBuilder.allowOnly(fields, definitions.fields().keySet());
         return "<fields>" + fields + "</fields>\n<operators>"
                 + Arrays.toString(RuleOperator.values()) + "</operators>\n<documentTypes>"
                 + definitions.documentTypes().stream().sorted().toList() + "</documentTypes>";

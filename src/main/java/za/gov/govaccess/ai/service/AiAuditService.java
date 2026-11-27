@@ -29,15 +29,17 @@ public class AiAuditService {
     private final BusinessAuditService businessAudit;
     private final ManagedUserService users;
     private final JdbcTemplate jdbc;
+    private final AiUserQuota quota;
 
     public AiAuditService(AiCallLogRepository logs, AiRequestLogRepository requests,
                           PlatformTransactionManager transactions, BusinessAuditService businessAudit,
-                          ManagedUserService users, JdbcTemplate jdbc) {
+                          ManagedUserService users, JdbcTemplate jdbc, AiUserQuota quota) {
         this.logs = logs;
         this.requests = requests;
         this.businessAudit = businessAudit;
         this.users = users;
         this.jdbc = jdbc;
+        this.quota = quota;
         independentTransaction = new TransactionTemplate(transactions);
         independentTransaction.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
     }
@@ -52,6 +54,10 @@ public class AiAuditService {
         active.set(scope);
         long start = System.nanoTime();
         try {
+            if (!quota.reserve(request.userId())) {
+                scope.outcome = AiOutcome.RATE_LIMITED;
+                throw new za.gov.govaccess.ai.provider.AiRateLimitException();
+            }
             return operation.get();
         } finally {
             active.remove();
@@ -63,7 +69,8 @@ public class AiAuditService {
                         "SELECT content FROM govaccess.policy_version WHERE id=?",
                         (rs, index) -> CanonicalJson.sha256(CanonicalJson.document(rs.getString(1))), policyId)
                         .stream().findFirst().orElse(null);
-                entry.linkAuditEvent(businessAudit.append(new Change(null, request.userId(), users.roleOf(request.userId()),
+                entry.linkAuditEvent(businessAudit.append(new Change(request.context().applicationId(),
+                        request.userId(), users.roleOf(request.userId()),
                         "AI_REQUEST_COMPLETED", policyId, hash, null, null, null,
                         request.promptId(), request.promptVersion(), scope.model)));
                 requests.saveAndFlush(entry);
@@ -83,6 +90,8 @@ public class AiAuditService {
     public void logicalOutcome(AiResponse response, AiOutcome outcome) {
         recordOutcome(response, outcome);
     }
+
+    public void providerFallback() { active.get().entry.markProviderFallback(); }
 
     private RequestScope recordOutcome(AiResponse response, AiOutcome outcome) {
         var scope = active.get();

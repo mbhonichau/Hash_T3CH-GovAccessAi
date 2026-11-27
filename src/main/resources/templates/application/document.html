@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Supporting document', ~{::#document-review})}">
+<body>
+<section id="document-review">
+    <div class="overview-heading d-flex justify-content-between align-items-start gap-3 flex-wrap">
+        <div><h1 th:text="${document.filename}"></h1></div>
+        <a class="btn btn-outline-primary app-nav-button" th:href="@{/applications/{id}(id=${document.applicationId})}">Back to application</a>
+    </div>
+    <p role="status" th:text="${#strings.replace(document.state, '_', ' ')}"></p>
+    <p class="alert alert-warning" role="status" th:if="${canVerify and document.instructionLikeContent}">
+        INSTRUCTION_LIKE_CONTENT. Review this document carefully. Extraction used the usual output validation.
+    </p>
+    <p th:if="${document.error}" role="alert" class="alert alert-danger" th:text="${document.error}"></p>
+    <p th:if="${document.duplicateOf != null}">An identical PDF already exists on this application.</p>
+    <div th:if="${document.state == 'QUEUED' or document.state == 'RUNNING'}">
+        <p role="status" th:attr="data-poll-url=@{/applications/{app}/documents/{id}/status(app=${document.applicationId},id=${document.id})},
+                                 data-wait-label='Document processing'">Document processing</p>
+        <noscript><p><a href="">Refresh processing status</a>.</p></noscript>
+        <script defer th:src="@{/js/document-import.js}"></script>
+    </div>
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <h2>Document preview</h2>
+            <a class="btn btn-outline-primary app-nav-button mb-2" th:href="@{/applications/{app}/documents/{id}/file(app=${document.applicationId},id=${document.id})}">Download PDF</a>
+            <form method="get" class="mb-2">
+                <label for="preview-page">Page</label>
+                <input id="preview-page" name="page" type="number" min="1" max="12" th:value="${page}" required>
+                <button class="btn btn-outline-primary" type="submit">Show page</button>
+            </form>
+            <img class="img-fluid" th:alt="|Document preview, page ${page}|"
+                 th:src="@{/applications/{app}/documents/{id}/preview(app=${document.applicationId},id=${document.id},page=${page})}">
+        </div>
+        <div class="col-lg-6">
+            <h2>Extracted fields</h2>
+            <p th:if="${document.state == 'SUCCEEDED' and document.type == null}">Document type could not be determined. Review this document manually.</p>
+            <p th:if="${document.type}" th:text="${#strings.replace(document.type, '_', ' ')}"></p>
+            <p th:if="${document.ocrConfidence != null}" th:text="|OCR confidence ${#numbers.formatDecimal(document.ocrConfidence,1,1)}%|"></p>
+            <p th:if="${document.fields.isEmpty()}">No policy fields are available for verification.</p>
+            <section class="card dashboard-card mb-2" th:each="field : ${document.fields}">
+                <div class="card-body">
+                    <h3 class="h6" th:text="${field.key}"></h3>
+                    <p th:text="${field.value.value == null ? 'Missing' : field.value.value.toString()}"></p>
+                    <p th:text="|${field.value.validation} · ${field.value.verified ? 'Verified' : 'Unverified'}|"></p>
+                    <p th:if="${field.value.humanCorrected}">Corrected by an officer</p>
+                    <p th:if="${field.value.sourceSnippet}" th:text="|Page ${field.value.pageNumber} · ${field.value.sourceSnippet}|"></p>
+                    <form method="post" th:if="${canVerify and document.state == 'SUCCEEDED'}"
+                          th:action="@{/applications/{app}/documents/{id}/verify(app=${document.applicationId},id=${document.id})}">
+                        <input type="hidden" name="fieldKey" th:value="${field.key}">
+                        <input type="hidden" name="version" th:value="${document.version}">
+                        <div th:if="${document.type != 'IDENTITY_DOCUMENT'}">
+                            <label class="form-label" th:for="|correction-${fieldStat.index}|">Correction (optional, JSON value)</label>
+                            <input class="form-control mb-2" th:id="|correction-${fieldStat.index}|" name="value" maxlength="400">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Verify field</button>
+                    </form>
+                </div>
+            </section>
+            <form method="post" th:if="${canVerify and (document.state == 'FAILED' or document.state == 'SUCCEEDED')}"
+                  th:action="@{/applications/{app}/documents/{id}/retry(app=${document.applicationId},id=${document.id})}">
+                <button type="submit" class="btn btn-outline-primary">Run extraction again</button>
+            </form>
+        </div>
+    </div>
+</section>
+</body>
+</html>

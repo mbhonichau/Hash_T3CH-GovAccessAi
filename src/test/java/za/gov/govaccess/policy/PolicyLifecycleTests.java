@@ -75,6 +75,27 @@ class PolicyLifecycleTests {
 
     @Test
     @Transactional
+    void programmeAndDraftScreensUsePolicyEditMode() throws Exception {
+        var actor = user("editor").authorities(AuthorityUtils.createAuthorityList("POLICY_EDIT"));
+        var session = new MockHttpSession();
+        String page = LIFECYCLE + "/programmes";
+        mvc.perform(post(page).session(session).with(actor).with(csrf()).param("code", "SCREEN_TEST")
+                        .param("name", "Screen test programme")).andExpect(status().isForbidden());
+        mvc.perform(post("/workspace/access").session(session).with(actor).with(csrf()).param("mode", "POLICY_EDIT"))
+                .andExpect(status().is3xxRedirection());
+        mvc.perform(get(page).session(session).with(actor)).andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("New programme")));
+        mvc.perform(post(page).session(session).with(actor).with(csrf()).param("code", "SCREEN_TEST")
+                        .param("name", "Screen test programme")).andExpect(status().is3xxRedirection());
+        var result = mvc.perform(post(LIFECYCLE + "/drafts").session(session).with(actor).with(csrf())
+                        .param("programme", "SCREEN_TEST").param("label", "Draft from screen"))
+                .andExpect(status().is3xxRedirection()).andReturn();
+        mvc.perform(get(result.getResponse().getRedirectedUrl()).session(session).with(actor)).andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Canonical rule JSON")));
+    }
+
+    @Test
+    @Transactional
     void namedPublicationIsTheFixedAssessmentInputAfterSupersession() throws Exception {
         var bootstrap = actorWithPermissions("bootstrap", "USER_MANAGE");
         UUID reviewerId = users.create(bootstrap, "demo-policy-reviewer", "Testing-password-3344",
@@ -239,6 +260,7 @@ class PolicyLifecycleTests {
             mvc.perform(post("/admin/users/" + id + "/audit-scope").with(principal).with(csrf()))
                     .andExpect(status().isForbidden());
             mvc.perform(get("/api/admin/ai/status").with(principal)).andExpect(status().is(policy ? 200 : 403));
+            mvc.perform(get("/admin/ai").with(principal)).andExpect(status().is(policy ? 200 : 403));
         }
     }
 
@@ -278,12 +300,14 @@ class PolicyLifecycleTests {
         var bootstrap = actorWithPermissions("bootstrap", "USER_MANAGE");
         UUID officerId = users.create(bootstrap, "scope-officer", "Testing-password-3344", ManagedRole.ASSESSMENT_OFFICER);
         UUID editorId = users.create(bootstrap, "scope-editor", "Testing-password-3344", ManagedRole.POLICY_ADMINISTRATOR);
-        UUID application = UUID.randomUUID();
+        var seededCases = jdbc.query("SELECT id FROM govaccess.case_application ORDER BY id LIMIT 2",
+                (row, index) -> row.getObject(1, UUID.class));
+        UUID application = seededCases.getFirst();
         UUID policy = draft();
         UUID programme = jdbc.queryForObject("SELECT programme_id FROM govaccess.policy_version WHERE id=?", UUID.class, policy);
         UUID assignedCase = audit.append(new Change(application, officerId, "ASSESSMENT_OFFICER", "CASE_EVENT",
                 null, null, null, null, null, null, null, null));
-        UUID unassignedCase = audit.append(new Change(UUID.randomUUID(), officerId, "ASSESSMENT_OFFICER", "CASE_EVENT",
+        UUID unassignedCase = audit.append(new Change(seededCases.getLast(), officerId, "ASSESSMENT_OFFICER", "CASE_EVENT",
                 null, null, null, null, null, null, null, null));
         UUID assignedProgramme = audit.append(new Change(null, editorId, "POLICY_ADMINISTRATOR", "POLICY_EVENT",
                 policy, null, null, null, null, null, null, null));

@@ -49,6 +49,8 @@ public class RegexPiiRedactor implements PiiRedactor {
         return ACCOUNT.matcher(masked).replaceAll("[ACCOUNT]");
     }
 
+    static boolean containsId(String value) { return ID.matcher(value).results().anyMatch(match -> luhn(match.group())); }
+
     private static boolean luhn(String digits) {
         int sum = 0;
         for (int index = digits.length() - 1; index >= 0; index--) {

@@ -6,6 +6,9 @@
     <div class="overview-heading">
         <h1 id="review-heading" th:text="${job.versionLabel}">Imported draft</h1>
         <p th:text="${job.sourceLabel}"></p>
+        <p class="alert alert-warning" role="status" th:if="${instructionLikeContent}">
+            INSTRUCTION_LIKE_CONTENT. Review the marked source carefully. The import used the usual output validation.
+        </p>
         <span class="policy-status status-draft">AI-generated draft</span>
     </div>
     <p class="alert alert-success" role="status" th:if="${editSaved}" th:text="${editSaved}"></p>
@@ -41,9 +44,13 @@
                         <form class="mt-2" method="post" th:if="${canEditPolicy and row.rule.group == null}"
                               th:action="@{/policies/imports/{id}/edit(id=${job.id})}">
                             <input type="hidden" name="ruleCode" th:value="${row.rule.ruleCode}">
-                            <label class="form-label" th:for="|value-${rowStat.index}|">Expected value (JSON)</label>
+                            <label class="form-label" th:for="|value-${rowStat.index}|">Expected value</label>
                             <input class="form-control mb-2" th:id="|value-${rowStat.index}|"
-                                   name="expectedValue" maxlength="2000" required th:value="${row.rule.expectedValue}">
+                                   name="expectedValue" maxlength="2000" required th:value="${row.rule.expectedValue}"
+                                   th:attr="aria-describedby=|value-help-${rowStat.index}|">
+                            <div class="form-text mb-2" th:id="|value-help-${rowStat.index}|">
+                                Enter the value this rule checks for. Keep quotation marks for text values; use numbers without quotes.
+                            </div>
                             <button class="btn btn-outline-primary btn-sm" type="submit">Save rule value</button>
                         </form>
                     </div>

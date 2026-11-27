@@ -74,6 +74,7 @@ class PolicyDocumentImportController {
     @GetMapping("/policies/imports/{id}")
     String progress(Principal principal, @PathVariable UUID id, Model model) {
         model.addAttribute("job", jobs.owned(id, principal));
+        model.addAttribute("instructionLikeContent", jobs.instructionLike(id));
         return "policy/import-progress";
     }
 
@@ -88,6 +89,7 @@ class PolicyDocumentImportController {
     @GetMapping("/policies/imports/{id}/review")
     String review(Principal principal, @PathVariable UUID id, Model model) {
         model.addAttribute("job", jobs.owned(id, principal));
+        model.addAttribute("instructionLikeContent", jobs.instructionLike(id));
         model.addAttribute("review", jobs.review(id, principal));
         return "policy/import-review";
     }

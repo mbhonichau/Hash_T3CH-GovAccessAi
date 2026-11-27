@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 @ControllerAdvice
 class WorkspaceNavigation {
+    private final za.gov.govaccess.ai.service.AiInputSafety aiSafety;
+
+    WorkspaceNavigation(za.gov.govaccess.ai.service.AiInputSafety aiSafety) { this.aiSafety = aiSafety; }
     @ModelAttribute
     void navigation(Authentication actor, Model model) {
         boolean managed = actor != null && actor.getPrincipal() instanceof ManagedPrincipal;
@@ -16,5 +19,7 @@ class WorkspaceNavigation {
         model.addAttribute("navAudit", ActorIdentity.has(actor, "AUDIT_VIEW_LIMITED")
                 || ActorIdentity.has(actor, "AUDIT_VIEW_ALL"));
         model.addAttribute("navUsers", ActorIdentity.has(actor, "USER_MANAGE"));
+        model.addAttribute("navHostedAi", aiSafety.hostedActive());
+        model.addAttribute("navAiGovernance", ActorIdentity.has(actor, "AUDIT_VERIFY"));
     }
 }

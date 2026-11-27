@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Case communication', ~{::#communication})}">
+<body>
+<section id="communication">
+    <div class="overview-heading">
+        <a class="btn btn-outline-primary app-nav-button mb-2" th:href="@{/applications/{app}/communications(app=${message.applicationId})}">Back to messages</a>
+        <h1 th:text="${message.kind == 'DECISION_NOTICE' ? 'Decision notice' : 'Request for additional evidence'}"></h1>
+        <p th:if="${staff}" th:text="|${message.state} · ${message.generatedBy}|"></p>
+    </div>
+    <div class="card dashboard-card mb-3"><div class="card-body">
+        <h2>English</h2>
+        <div class="text-break" style="white-space: pre-wrap" th:text="${message.english}"></div>
+    </div></div>
+    <section class="card dashboard-card mb-3" th:if="${message.translation != null}" aria-labelledby="translation-heading">
+        <div class="card-body">
+            <h2 id="translation-heading" th:text="${message.translationApproved ? 'Reviewed translation' : 'Machine-translated · awaiting human review'}"></h2>
+            <div class="text-break" style="white-space: pre-wrap" th:lang="${message.language}" th:text="${message.translation}"></div>
+        </div>
+    </section>
+    <section class="card dashboard-card" th:if="${staff}" aria-labelledby="review-heading">
+        <div class="card-body">
+            <h2 id="review-heading">Officer review</h2>
+            <p th:if="${message.officerSummary}" th:text="${message.officerSummary}"></p>
+            <p th:text="|Estimated English reading grade ${#numbers.formatDecimal(message.readingGrade(),1,1)} · target ${readingTarget}|"></p>
+            <p class="alert alert-warning" th:if="${message.readingGrade() > readingTarget}">The reading level is above the target. Review the wording before sending.</p>
+            <p class="alert alert-warning" role="status" th:if="${message.kind == 'DECISION_NOTICE' and message.state == 'DRAFT' and !noticeConfigured}">
+                Approval is blocked until the programme has approved review or appeal instructions.
+            </p>
+            <form method="post" class="mb-3" th:if="${canApproveNotice and noticeConfigured and message.kind == 'DECISION_NOTICE' and message.state == 'DRAFT'}"
+                  th:action="@{/applications/{app}/communications/{id}/approve(app=${message.applicationId},id=${message.id})}">
+                <button class="btn btn-primary">Approve English notice</button>
+            </form>
+            <form method="post" class="mb-3" th:if="${canApproveNotice and message.state == 'APPROVED' and !#strings.isEmpty(translationLanguage) and message.translation == null}"
+                  th:action="@{/applications/{app}/communications/{id}/translate(app=${message.applicationId},id=${message.id})}">
+                <button class="btn btn-outline-primary" th:text="|Generate translation (${translationLanguage})|"></button>
+            </form>
+            <form method="post" class="mb-3" th:if="${canApproveNotice and message.state == 'APPROVED' and message.translation != null and !message.translationApproved}"
+                  th:action="@{/applications/{app}/communications/{id}/approve-translation(app=${message.applicationId},id=${message.id})}">
+                <button class="btn btn-outline-primary">Approve reviewed translation</button>
+            </form>
+            <form method="post" th:if="${(canApproveNotice and message.kind == 'DECISION_NOTICE' and message.state == 'APPROVED')
+                    or (canRequestEvidence and message.kind == 'EVIDENCE_REQUEST' and message.state == 'DRAFT')}"
+                  th:action="@{/applications/{app}/communications/{id}/send(app=${message.applicationId},id=${message.id})}">
+                <label for="send-reason" class="form-label">Reason for sending</label>
+                <textarea id="send-reason" name="reason" class="form-control mb-2" maxlength="1000" required></textarea>
+                <button class="btn btn-primary">Send to applicant workspace</button>
+            </form>
+        </div>
+    </section>
+</section>
+</body>
+</html>

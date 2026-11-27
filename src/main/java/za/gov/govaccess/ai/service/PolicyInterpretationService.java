@@ -57,19 +57,7 @@ public class PolicyInterpretationService {
     }
 
     public FinancialScreenPolicy interpretBundledSample(AiCallContext context) {
-        var prompt = prompts.active("policy-interpretation");
-        var request = new AiRequest(prompt.id(), prompt.version(), prompt.text(), """
-                <fields>
-                qualifyingSassaGrant: enum list, operator %s.
-                standardIncome: decimal, ZAR per year, operator %s.
-                </fields>
-                <policy>
-                In this synthetic bursary scenario, the qualifying verified grants are
-                Foster Care, Care Dependency, and Child Support.
-                The standard annual gross household income cap is ZAR 350000, inclusive.
-                </policy>
-                """.formatted(RuleOperator.IN_SET, RuleOperator.LESS_THAN_OR_EQUAL),
-                List.of(), schema, 0, true, context);
+        var request = bundledRequest(context);
         var reference = policies.bundledRules();
         var grant = reference.qualifyingSassaGrant();
         var income = reference.standardIncome();
@@ -85,6 +73,21 @@ public class PolicyInterpretationService {
                 new GrantRule(grant.ruleKey(), extraction.qualifyingSassaGrant(), grant.sourceSection(), grant.sourceQuote()),
                 new IncomeRule(income.ruleKey(), extraction.standardIncome(), income.sourceSection(), income.sourceQuote()),
                 reference.disabilityIncome());
+    }
+
+    public AiRequest bundledRequest(AiCallContext context) {
+        var prompt = prompts.active("policy-interpretation");
+        AiPromptBuilder.allowOnly(List.of("qualifyingSassaGrant", "standardIncome"),
+                schema.path("properties").properties().stream().map(java.util.Map.Entry::getKey).collect(java.util.stream.Collectors.toSet()));
+        return AiPromptBuilder.build(prompt, AiPromptBuilder.Data.POLICY, """
+                <fields>
+                qualifyingSassaGrant: enum list, operator %s.
+                standardIncome: decimal, ZAR per year, operator %s.
+                </fields>""".formatted(RuleOperator.IN_SET, RuleOperator.LESS_THAN_OR_EQUAL), """
+                In this synthetic bursary scenario, the qualifying verified grants are
+                Foster Care, Care Dependency, and Child Support.
+                The standard annual gross household income cap is ZAR 350000, inclusive.""",
+                List.of(), schema, true, context);
     }
 
     public record Extraction(@NotEmpty Set<@NotNull VerifiedSassaGrant> qualifyingSassaGrant,

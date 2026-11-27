@@ -11,11 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 
 /** Baselines an existing Hibernate schema at its latest complete migration level before Flyway starts. */
-@Component
 public class FlywayLegacyHistoryRecovery implements FlywayConfigurationCustomizer, FlywayMigrationStrategy {
     private static final Set<String> AI_CALL_LOG_COLUMNS = Set.of(
             "id", "created_at", "prompt_id", "prompt_version", "input_sha256", "latency_ms", "outcome");
@@ -102,6 +100,12 @@ public class FlywayLegacyHistoryRecovery implements FlywayConfigurationCustomize
         if (!hasAiLog && !hasAiCache) return 0;
 
         requireColumns("ai_call_log", AI_CALL_LOG_COLUMNS);
+        String log = "\"" + schema + "\".ai_call_log";
+        for (String column : Set.of("user_id uuid", "related_entity_id uuid", "related_entity_type varchar(255)",
+                "provider varchar(255)", "model varchar(255)", "output_sha256 varchar(64)", "tokens_in integer",
+                "tokens_out integer")) {
+            jdbc.execute("ALTER TABLE " + log + " ADD COLUMN IF NOT EXISTS " + column);
+        }
         if (!hasAiCache) {
             jdbc.execute("CREATE TABLE \"" + schema + "\".ai_cache ("
                     + "cache_key varchar(64) PRIMARY KEY, raw_text text NOT NULL, model varchar(255) NOT NULL, "

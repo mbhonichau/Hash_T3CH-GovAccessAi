@@ -24,6 +24,9 @@ import za.gov.govaccess.policy.repository.PolicyVersionRepository;
 import za.gov.govaccess.policy.service.PolicyLifecycleService;
 import za.gov.govaccess.policy.service.PolicyLifecycleService.SyntheticCase;
 import za.gov.govaccess.policy.service.PolicyVersionSelectionService;
+import za.gov.govaccess.policy.service.RulePolicyService;
+import za.gov.govaccess.programme.repository.ProgrammeRepository;
+import za.gov.govaccess.rules.model.RuleDocument;
 import za.gov.govaccess.security.ActorIdentity;
 import za.gov.govaccess.security.PolicyWorkspaceAccess;
 
@@ -34,13 +37,18 @@ class PolicyLifecycleController {
     private final PolicyLifecycleService lifecycle;
     private final PolicyVersionSelectionService selection;
     private final ObjectMapper mapper;
+    private final ProgrammeRepository programmes;
+    private final RulePolicyService rules;
 
     PolicyLifecycleController(PolicyVersionRepository versions, PolicyLifecycleService lifecycle,
-                              PolicyVersionSelectionService selection, ObjectMapper mapper) {
+                              PolicyVersionSelectionService selection, ObjectMapper mapper,
+                              ProgrammeRepository programmes, RulePolicyService rules) {
         this.versions = versions;
         this.lifecycle = lifecycle;
         this.selection = selection;
         this.mapper = mapper;
+        this.programmes = programmes;
+        this.rules = rules;
     }
 
     @ModelAttribute
@@ -56,6 +64,34 @@ class PolicyLifecycleController {
     String versions(Model model) {
         model.addAttribute("versions", versions.findAllByOrderByVersionLabelAsc());
         return "policy/lifecycle-list";
+    }
+
+    @GetMapping("/programmes")
+    String programmes(Model model) {
+        model.addAttribute("programmes", programmes.findAll(org.springframework.data.domain.Sort.by("name")));
+        return "policy/programmes";
+    }
+
+    @PostMapping("/programmes")
+    String createProgramme(@RequestParam String code, @RequestParam String name, RedirectAttributes flash) {
+        try {
+            rules.createProgramme(code.strip(), name);
+            flash.addFlashAttribute("successMessage", "Programme created.");
+        } catch (IllegalArgumentException e) {
+            flash.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/policies/lifecycle/programmes";
+    }
+
+    @PostMapping("/drafts")
+    String createDraft(@RequestParam String programme, @RequestParam String label, RedirectAttributes flash) {
+        try {
+            var version = rules.saveDraft(programme, label.strip(), new RuleDocument(RuleDocument.CURRENT_VERSION, List.of(), null));
+            return "redirect:/policies/lifecycle/" + version.getId();
+        } catch (IllegalArgumentException e) {
+            flash.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/policies/lifecycle/programmes";
+        }
     }
 
     @GetMapping("/{id}")

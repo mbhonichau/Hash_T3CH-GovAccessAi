@@ -60,12 +60,17 @@ import static za.gov.govaccess.rules.dto.FinancialScreenResult.Outcome.PASSES_FI
         "spring.jpa.hibernate.ddl-auto=validate",
         "spring.security.user.password=login-test-password",
         "spring.security.user.roles=POLICY_EDIT",
+        "govaccess.ai.providers[0].base-url=https://unused-provider.invalid/v1",
+        "govaccess.ai.providers[0].model=test-hosted",
+        "govaccess.ai.providers[0].hosted=true",
         "spring.datasource.url=jdbc:h2:mem:govaccess;DATABASE_TO_LOWER=TRUE",
         "spring.datasource.username=sa",
         "spring.datasource.password="
 })
 @AutoConfigureMockMvc
 class GovaccessaiApplicationTests {
+    @Autowired org.springframework.jdbc.core.JdbcTemplate intakeJdbc;
+    @Autowired za.gov.govaccess.ai.service.AiInputSafety aiSafety;
 
     @Autowired
     private MockMvc mvc;
@@ -157,7 +162,10 @@ class GovaccessaiApplicationTests {
     @Test
     @WithMockUser(authorities = "AI_ADMIN")
     void authorizesTheProbeAndRuntimeToggleWithCsrf() throws Exception {
+        mvc.perform(get("/admin/ai")).andExpect(status().isOk())
+                .andExpect(content().string(containsString("Test provider")));
         mvc.perform(post("/api/admin/ai/probe")).andExpect(status().isForbidden());
+        mvc.perform(post("/admin/ai/enabled").param("enabled", "false")).andExpect(status().isForbidden());
         when(structuredOutput.probe(any(AiRequest.class), any())).thenAnswer(invocation -> {
             AiRequest request = invocation.getArgument(0);
             assertThat(request.synthetic()).isTrue();
@@ -169,10 +177,13 @@ class GovaccessaiApplicationTests {
         mvc.perform(post("/api/admin/ai/probe").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("\"ok\":true")));
+        mvc.perform(post("/admin/ai/probe").with(csrf())).andExpect(redirectedUrl("/admin/ai"))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash()
+                        .attribute("successMessage", "The provider returned a valid test response."));
         try {
-            mvc.perform(post("/api/admin/ai/enabled").with(csrf()).param("enabled", "false"))
-                    .andExpect(status().isOk())
-                    .andExpect(content().string(containsString("\"enabled\":false")));
+            mvc.perform(post("/admin/ai/enabled").with(csrf()).param("enabled", "false"))
+                    .andExpect(redirectedUrl("/admin/ai"));
+            mvc.perform(get("/admin/ai")).andExpect(content().string(containsString("Enable AI calls")));
             mvc.perform(get("/api/admin/ai/status"))
                     .andExpect(content().string(containsString("\"enabled\":false")));
         } finally {
@@ -192,6 +203,24 @@ class GovaccessaiApplicationTests {
     }
 
     @Test
+    void loginWithAnExpiredFormReturnsToSignInWithoutAuthenticating() throws Exception {
+        var session = new MockHttpSession();
+        mvc.perform(post("/login").session(session).with(csrf().useInvalidToken())
+                        .param("username", "user").param("password", "login-test-password"))
+                .andExpect(redirectedUrl("/login?expired"));
+
+        mvc.perform(get("/login?expired").session(session))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Your sign-in form expired")));
+        mvc.perform(get("/").session(session)).andExpect(redirectedUrl("http://localhost/login"));
+
+        mvc.perform(post("/login").session(session).with(csrf())
+                        .param("username", "user").param("password", "login-test-password"))
+                .andExpect(redirectedUrl("/"));
+        mvc.perform(get("/").session(session)).andExpect(status().isOk());
+    }
+
+    @Test
     void signInOpensHomeEvenWhenAnErrorRequestWasSaved() throws Exception {
         var session = new MockHttpSession();
         mvc.perform(get("/error").session(session))
@@ -206,7 +235,10 @@ class GovaccessaiApplicationTests {
         mvc.perform(get("/").session(session))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Eligibility overview")))
+                .andExpect(content().string(containsString("Hosted AI configured. Synthetic data only.")))
                 .andExpect(content().string(containsString("2025 financial screening")));
+        mvc.perform(get("/system/status").session(session)).andExpect(status().isOk())
+                .andExpect(content().string(containsString("Application health")));
 
         mvc.perform(get("/workspace/access").session(session))
                 .andExpect(status().isOk())
@@ -225,6 +257,18 @@ class GovaccessaiApplicationTests {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    @WithMockUser(authorities = "AUDIT_VERIFY")
+    void showsAiGovernanceAndBlocksRecognisedIdsWithHostedAi() throws Exception {
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> aiSafety.checkText("Example ID 0000000000018"))
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("identity number");
+        mvc.perform(get("/audit/ai").param("outcome", "RATE_LIMITED")).andExpect(status().isOk())
+                .andExpect(content().string(containsString("Rate-limited requests")));
+        mvc.perform(get("/audit/ai").with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user("officer").authorities(
+                        new org.springframework.security.core.authority.SimpleGrantedAuthority("CASE_REVIEW"))))
+                .andExpect(status().isForbidden());
+    }
+
     @Autowired
     private PolicyVersionRepository policies;
 
@@ -234,12 +278,13 @@ class GovaccessaiApplicationTests {
     @Test
     @Transactional
     @WithMockUser(authorities = "POLICY_EDIT")
-    void loadsAndPreviewsTheBundledDraftFromAnEmptyWorkspace() throws Exception {
+    void loadsAndPreviewsTheBundledDraftWhenThePolicyIsMissing() throws Exception {
         var session = new MockHttpSession();
         mvc.perform(post("/workspace/access").session(session).with(csrf()).param("mode", "POLICY_EDIT"))
                 .andExpect(redirectedUrl("/workspace/access"));
+        long programmeCount = programmes.count();
+        intakeJdbc.update("UPDATE govaccess.assessment SET policy_version_id=NULL");
         policies.deleteAllInBatch();
-        programmes.deleteAllInBatch();
         mvc.perform(get("/policies/nsfas-2025").session(session))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Load NSFAS draft")));
@@ -248,7 +293,7 @@ class GovaccessaiApplicationTests {
             mvc.perform(post("/policies/nsfas-2025/load").session(session).with(csrf()))
                     .andExpect(redirectedUrl("/policies/nsfas-2025"));
         }
-        assertThat(programmes.count()).isEqualTo(1);
+        assertThat(programmes.count()).isEqualTo(programmeCount);
         assertThat(policies.countByStatus("DRAFT")).isEqualTo(1);
         assertThat(policies.countByStatus("PUBLISHED")).isZero();
         mvc.perform(get("/policies/nsfas-2025"))

@@ -5,18 +5,18 @@
 <section id="application-queue" aria-labelledby="queue-heading">
     <div class="overview-heading d-flex justify-content-between align-items-start gap-3 flex-wrap">
         <div><h1 id="queue-heading">Application queue</h1><p>Open a case to review its intake, evidence, assessment and decision history.</p></div>
-        <a class="btn btn-primary" sec:authorize="hasAuthority('PERM_APPLICATION_CREATE')" th:href="@{/applications/new}">Create case</a>
+        <a class="btn btn-outline-primary app-nav-button" th:if="${canSubmitApplication}" th:href="@{/applications/new}">Create case</a>
     </div>
     <section class="card dashboard-card" aria-label="Application cases">
         <div class="table-responsive" th:unless="${#lists.isEmpty(applications)}">
             <table class="table policy-table mb-0">
                 <thead><tr><th scope="col">Reference</th><th scope="col">Applicant</th><th scope="col">Programme</th><th scope="col">Status</th><th scope="col">Recommendation</th><th scope="col">Created</th></tr></thead>
                 <tbody><tr th:each="caseItem : ${applications}">
-                    <td><a th:href="@{/applications/{id}(id=${caseItem.id()})}" th:text="${caseItem.reference()}">Reference</a></td>
+                    <td><a class="btn btn-outline-primary app-nav-button btn-sm" th:href="@{/applications/{id}(id=${caseItem.id()})}" th:text="${caseItem.reference()}">Reference</a></td>
                     <td th:text="${caseItem.applicantName()}">Applicant</td>
                     <td th:text="${caseItem.programmeName()}">Programme</td>
                     <td th:text="${#strings.replace(caseItem.status().name(), '_', ' ')}">Status</td>
-                    <td th:text="${caseItem.recommendation() == null ? 'Pending' : #strings.replace(caseItem.recommendation().name(), '_', ' ')}">Pending</td>
+                    <td th:text="${caseItem.recommendation() == null ? 'Pending' : caseItem.recommendation().displayLabel()}">Pending</td>
                     <td th:text="${#temporals.format(caseItem.createdAt(), 'd MMM yyyy HH:mm')}">Date</td>
                 </tr></tbody>
             </table>

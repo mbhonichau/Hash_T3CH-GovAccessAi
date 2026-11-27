@@ -42,10 +42,11 @@ public class PolicyImportJobs {
     private final ObjectMapper mapper;
     private final BusinessAuditService audit;
     private final ManagedUserService users;
+    private final za.gov.govaccess.ai.service.AiInputSafety safety;
 
     public PolicyImportJobs(PolicyImportRepository jobs, ProgrammeRepository programmes,
                             PolicyVersionRepository versions, RulePolicyService policies, ObjectMapper mapper,
-                            BusinessAuditService audit, ManagedUserService users) {
+                            BusinessAuditService audit, ManagedUserService users, za.gov.govaccess.ai.service.AiInputSafety safety) {
         this.jobs = jobs;
         this.programmes = programmes;
         this.versions = versions;
@@ -53,6 +54,7 @@ public class PolicyImportJobs {
         this.mapper = mapper;
         this.audit = audit;
         this.users = users;
+        this.safety = safety;
     }
 
     public PolicyImportJob enqueue(Principal owner, String programme, String version, String title, Source source) {
@@ -70,6 +72,8 @@ public class PolicyImportJobs {
                 || source.pdf().length > PolicySourceReader.MAX_PDF_BYTES)) {
             throw new IllegalArgumentException("Supply one PDF (up to 8 MB) or paste up to 200000 characters of policy text.");
         }
+        safety.checkText(source.text());
+        safety.checkPdfText(source.pdf());
         var job = new PolicyImportJob(UUID.randomUUID(), userId(owner), UUID.randomUUID(), programme, version.strip(),
                 title.strip(), Status.QUEUED, 0, 0, null, Instant.now());
         jobs.enqueue(job, source);
@@ -79,6 +83,8 @@ public class PolicyImportJobs {
     public List<PolicyImportJob> recent(Principal owner) {
         return jobs.recent(userId(owner));
     }
+
+    public boolean instructionLike(UUID id) { return jobs.instructionLike(id); }
 
     public PolicyImportJob owned(UUID id, Principal owner) {
         return jobs.owned(id, userId(owner), false).orElseThrow(NoSuchElementException::new);

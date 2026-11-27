@@ -1,5 +1,23 @@
 # GovAccess AI
 
+## Where to find the screens
+
+| Workflow | Screen |
+|---|---|
+| Sign in and change workspace mode | **Sign in**, then **Workspace access** for authorised policy users |
+| System and provider checks | **System status** for application health. **AI administration** for the runtime switch and synthetic provider probe |
+| Review AI activity | **AI governance** for auditors. Filter request metadata by user, provider, prompt, or outcome |
+| Configure a programme and policy | **Policy lifecycle → Programmes and new drafts**, **Rule catalogue**, and **Policy Studio** for the NSFAS sample |
+| Import and review a policy source | **Policy imports**, then the job’s progress and review screens |
+| Review, test, publish, and fork a version | **Policy lifecycle → Version** |
+| Manage roles and assignments | **Managed users** for accounts, case assignments, and audit scope. **Staff access** for legacy accounts |
+| Verify the audit chain | **Audit history → Verify audit chain** for auditors |
+| Submit and review an application | **New application** or **Application queue → Case**. Applicants have **View my applications** on their landing page |
+| Upload and verify supporting evidence | **Case → Supporting documents → Document** |
+| Assess and compare evidence versions | **Case → Assess available evidence** and **Assessment history** for saved confidence factors, thresholds, and snapshot IDs |
+| Explain and decide a case | **Case → Decision workspace** for the saved explanation, confirmation, amendment, override, and evidence follow-up |
+| Draft and release communications | **Case → Case messages and notices** for evidence recovery and decision notices. **Policy lifecycle → Programme notice configuration** for authorised review or appeal wording |
+
 GovAccess AI provides a configurable eligibility assessment engine for government programmes. The application uses Java 25, Spring Boot 3.5.16, Thymeleaf, and locally served Bootstrap 5.3.8. Spring AI 1.0.9 supplies the PDF reader. Phase 1 requires no model account or API key.
 
 ## Build and test
@@ -83,11 +101,44 @@ Run `.\scripts\Test-RepositorySecrets.ps1 -Staged` before committing, or run it 
 
 1. Prepare two disposable PostgreSQL databases. Start with a fresh database and a copy of a pre-hardening database containing at least one saved policy or audit row. Include a copy of the Hibernate-created policy tables if that is how the existing deployment was provisioned.
 2. Back up the existing copy, stop old application instances, and launch this version against each database in turn. Use the schema-owning role. Keep Flyway enabled and Hibernate in validation mode.
-3. Check that `govaccess.flyway_schema_history` ends at version `14` with successful entries. For a legacy schema containing the AI tables and no Flyway history, startup records a V2 baseline. If V3 is pending and Hibernate already created the policy tables, Flyway stages them and restores their rows while adopting the versioned schema. V10 converts the saved NSFAS rule JSON into canonical content and preserves the legacy JSON for the existing editor.
+3. Check that `govaccess.flyway_schema_history` ends at version `21` with successful entries. For a legacy schema containing the AI tables and no Flyway history, startup records a V2 baseline. If V3 is pending and Hibernate already created the policy tables, Flyway stages them and restores their rows while adopting the versioned schema. V10 converts the saved NSFAS rule JSON into canonical content and preserves the legacy JSON for the existing editor.
 4. Compare schema-only dumps of `govaccess` using `pg_dump --schema-only --schema=govaccess --no-owner --no-privileges` or compare the table definitions in the SQL Editor. Check that `ai_call_log.request_id` is non-null and references `ai_request_log.id`. Confirm the existing policy rows and hashes are preserved. Each legacy attempt is linked to its own historical request because the original rows lacked a correlation ID.
 5. Restart both databases' application instances and confirm Flyway has no pending migrations and Hibernate validation succeeds. The migration callback for previously Hibernate-created policy tables is part of Spring Boot startup. Use app startup for that upgrade path.
 
-The deployed intake project already used versions V5–V7. Application startup recognises those exact historical entries by version, description, script and checksum, and applies this branch's V8–V14 afterward. Its history rows remain intact. Use Spring Boot startup for that deployment, since the standalone Flyway Maven goal does not run the application-specific validation strategy.
+The deployed intake project already used versions V5–V7. Application startup recognises those exact historical entries by version, description, script and checksum, and applies this branch's V8–V21 afterward. Its history rows remain intact. Use Spring Boot startup for that deployment, since the standalone Flyway Maven goal does not run the application-specific validation strategy.
+
+### AI governance and demo replay
+
+- `govaccess.ai.user-requests-per-minute` and `govaccess.ai.user-requests-per-day` default to 60 and 500 per user. A request, including any repair or provider retries, uses one logical slot. Daily windows reset at UTC midnight. Limit denials are audited with zero provider attempts.
+- A hosted-capable workspace displays the synthetic-data banner. Parsed uploads containing a Luhn-valid identity number are blocked. Identity numbers detected during scanned document OCR also stop processing before an AI call. Instruction-like content is flagged for review and proceeds through the normal validation when other input checks pass.
+- Run `scripts/Prewarm-GovAccessDemo.ps1` with your database and live provider environment configured. It runs the registered synthetic AI workflow (the bundled NSFAS policy import) without saving a draft. RECORD archives synthetic completions and puts validated results in the replay cache. The seeded case summaries do not invoke a live model.
+- Start with the `demo` profile, using the same database, prompt and model. The startup check lists missing registered cache entries. `REPLAY_ONLY` misses fail without a provider call. Keep the demo response archive restricted to synthetic data.
+
+### Applicant communications
+
+- After recording an evidence follow-up in **Decision workspace**, open **Case messages and notices** to draft it from the current assessment. Review the identified evidence and enter a reason to send. Sending publishes the message to the applicant's case workspace.
+- After an official decision, draft the notice from the recorded decision, criteria and facts. A policy publisher must approve the programme's review or appeal wording before an officer can approve a notice. Approval copies the authorised wording into the notice. The estimated English reading grade is advisory and defaults to a target of 8.
+- Leave `NOTICE_TRANSLATION_LANGUAGE` blank to skip translation. If an authorised reviewer can verify a language, set one language code (for example `af`) and optional glossary entries in `NOTICE_TRANSLATION_GLOSSARY` as `English=translation` pairs separated by `|`. Generate after approving English. Review the machine translation and approve it before sending if it should be published alongside English.
+
+### Decision workspace
+
+The case assessment saves the pinned policy hash, a protected evidence snapshot, and a structured explanation input with rule results and evidence references. Explanations use the configured local AI provider when available and pass deterministic checks. The workspace displays a template explanation when generation is unavailable or validation fails after the repair attempt. Reassess older records to use the decision workspace.
+
+Explanation prompt v2 sends the saved projection between `<assessment>` tags. New assessments capture source document IDs and any recorded page numbers for rule explanations. Older snapshots can still be explained with their recorded evidence references. Run a new assessment to capture citation details from currently verified fields.
+
+Every decision action requires a reason. An amendment corrects a verified document field, creates a new assessment, and invalidates the replaced assessment's explanation and pending handoffs. An evidence request records a durable handoff for Stage 8.
+
+Configure officer override authority with `govaccess.decision.delegated-officers`, a comma-separated list of managed usernames. The default is empty. `govaccess.decision.supervisor-only-overrides` defaults to `DECLINED`. Overrides outside an officer's delegation enter the assigned supervisor's queue. Without an assigned supervisor, the action is denied. Final outcomes require confirmation or an authorised override.
+
+### Application documents
+
+After verifying document fields, an assigned officer or supervisor can select **Assess available evidence** on the case. Stage 6 takes inputs from the submitted declarations and the Stage 5 field records. Rule satisfaction is the share of applicable top-level rules that pass. Evidence completeness is the share that can be evaluated to pass, fail, or conflict. The confidence index weights completeness, field verification and extraction confidence. The `govaccess.assessment` configuration in `application.yml` supplies weights and label thresholds, which are saved with each case assessment. Low confidence and reconciliation exceptions route the recommendation to review. The case display carries the protected snapshot ID for audit and reproduction.
+
+1. In **Rule catalogue**, allow the document type on the relevant field. Add that type to the rule's `requiredEvidence` and publish the tested policy. A case pins the published version that applies on its submission date. Older cases with no recorded policy require an explicit migration or operational review before uploads.
+2. Set `DOCUMENT_STORAGE_DIRECTORY` to a private persistent directory outside web resources. Keep it accessible to the application and backed up alongside the database. Configure a local OpenAI-compatible model with `AI_HOSTED=false` and a loopback `AI_BASE_URL`. Document calls use local inference. Tess4J uses the bundled English trained data by default. Set `TESSDATA_PREFIX` to use an explicitly managed directory containing `eng.traineddata`. OCR needs a supported local Tesseract native runtime.
+3. Sign in as an Applicant, submit a case, then upload a synthetic PDF from **Supporting documents**. For a synthetic payslip, use a heading such as `Payslip` and a labelled line such as `Gross Pay: 1200`, matching the field label in the catalogue. The current extraction allowlist expects matching field labels and typed values on the same line.
+4. In **Managed users**, assign the case to an officer and optionally a team or escalation supervisor. From the assigned case, open the document and review the PDF preview alongside the extracted fields. A verification can accept the existing value or supply a correction, such as `1250` for a numeric field. Re-extraction preserves verified values.
+5. If the local model accepts images, set `AI_DOCUMENT_IMAGES=true`. Low-confidence OCR can trigger an additional extraction call with an image showing only the allowed source lines. Corrections and extraction are logged in the case audit.
 
 ### Policy lifecycle and business audit
 
@@ -123,3 +174,7 @@ The seeded programmes are demo records. The bundled NSFAS draft carries citation
 Switch to **Policy Edit**, then open **Policy imports**. Choose a programme, enter a draft label and document title, and upload a text PDF or paste policy text. The job processes one section at a time. On completion, **Review AI draft** shows citations, low-confidence rules, rejected suggestions, and unmapped requirements. Review edits retain the original value and editor.
 
 Uploaded policy sources use an AI provider on the same machine. For Ollama, configure `AI_BASE_URL=http://127.0.0.1:11434/v1`, `AI_HOSTED=false`, and `AI_MODEL` with the installed tag. Keep hosted providers for the bundled synthetic import. The general import uses prompt v4. Its review includes exemptions, calculation methods and rule-level human-review notes. The bundled sample still uses v2.
+
+### RBAC demo fixtures
+
+Use the [RBAC demo seed and manual checks](docs/rbac-testing.md) to try each managed role with synthetic cases and audit scopes.

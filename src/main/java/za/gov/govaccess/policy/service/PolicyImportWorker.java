@@ -20,13 +20,16 @@ public class PolicyImportWorker {
     private final PolicySourceReader sources;
     private final PolicyInterpretationService interpreter;
     private final PolicyImportJobs drafts;
+    private final za.gov.govaccess.ai.service.AiInputSafety safety;
 
     public PolicyImportWorker(PolicyImportRepository jobs, PolicySourceReader sources,
-                              PolicyInterpretationService interpreter, PolicyImportJobs drafts) {
+                              PolicyInterpretationService interpreter, PolicyImportJobs drafts,
+                              za.gov.govaccess.ai.service.AiInputSafety safety) {
         this.jobs = jobs;
         this.sources = sources;
         this.interpreter = interpreter;
         this.drafts = drafts;
+        this.safety = safety;
     }
 
     @Scheduled(fixedDelayString = "${govaccess.policy-import.poll-ms:1500}",
@@ -41,6 +44,11 @@ public class PolicyImportWorker {
         try {
             var source = jobs.source(job.id());
             var chunks = sources.read(source.text(), source.pdf());
+            String extractedText = chunks.stream().map(PolicySourceReader.Chunk::text).collect(java.util.stream.Collectors.joining("\n"));
+            if (za.gov.govaccess.ai.service.AiInputSafety.instructionLike(extractedText)) {
+                safety.flagPolicy(job.id(), job.userId(), job.draftId());
+            }
+            safety.checkText(extractedText);
             jobs.progress(job.id(), 0, chunks.size());
             var context = new AiCallContext(job.userId(), "POLICY_VERSION", job.draftId());
             var review = interpreter.interpretDocument(job.sourceLabel(), chunks, context,
@@ -48,8 +56,11 @@ public class PolicyImportWorker {
             drafts.complete(job, review);
         } catch (IOException e) {
             jobs.fail(job.id(), "The PDF could not be read. Upload a readable text PDF.");
-        } catch (AiProviderException | AiReplayMissException e) {
-            jobs.fail(job.id(), "Document imports require an enabled, locally processed AI provider.");
+        } catch (AiProviderException e) {
+            jobs.fail(job.id(), e.reason() == AiProviderException.Reason.RATE_LIMITED ? e.getMessage()
+                    : "Document imports require an enabled, locally processed AI provider.");
+        } catch (AiReplayMissException e) {
+            jobs.fail(job.id(), "No recorded response matches this import.");
         } catch (AiOutputInvalidException e) {
             jobs.fail(job.id(), "The AI response failed document rule validation.");
         } catch (IllegalArgumentException e) {

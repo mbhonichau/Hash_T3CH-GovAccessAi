@@ -9,7 +9,12 @@
 <body>
 <main class="container py-4">
     <h1>Applicant workspace</h1>
-    <p>Online application services are unavailable in this workspace.</p>
+    <p class="alert alert-warning" role="status" th:if="${navHostedAi}">Hosted AI configured. Synthetic data only.</p>
+    <nav class="application-navigation mb-3" aria-label="Applicant workspace navigation">
+        <a class="btn btn-outline-primary app-nav-button" th:href="@{/applications/new}">Start an application</a>
+        <a class="btn btn-outline-primary app-nav-button" th:href="@{/applications}">View my applications</a>
+        <a class="btn btn-outline-primary app-nav-button" th:href="@{/system/status}">System status</a>
+    </nav>
     <form method="post" th:action="@{/logout}">
         <button class="btn btn-outline-primary" type="submit">Sign out</button>
     </form>

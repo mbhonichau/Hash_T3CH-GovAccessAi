@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Assessment history', ~{::#assessment-history})}">
+<body>
+<section id="assessment-history">
+    <div class="overview-heading">
+        <a class="btn btn-outline-primary app-nav-button mb-2" th:href="@{/applications/{id}(id=${applicationId})}">Back to application</a>
+        <h1>Assessment history</h1>
+    </div>
+    <p th:if="${#lists.isEmpty(assessmentReports)}">No evidence reconciliation assessments have been recorded.</p>
+    <details class="card dashboard-card mb-3" th:each="report : ${assessmentReports}">
+        <summary class="card-header" th:text="|${#temporals.format(report.assessedAt, 'd MMM yyyy HH:mm XXX')} · ${report.recommendationLabel()}|"></summary>
+        <div class="card-body">
+            <div th:replace="~{fragments/evidence-quality :: quality(${report})}"></div>
+            <p class="small" th:text="|Medium starts at ${#numbers.formatPercent(report.configuration.mediumThreshold, 0, 0)} · High starts at ${#numbers.formatPercent(report.configuration.highThreshold, 0, 0)}|"></p>
+        </div>
+    </details>
+</section>
+</body>
+</html>

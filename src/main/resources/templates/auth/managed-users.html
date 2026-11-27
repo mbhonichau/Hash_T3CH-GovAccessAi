@@ -29,6 +29,37 @@
             </form>
         </div>
     </div>
+    <div class="card dashboard-card mb-3">
+        <div class="card-body">
+            <h2>Assign an application</h2>
+            <p>Use the application ID from the case URL. A blank staff selection clears that assignment.</p>
+            <form method="post" th:action="@{/applications/assignment}" class="row g-2 align-items-end">
+                <div class="col-md"><label class="form-label" for="case-id">Application ID</label>
+                    <input class="form-control" id="case-id" name="caseId" maxlength="36" required></div>
+                <div class="col-md"><label class="form-label" for="case-owner">Applicant owner</label>
+                    <select class="form-select" id="case-owner" name="owner">
+                        <option value="">Keep current owner</option>
+                        <option th:each="a : ${accounts}" th:if="${a.role.name() == 'APPLICANT' and a.enabled}" th:value="${a.id}" th:text="${a.username}"></option>
+                    </select></div>
+                <div class="col-md"><label class="form-label" for="case-officer">Assigned officer</label>
+                    <select class="form-select" id="case-officer" name="officer">
+                        <option value="">Unassigned</option>
+                        <option th:each="a : ${accounts}" th:if="${a.role.name() == 'ASSESSMENT_OFFICER' and a.enabled}" th:value="${a.id}" th:text="${a.username}"></option>
+                    </select></div>
+                <div class="col-md"><label class="form-label" for="case-team">Team supervisor</label>
+                    <select class="form-select" id="case-team" name="supervisor">
+                        <option value="">Unassigned</option>
+                        <option th:each="a : ${accounts}" th:if="${a.role.name() == 'SUPERVISOR' and a.enabled}" th:value="${a.id}" th:text="${a.username}"></option>
+                    </select></div>
+                <div class="col-md"><label class="form-label" for="case-escalation">Escalate to</label>
+                    <select class="form-select" id="case-escalation" name="escalation">
+                        <option value="">Unassigned</option>
+                        <option th:each="a : ${accounts}" th:if="${a.role.name() == 'SUPERVISOR' and a.enabled}" th:value="${a.id}" th:text="${a.username}"></option>
+                    </select></div>
+                <div class="col-md-auto"><button class="btn btn-primary" type="submit">Save assignment</button></div>
+            </form>
+        </div>
+    </div>
     <div class="card dashboard-card">
         <div class="card-header"><h2>Accounts</h2></div>
         <p class="card-body mb-0" th:if="${#lists.isEmpty(accounts)}">No managed accounts yet.</p>

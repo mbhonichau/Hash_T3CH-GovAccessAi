@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · AI administration', ~{::#ai-administration})}">
+<body>
+<section id="ai-administration">
+    <div class="overview-heading"><h1>AI administration</h1></div>
+    <div class="card dashboard-card mb-3">
+        <div class="card-body">
+            <h2>AI availability</h2>
+            <p th:text="${aiEnabled ? 'AI calls are enabled.' : 'AI calls are disabled.'}"></p>
+            <form method="post" th:action="@{/admin/ai/enabled}">
+                <button type="submit" class="btn btn-outline-primary" name="enabled" th:value="${!aiEnabled}"
+                        th:text="${aiEnabled ? 'Disable AI calls' : 'Enable AI calls'}"></button>
+            </form>
+        </div>
+    </div>
+    <div class="card dashboard-card">
+        <div class="card-body">
+            <h2>Provider connection</h2>
+            <p>Send a synthetic test request to check provider credentials and model access.</p>
+            <form method="post" th:action="@{/admin/ai/probe}">
+                <button type="submit" class="btn btn-primary" th:disabled="${!aiEnabled}">Test provider</button>
+            </form>
+        </div>
+    </div>
+</section>
+</body>
+</html>
