@@ -9,14 +9,24 @@
 | Review AI activity | **AI governance** for auditors. Filter request metadata by user, provider, prompt, or outcome |
 | Configure a programme and policy | **Policy lifecycle → Programmes and new drafts**, **Rule catalogue**, and **Policy Studio** for the NSFAS sample |
 | Import and review a policy source | **Policy imports**, then the job’s progress and review screens |
-| Review, test, publish, and fork a version | **Policy lifecycle → Version** |
+| Review, test, publish, and fork a version | **Policy lifecycle → Version**. Manual drafts provide a guided rule builder; canonical JSON remains available under the advanced editor |
 | Manage roles and assignments | **Managed users** for accounts, case assignments, and audit scope. **Staff access** for legacy accounts |
 | Verify the audit chain | **Audit history → Verify audit chain** for auditors |
 | Submit and review an application | **New application** or **Application queue → Case**. Applicants have **View my applications** on their landing page |
 | Upload and verify supporting evidence | **Case → Supporting documents → Document** |
 | Assess and compare evidence versions | **Case → Assess available evidence** and **Assessment history** for saved confidence factors, thresholds, and snapshot IDs |
 | Explain and decide a case | **Case → Decision workspace** for the saved explanation, confirmation, amendment, override, and evidence follow-up |
-| Draft and release communications | **Case → Case messages and notices** for evidence recovery and decision notices. **Policy lifecycle → Programme notice configuration** for authorised review or appeal wording |
+| Draft and release communications | **Case → Case messages and notices** for evidence recovery and decision notices. **Policy lifecycle → Programme notice configuration** explains which official review or appeal details to enter |
+
+## Interface and accessibility
+
+The application uses a white page background with SITA-inspired blue and green accents, glass-style cards, and light blue primary actions. Navigation buttons use distinct hover states for ordinary navigation, cancellation, and sign-out.
+
+The applicant landing page has shortcuts to start an application, review existing applications, and check service status. Policy administrators can add manual policy rules with a guided form that uses the rule catalogue and asks for the eligibility effect, missing-evidence handling, and source citation. A canonical JSON editor remains available for advanced edits. Policy review cannot start until a draft contains at least one rule.
+
+Programme notice configuration describes the information applicants need and shows an example layout with placeholders. Replace every placeholder with wording verified against the official programme rules before saving; the example is not approved notice text.
+
+Key text and button color combinations have been contrast-checked during implementation. This is not a full WCAG audit: screen-reader testing and a complete accessibility review remain outstanding, so the application does not claim WCAG conformance.
 
 GovAccess AI provides a configurable eligibility assessment engine for government programmes. The application uses Java 25, Spring Boot 3.5.16, Thymeleaf, and locally served Bootstrap 5.3.8. Spring AI 1.0.9 supplies the PDF reader. Phase 1 requires no model account or API key.
 
