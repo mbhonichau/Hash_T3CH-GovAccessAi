@@ -59,7 +59,7 @@ public class PolicyLifecycleService {
         var version = require(id, "DRAFT");
         var document = rules.read(version.getContent());
         if (document.rules().isEmpty()) {
-            throw new IllegalArgumentException("A policy needs at least one rule before review");
+            throw new IllegalArgumentException("Add at least one rule to the policy content before submitting it for review.");
         }
         rules.validate(document);
         version.submitForReview(actor.id());

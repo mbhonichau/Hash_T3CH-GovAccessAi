@@ -4,7 +4,7 @@
 <body>
 <section id="programmes">
     <div class="overview-heading">
-        <a th:href="@{/policies/lifecycle}">Back to policy lifecycle</a>
+        <a class="btn btn-outline-primary app-nav-button app-back-button mb-2" th:href="@{/policies/lifecycle}">Back to policy lifecycle</a>
         <h1>Programmes and drafts</h1>
     </div>
     <p th:unless="${canEditPolicy}"><a th:href="@{/workspace/access}">Enter Policy Edit</a> to create programmes and drafts.</p>

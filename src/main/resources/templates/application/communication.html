@@ -4,7 +4,7 @@
 <body>
 <section id="communication">
     <div class="overview-heading">
-        <a class="btn btn-outline-primary app-nav-button mb-2" th:href="@{/applications/{app}/communications(app=${message.applicationId})}">Back to messages</a>
+        <a class="btn btn-outline-primary app-nav-button app-back-button mb-2" th:href="@{/applications/{app}/communications(app=${message.applicationId})}">Back to messages</a>
         <h1 th:text="${message.kind == 'DECISION_NOTICE' ? 'Decision notice' : 'Request for additional evidence'}"></h1>
         <p th:if="${staff}" th:text="|${message.state} · ${message.generatedBy}|"></p>
     </div>

@@ -9,7 +9,7 @@
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/vendor/mazer/icons/bootstrap-icons.css}">
     <link rel="stylesheet" th:href="@{/vendor/mazer/css/app.css}">
-    <link rel="stylesheet" th:href="@{/css/app.css(v='20261127-full-sita-glass-white')}">
+    <link rel="stylesheet" th:href="@{/css/app.css(v='20261127-lighter-buttons')}">
     <script defer th:src="@{/js/navigation.js}"></script>
 </head>
 <body>
@@ -24,7 +24,7 @@
                         <span th:text="${username}">User</span>
                     </span>
                     <form th:action="@{/logout}" method="post">
-                        <button class="sign-out" type="submit">Sign out</button>
+                        <button class="sign-out app-exit-button" type="submit">Sign out</button>
                     </form>
                 </div>
             </div>
