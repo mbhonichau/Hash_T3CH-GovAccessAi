@@ -4,7 +4,7 @@
 <body>
 <section id="application-details" aria-labelledby="case-heading">
     <div class="overview-heading d-flex justify-content-between align-items-start gap-3 flex-wrap">
-        <div><a class="btn btn-outline-primary app-nav-button mb-2" th:href="@{/applications}">← Application queue</a>
+        <div><a class="btn btn-outline-primary app-nav-button app-back-button mb-2" th:href="@{/applications}">← Application queue</a>
             <h1 id="case-heading" th:text="${caseDetail.application().reference()}">Case reference</h1>
             <p>Case details and workflow history.</p></div>
         <span class="badge rounded-pill text-bg-secondary" th:text="${#strings.replace(caseDetail.application().status().name(), '_', ' ')}">Received</span>

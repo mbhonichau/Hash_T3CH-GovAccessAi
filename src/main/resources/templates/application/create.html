@@ -5,7 +5,7 @@
 <section id="application-create" aria-labelledby="create-heading">
     <div class="overview-heading d-flex justify-content-between align-items-start gap-3 flex-wrap">
         <div><h1 id="create-heading">Create application case</h1><p>Record the minimum information needed to open an intake case.</p></div>
-        <a class="btn btn-outline-primary app-nav-button" th:href="@{/applications}">Back to application queue</a>
+        <a class="btn btn-outline-primary app-nav-button app-back-button" th:href="@{/applications}">Back to application queue</a>
     </div>
     <div class="card dashboard-card"><div class="card-body">
         <form th:action="@{/applications}" th:object="${applicationForm}" method="post">
@@ -35,7 +35,7 @@
                 <div class="text-danger" th:errors="*{declarations}"></div>
             </div>
             <button class="btn btn-primary" type="submit">Create case</button>
-            <a class="btn btn-outline-primary app-nav-button" th:href="@{/applications}">Cancel</a>
+            <a class="btn btn-outline-secondary app-nav-button app-cancel-button" th:href="@{/applications}">Cancel</a>
         </form>
     </div></div>
 </section>

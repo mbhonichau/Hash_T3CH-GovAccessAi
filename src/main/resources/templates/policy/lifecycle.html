@@ -17,11 +17,106 @@
         <div class="card-header"><h2>Policy content</h2></div>
         <div class="card-body">
             <form th:if="${canEditPolicy and version.status == 'DRAFT' and version.origin == 'MANUAL' and version.ruleJson == null}"
-                  method="post" th:action="@{/policies/lifecycle/{id}/edit(id=${version.id})}">
-                <label for="draft-content" class="form-label">Canonical rule JSON</label>
-                <textarea id="draft-content" class="form-control mb-3" name="content" rows="13"
-                          maxlength="200000" required th:text="${version.content}"></textarea>
-                <button class="btn btn-primary" type="submit">Save draft content</button>
+                  method="post" th:action="@{/policies/lifecycle/{id}/edit(id=${version.id})}" id="policy-content-form">
+                <div class="rule-builder-panel">
+                    <noscript><p class="alert alert-info">The guided rule builder needs JavaScript. You can still edit the policy in the advanced JSON editor below.</p></noscript>
+                    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+                        <div>
+                            <h3 class="h5">Build a rule</h3>
+                            <p class="mb-2">Choose a catalogue field, set its requirement, and cite the source policy. You do not need to write JSON.</p>
+                        </div>
+                        <a class="btn btn-outline-primary app-nav-button" th:href="@{/rules/catalogue}">View rule catalogue</a>
+                    </div>
+                    <p class="alert alert-warning" role="status" id="policy-rule-count" aria-live="polite"
+                       th:if="${ruleCount == 0}">This draft has no rules yet. Add at least one rule before submitting it for review.</p>
+                    <p class="alert alert-success" role="status" id="policy-rule-count" aria-live="polite"
+                       th:if="${ruleCount > 0}" th:text="|${ruleCount} top-level ${ruleCount == 1 ? 'rule' : 'rules'} in this draft.|"></p>
+                    <p class="alert alert-info" th:if="${#lists.isEmpty(ruleFields)}">
+                        No rule fields are configured yet. Add a field and its source document in the rule catalogue first.
+                    </p>
+                    <fieldset id="rule-builder" th:disabled="${#lists.isEmpty(ruleFields)}">
+                        <legend class="visually-hidden">New policy rule</legend>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" for="rule-name">Rule name</label>
+                                <input class="form-control" id="rule-name" maxlength="255" autocomplete="off">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" for="rule-code">Rule code</label>
+                                <input class="form-control" id="rule-code" maxlength="100" value="RULE_1" aria-describedby="rule-code-help">
+                                <div class="form-text" id="rule-code-help">Use a unique short code such as RULE_1.</div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" for="rule-field">What should the rule check?</label>
+                                <select class="form-select" id="rule-field">
+                                    <option value="">Choose a field</option>
+                                    <option th:each="field : ${ruleFields}" th:value="${field.key}" th:text="|${field.label} (${field.key})|"
+                                            th:attr="data-value-type=${field.valueType},data-unit=${field.unit == null ? '' : field.unit}"></option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" for="rule-operator">Requirement</label>
+                                <select class="form-select" id="rule-operator" disabled>
+                                    <option value="">Choose a field first</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6" id="rule-value-wrap">
+                                <label class="form-label" for="rule-value">Required value</label>
+                                <input class="form-control" id="rule-value" autocomplete="off">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" for="rule-mandatory">If this requirement is not met</label>
+                                <select class="form-select" id="rule-mandatory">
+                                    <option value="">Choose what it means</option>
+                                    <option value="true">Applicant does not qualify</option>
+                                    <option value="false">Continue checking other rules</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" for="rule-missing">If evidence is missing</label>
+                                <select class="form-select" id="rule-missing">
+                                    <option value="">Choose what should happen</option>
+                                    <option value="UNKNOWN">Mark as unknown</option>
+                                    <option value="NEEDS_REVIEW">Send for human review</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" for="rule-evidence">Required evidence (optional)</label>
+                                <select class="form-select" id="rule-evidence" multiple size="3" aria-describedby="rule-evidence-help">
+                                    <option th:each="document : ${documentTypes}" th:value="${document.key}" th:text="${document.label}"></option>
+                                </select>
+                                <div class="form-text" id="rule-evidence-help">Use Ctrl or Command to select more than one.</div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" for="rule-source-document">Source policy document</label>
+                                <input class="form-control" id="rule-source-document" maxlength="255" autocomplete="off">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" for="rule-source-section">Section or heading</label>
+                                <input class="form-control" id="rule-source-section" maxlength="255" autocomplete="off">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label" for="rule-source-page">Page number (optional)</label>
+                                <input class="form-control" id="rule-source-page" type="number" min="1" step="1">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label" for="rule-source-quote">Source wording</label>
+                                <textarea class="form-control" id="rule-source-quote" rows="3" maxlength="4000"></textarea>
+                            </div>
+                        </div>
+                        <p class="alert alert-danger mt-3 mb-0" id="rule-builder-error" role="alert" tabindex="-1" hidden></p>
+                        <button class="btn btn-outline-primary mt-3" id="add-policy-rule" type="button">Add rule to draft</button>
+                    </fieldset>
+                </div>
+                <details class="advanced-rule-editor mt-3">
+                    <summary>Advanced editor (canonical JSON)</summary>
+                    <p class="form-text mt-2">Use this only if you are familiar with the rule format. The guided rule form above is safer for most edits.</p>
+                    <label for="draft-content" class="form-label">Policy content in JSON format</label>
+                    <textarea id="draft-content" class="form-control mb-3 font-monospace" name="content" rows="13"
+                              maxlength="200000" required th:text="${version.content}"></textarea>
+                </details>
+                <button class="btn btn-primary mt-3" type="submit">Save draft changes</button>
+                <script defer th:src="@{/js/policy-rule-builder.js}"></script>
             </form>
             <pre class="mb-0" th:unless="${canEditPolicy and version.status == 'DRAFT' and version.origin == 'MANUAL' and version.ruleJson == null}"
                  th:text="${version.content}"></pre>
@@ -30,8 +125,12 @@
     <div class="card dashboard-card" th:if="${version.status == 'DRAFT' and canEditPolicy}">
         <div class="card-body">
             <h2>Submit for review</h2>
-            <p>Submitting freezes the draft content for testing.</p>
-            <form method="post" th:action="@{/policies/lifecycle/{id}/review(id=${version.id})}">
+            <p>Submitting freezes the draft content for testing. The draft must contain at least one valid rule.</p>
+            <form method="post" id="submit-policy-review" th:attr="data-rule-count=${ruleCount}"
+                  th:action="@{/policies/lifecycle/{id}/review(id=${version.id})}">
+                <p class="alert alert-warning" th:if="${ruleCount == 0}" role="status">
+                    Add at least one rule in Policy content before submitting this draft for review.
+                </p>
                 <button class="btn btn-primary" type="submit">Submit for review</button>
             </form>
         </div>

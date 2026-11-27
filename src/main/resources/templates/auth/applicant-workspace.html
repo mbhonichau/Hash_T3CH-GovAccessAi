@@ -5,19 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Applicant workspace · GovAccess AI</title>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/vendor/mazer/icons/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/css/app.css(v='20261127-lighter-buttons')}">
 </head>
-<body>
-<main class="container py-4">
-    <h1>Applicant workspace</h1>
-    <p class="alert alert-warning" role="status" th:if="${navHostedAi}">Hosted AI configured. Synthetic data only.</p>
-    <nav class="application-navigation mb-3" aria-label="Applicant workspace navigation">
-        <a class="btn btn-outline-primary app-nav-button" th:href="@{/applications/new}">Start an application</a>
-        <a class="btn btn-outline-primary app-nav-button" th:href="@{/applications}">View my applications</a>
-        <a class="btn btn-outline-primary app-nav-button" th:href="@{/system/status}">System status</a>
-    </nav>
-    <form method="post" th:action="@{/logout}">
-        <button class="btn btn-outline-primary" type="submit">Sign out</button>
-    </form>
+<body class="applicant-page">
+<a class="skip-link" href="#applicant-main">Skip to main content</a>
+<main id="applicant-main" class="container py-4 applicant-shell" tabindex="-1">
+    <header class="applicant-header">
+        <a class="site-name" th:href="@{/}" aria-label="GovAccess AI applicant workspace">
+            <span class="brand-mark"><i class="bi-shield-check" aria-hidden="true"></i></span>
+            <span>GovAccess <span class="brand-ai">AI</span></span>
+        </a>
+        <form method="post" th:action="@{/logout}">
+            <button class="btn btn-outline-secondary app-nav-button app-exit-button" type="submit">Sign out</button>
+        </form>
+    </header>
+    <section class="applicant-welcome" aria-labelledby="applicant-heading">
+        <div class="applicant-welcome-copy">
+            <p class="applicant-eyebrow">Applicant workspace</p>
+            <h1 id="applicant-heading">Support starts with your next step</h1>
+            <p class="applicant-intro">Apply for support and follow your application progress from one secure place.</p>
+            <p class="alert alert-warning" role="status" th:if="${navHostedAi}">Hosted AI configured. Synthetic data only.</p>
+            <a class="btn btn-primary applicant-start-button" th:href="@{/applications/new}">
+                Start an application <i class="bi-arrow-right ms-1" aria-hidden="true"></i>
+            </a>
+        </div>
+        <div class="applicant-illustration" aria-hidden="true">
+            <span class="applicant-orbit applicant-orbit-blue"></span>
+            <span class="applicant-orbit applicant-orbit-green"></span>
+            <span class="applicant-orbit applicant-orbit-ring"></span>
+            <span class="applicant-illustration-mark"><i class="bi-shield-check"></i></span>
+        </div>
+    </section>
+    <section class="applicant-quick-links" aria-labelledby="quick-links-heading">
+        <div class="applicant-section-heading">
+            <p class="applicant-eyebrow">Your workspace</p>
+            <h2 id="quick-links-heading">What would you like to do?</h2>
+        </div>
+        <div class="applicant-choice-grid">
+            <article class="applicant-choice-card">
+                <span class="applicant-choice-icon applicant-choice-blue" aria-hidden="true"><i class="bi-folder2-open"></i></span>
+                <h3>Follow your applications</h3>
+                <p>Review the applications you have started and check their latest status.</p>
+                <a class="btn btn-outline-primary app-nav-button" th:href="@{/applications}">View my applications</a>
+            </article>
+            <article class="applicant-choice-card">
+                <span class="applicant-choice-icon applicant-choice-green" aria-hidden="true"><i class="bi-info-circle"></i></span>
+                <h3>Check service status</h3>
+                <p>See whether the application service is available before you continue.</p>
+                <a class="btn btn-outline-primary app-nav-button" th:href="@{/system/status}">View service status</a>
+            </article>
+        </div>
+    </section>
 </main>
 </body>
 </html>

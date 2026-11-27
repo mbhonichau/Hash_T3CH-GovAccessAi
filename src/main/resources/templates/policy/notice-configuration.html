@@ -4,8 +4,9 @@
 <body>
 <section id="notice-configuration">
     <div class="overview-heading">
-        <a th:href="@{/policies/lifecycle}">Back to policy lifecycle</a>
+        <a class="btn btn-outline-primary app-nav-button app-back-button mb-2" th:href="@{/policies/lifecycle}">Back to policy lifecycle</a>
         <h1>Programme notice configuration</h1>
+        <p>Set the official instructions applicants will see when they receive a decision.</p>
     </div>
     <form method="get" th:action="@{/policies/lifecycle/notice-configuration}" class="mb-3">
         <label class="form-label" for="programme">Programme</label>
@@ -16,11 +17,43 @@
     </form>
     <form method="post" th:if="${selectedProgramme != null}" th:action="@{/policies/lifecycle/notice-configuration}">
         <input type="hidden" name="programme" th:value="${selectedProgramme}">
-        <label class="form-label" for="procedure">Authorised review or appeal wording</label>
-        <p class="form-text" id="procedure-help">Enter the official period and procedure as they should appear in a notice.</p>
-        <textarea class="form-control mb-2" id="procedure" name="procedure" rows="8" maxlength="4000" required
-                  aria-describedby="procedure-help" th:text="${procedure == null ? '' : procedure.text}"></textarea>
-        <button class="btn btn-primary">Approve programme wording</button>
+        <div class="card dashboard-card mb-3 procedure-guidance">
+            <div class="card-body">
+                <h2>What should these instructions say?</h2>
+                <p>This wording is added to applicant decision notices. Only enter details confirmed in the programme's official rules.</p>
+                <ul>
+                    <li>How long the applicant has to ask for a review or appeal, and when that period starts.</li>
+                    <li>How to submit the request, including the approved email, address, office or online service.</li>
+                    <li>What information or supporting documents the applicant should include.</li>
+                    <li>Where the applicant can get help or ask questions.</li>
+                </ul>
+                <p class="alert alert-warning mb-3" role="note">
+                    Do not guess a deadline, contact detail or right of appeal. Check the current official programme rules before saving.
+                </p>
+                <details>
+                    <summary>See an example layout with placeholders</summary>
+                    <p class="form-text mt-2" id="procedure-example-help">Replace every bracketed item with verified programme wording. This example is not approved notice text.</p>
+                    <pre class="procedure-example mb-0">You may ask for a [review or appeal] within [official period] of [when the period begins].
+
+To submit your request, [official submission steps and contact details]. Include [required reference or supporting information].
+
+For help, contact [approved programme support contact].</pre>
+                </details>
+            </div>
+        </div>
+        <div class="card dashboard-card mb-3">
+            <div class="card-body">
+                <p class="alert alert-success" role="status" th:if="${procedure != null}">
+                    Currently approved wording is shown below. Confirm any changes against the official programme rules before saving.
+                </p>
+                <label class="form-label" for="procedure">Final review or appeal instructions</label>
+                <p class="form-text" id="procedure-help">Enter the final wording exactly as it should appear to an applicant. Remove all example brackets.</p>
+                <textarea class="form-control mb-3" id="procedure" name="procedure" rows="8" maxlength="4000" required
+                          aria-describedby="procedure-help" placeholder="Use the example layout above, replacing every bracket with verified programme wording."
+                          th:text="${procedure == null ? '' : procedure.text}"></textarea>
+                <button class="btn btn-primary" type="submit">Save approved wording</button>
+            </div>
+        </div>
     </form>
 </section>
 </body>

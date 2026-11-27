@@ -27,6 +27,7 @@ import za.gov.govaccess.policy.service.PolicyVersionSelectionService;
 import za.gov.govaccess.policy.service.RulePolicyService;
 import za.gov.govaccess.programme.repository.ProgrammeRepository;
 import za.gov.govaccess.rules.model.RuleDocument;
+import za.gov.govaccess.rules.service.RuleCatalogueService;
 import za.gov.govaccess.security.ActorIdentity;
 import za.gov.govaccess.security.PolicyWorkspaceAccess;
 
@@ -39,16 +40,19 @@ class PolicyLifecycleController {
     private final ObjectMapper mapper;
     private final ProgrammeRepository programmes;
     private final RulePolicyService rules;
+    private final RuleCatalogueService catalogue;
 
     PolicyLifecycleController(PolicyVersionRepository versions, PolicyLifecycleService lifecycle,
                               PolicyVersionSelectionService selection, ObjectMapper mapper,
-                              ProgrammeRepository programmes, RulePolicyService rules) {
+                              ProgrammeRepository programmes, RulePolicyService rules,
+                              RuleCatalogueService catalogue) {
         this.versions = versions;
         this.lifecycle = lifecycle;
         this.selection = selection;
         this.mapper = mapper;
         this.programmes = programmes;
         this.rules = rules;
+        this.catalogue = catalogue;
     }
 
     @ModelAttribute
@@ -96,8 +100,15 @@ class PolicyLifecycleController {
 
     @GetMapping("/{id}")
     String version(@PathVariable UUID id, Model model) {
-        model.addAttribute("version", versions.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+        var version = versions.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        model.addAttribute("version", version);
+        model.addAttribute("ruleCount", rules.read(version.getContent()).rules().size());
+        model.addAttribute("ruleFields", catalogue.catalogue().fields().values().stream()
+                .sorted(java.util.Comparator.comparing(
+                        za.gov.govaccess.rules.entity.FieldDefinition::getLabel, String.CASE_INSENSITIVE_ORDER))
+                .toList());
+        model.addAttribute("documentTypes", catalogue.documents());
         return "policy/lifecycle";
     }
 
