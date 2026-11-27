@@ -35,7 +35,7 @@
                         <td><a th:href="@{/applications/{id}(id=${case.id()})}" th:text="${case.reference()}">Case</a></td>
                         <td th:text="${case.applicantName()}">Applicant</td><td th:text="${case.programmeName()}">Programme</td>
                         <td th:text="${#strings.replace(case.status().name(), '_', ' ')}">Status</td>
-                        <td th:text="${case.recommendation() == null ? 'Pending' : #strings.replace(case.recommendation().name(), '_', ' ')}">Outcome</td>
+                        <td th:text="${case.recommendation() == null ? 'Pending' : case.recommendation().displayLabel()}">Recommendation</td>
                     </tr></tbody>
                 </table>
             </div>

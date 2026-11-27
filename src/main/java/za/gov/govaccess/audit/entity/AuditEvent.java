@@ -21,6 +21,7 @@ public class AuditEvent {
     @Column(nullable = false, length = 64) private String action;
     @Column(nullable = false, columnDefinition = "text") private String detail;
     @Column(name = "occurred_at", nullable = false) private Instant occurredAt;
+    @Column(name = "actor_role", length = 100) private String actorRole;
 
     protected AuditEvent() {}
     public AuditEvent(ApplicationRecord application, String actorUsername, String action, String detail) {
@@ -36,4 +37,5 @@ public class AuditEvent {
     public String getAction() { return action; }
     public String getDetail() { return detail; }
     public Instant getOccurredAt() { return occurredAt; }
+    public String getActorRole() { return actorRole; }
 }

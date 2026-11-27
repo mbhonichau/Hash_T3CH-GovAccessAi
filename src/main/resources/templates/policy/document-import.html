@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Policy imports', ~{::#policy-imports})}">
+<body>
+<section id="policy-imports" aria-labelledby="import-heading">
+    <div class="overview-heading">
+        <h1 id="import-heading">Policy imports</h1>
+        <p>Turn a text PDF or pasted policy into a draft for human review.</p>
+    </div>
+    <p class="alert alert-danger" role="alert" th:if="${importError}" th:text="${importError}"></p>
+    <p th:unless="${canEditPolicy}"><a th:href="@{/workspace/access}">Switch to Policy Edit</a> to start an import.</p>
+    <div class="card dashboard-card mb-3" th:if="${canEditPolicy}">
+        <div class="card-body">
+            <h2>Import a policy</h2>
+            <p>Use policy criteria only. Remove applicant records and personal identifiers. Uploaded sources require a local AI provider.</p>
+            <form method="post" enctype="multipart/form-data" th:action="@{/policies/imports}">
+                <div class="row g-3">
+                    <div class="col-12 col-lg-4">
+                        <label class="form-label" for="programme-code">Programme</label>
+                        <select class="form-select" id="programme-code" name="programmeCode" required>
+                            <option th:each="programme : ${programmes}" th:value="${programme.code}" th:text="${programme.name}"></option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <label class="form-label" for="version-label">New draft label</label>
+                        <input class="form-control" id="version-label" name="versionLabel" maxlength="100" required>
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <label class="form-label" for="document-title">Source document title</label>
+                        <input class="form-control" id="document-title" name="documentTitle" maxlength="255" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="policy-pdf">PDF upload (up to 8 MB)</label>
+                        <input class="form-control" id="policy-pdf" name="pdf" type="file" accept="application/pdf,.pdf">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="policy-text">Or paste policy text</label>
+                        <textarea class="form-control" id="policy-text" name="text" rows="7" maxlength="200000"></textarea>
+                    </div>
+                </div>
+                <button class="btn btn-primary mt-3" type="submit">Queue import</button>
+            </form>
+        </div>
+    </div>
+    <div class="card dashboard-card">
+        <div class="card-header"><h2>Your recent imports</h2></div>
+        <p class="card-body mb-0" th:if="${#lists.isEmpty(jobs)}">You haven’t queued an import yet.</p>
+        <ul class="list-group list-group-flush" th:unless="${#lists.isEmpty(jobs)}">
+            <li class="list-group-item d-flex justify-content-between" th:each="job : ${jobs}">
+                <a th:href="@{/policies/imports/{id}(id=${job.id})}" th:text="${job.versionLabel}"></a>
+                <span class="policy-status status-draft" th:text="${job.status}"></span>
+            </li>
+        </ul>
+    </div>
+</section>
+</body>
+</html>

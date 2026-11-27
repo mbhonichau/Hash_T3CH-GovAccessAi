@@ -17,6 +17,8 @@ import za.gov.govaccess.rules.model.RuleDocument;
 import za.gov.govaccess.rules.service.RuleCatalogueService;
 import za.gov.govaccess.rules.service.RuleDocumentValidator;
 import za.gov.govaccess.rules.service.RuleEvaluator;
+import za.gov.govaccess.security.ActorIdentity;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 public class RulePolicyService {
@@ -53,17 +55,40 @@ public class RulePolicyService {
 
     @Transactional
     public PolicyVersion saveDraft(String programmeCode, String versionLabel, RuleDocument document) {
+        return saveDraft(UUID.randomUUID(), programmeCode, versionLabel, document, false,
+                ActorIdentity.of(SecurityContextHolder.getContext().getAuthentication()).id());
+    }
+
+    @Transactional
+    public PolicyVersion saveImportedDraft(UUID id, String programmeCode, String versionLabel, RuleDocument document) {
+        return saveImportedDraft(id, programmeCode, versionLabel, document,
+                ActorIdentity.of(SecurityContextHolder.getContext().getAuthentication()).id());
+    }
+
+    @Transactional
+    public PolicyVersion saveImportedDraft(UUID id, String programmeCode, String versionLabel, RuleDocument document, UUID author) {
+        return saveDraft(id, programmeCode, versionLabel, document, true, author);
+    }
+
+    private PolicyVersion saveDraft(UUID id, String programmeCode, String versionLabel,
+                                    RuleDocument document, boolean generated, UUID author) {
         if (versionLabel == null || versionLabel.isBlank() || versionLabel.length() > 100
                 || policies.findByProgrammeCodeAndVersionLabel(programmeCode, versionLabel).isPresent()) {
             throw new IllegalArgumentException("Choose a unique policy version label");
         }
         var programme = programmes.findByCode(programmeCode)
                 .orElseThrow(() -> new IllegalArgumentException("Programme not found"));
+        validate(document);
+        var version = generated ? PolicyVersion.aiDraft(id, programme, versionLabel, null)
+                : PolicyVersion.manualDraft(id, programme, versionLabel, null);
+        version.setContent(write(document));
+        version.recordAuthor(author);
+        return policies.saveAndFlush(version);
+    }
+
+    public void validate(RuleDocument document) {
         var definitions = catalogue.catalogue();
         validator.validate(document, definitions.fields(), definitions.documentTypes());
-        var version = PolicyVersion.manualDraft(UUID.randomUUID(), programme, versionLabel, null);
-        version.setContent(write(document));
-        return policies.saveAndFlush(version);
     }
 
     public RuleEvaluator.Result evaluate(RuleDocument document, List<VerifiedRuleEvidence> evidence) {

@@ -47,7 +47,8 @@ class PolicyInterpretationController {
             return error(HttpStatus.SERVICE_UNAVAILABLE,
                     "No recorded AI response matches this import. Use the normal Supabase profile for a live provider.");
         } catch (AiProviderException e) {
-            return error(HttpStatus.SERVICE_UNAVAILABLE, providerMessage(e));
+            return error(e.reason() == AiProviderException.Reason.RATE_LIMITED ? HttpStatus.TOO_MANY_REQUESTS
+                    : HttpStatus.SERVICE_UNAVAILABLE, providerMessage(e));
         } catch (DataIntegrityViolationException | IllegalArgumentException e) {
             return error(HttpStatus.CONFLICT, "The draft could not be saved. Choose a different version label or try again.");
         }
@@ -62,6 +63,7 @@ class PolicyInterpretationController {
         return switch (error.reason()) {
             case NOT_CONFIGURED -> "No AI provider is configured. Set AI_BASE_URL, AI_MODEL and AI_API_KEY in the app's launch environment.";
             case DISABLED -> "AI calls are disabled by the application configuration.";
+            case RATE_LIMITED -> error.getMessage();
             case BLOCKED -> "The AI request was blocked by the hosted provider's input safeguards.";
             case UNAVAILABLE -> "The AI provider could not be reached or returned an unreadable response. Check the endpoint and try again.";
             case HTTP_ERROR -> switch (error.status()) {

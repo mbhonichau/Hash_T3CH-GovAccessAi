@@ -27,6 +27,9 @@ public class AiRequestLog {
     private long totalLatencyMs;
     @Column(nullable = false, length = 64) private String inputSha256;
     @Column(length = 64) private String outputSha256;
+    private UUID auditEventId;
+    private UUID applicationId;
+    private boolean providerFallback;
 
     protected AiRequestLog() {}
 
@@ -36,6 +39,7 @@ public class AiRequestLog {
         userId = request.context().userId();
         relatedEntityType = request.context().relatedEntityType();
         relatedEntityId = request.context().relatedEntityId();
+        applicationId = request.context().applicationId();
         promptId = request.promptId();
         promptVersion = request.promptVersion();
         this.inputSha256 = inputSha256;
@@ -56,4 +60,7 @@ public class AiRequestLog {
     public UUID getRelatedEntityId() { return relatedEntityId; }
     public AiOutcome getOutcome() { return outcome; }
     public int getAttemptCount() { return attemptCount; }
+    public UUID getAuditEventId() { return auditEventId; }
+    public void markProviderFallback() { providerFallback = true; }
+    public void linkAuditEvent(UUID eventId) { auditEventId = java.util.Objects.requireNonNull(eventId); }
 }

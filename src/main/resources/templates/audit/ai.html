@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · AI governance', ~{::#ai-governance})}">
+<body>
+<section id="ai-governance">
+    <div class="overview-heading"><h1>AI governance</h1></div>
+    <dl class="row g-2" aria-label="All-time AI totals">
+        <div class="col-sm-3"><dt>Invalid outputs</dt><dd th:text="${counts.invalid}"></dd></div>
+        <div class="col-sm-3"><dt>Provider fallbacks</dt><dd th:text="${counts.providerFallbacks}"></dd></div>
+        <div class="col-sm-3"><dt>Template fallbacks</dt><dd th:text="${counts.templateFallbacks}"></dd></div>
+        <div class="col-sm-3"><dt>Rate-limited requests</dt><dd th:text="${counts.rateLimited}"></dd></div>
+    </dl>
+    <form method="get" th:action="@{/audit/ai}" class="row g-2 mb-3 align-items-end" aria-label="Filter AI requests">
+        <div class="col-md"><label for="prompt-filter" class="form-label">Prompt ID</label>
+            <input id="prompt-filter" class="form-control" name="prompt" maxlength="255" th:value="${promptFilter}"></div>
+        <div class="col-md"><label for="provider-filter" class="form-label">Provider</label>
+            <input id="provider-filter" class="form-control" name="provider" maxlength="255" th:value="${providerFilter}"></div>
+        <div class="col-md"><label for="outcome-filter" class="form-label">Outcome</label>
+            <select id="outcome-filter" class="form-select" name="outcome">
+                <option value="">All outcomes</option>
+                <option th:each="item : ${outcomes}" th:value="${item}" th:text="${item}" th:selected="${item == outcomeFilter}"></option>
+            </select></div>
+        <div class="col-md"><label for="user-filter" class="form-label">User ID</label>
+            <input id="user-filter" class="form-control" name="user" maxlength="36" th:value="${userFilter}"></div>
+        <div class="col-md-auto"><button class="btn btn-primary">Filter</button></div>
+    </form>
+    <p th:if="${#lists.isEmpty(requests)}">No matching AI requests.</p>
+    <div class="table-responsive" th:unless="${#lists.isEmpty(requests)}">
+        <table class="table policy-table">
+            <caption>Up to 100 matching requests, newest first</caption>
+            <thead><tr><th scope="col">Time</th><th scope="col">User ID</th><th scope="col">Entity</th>
+                <th scope="col">Prompt</th><th scope="col">Provider</th><th scope="col">Model</th>
+                <th scope="col">Outcome</th><th scope="col">Attempts</th><th scope="col">Latency (ms)</th></tr></thead>
+            <tbody><tr th:each="request : ${requests}">
+                <td th:text="${request.time}"></td><td th:text="${request.user}"></td>
+                <td><span th:text="${request.entityType}"></span> <span th:text="${request.entity}"></span></td>
+                <td th:text="|${request.prompt} v${request.version}|"></td>
+                <td th:text="${request.provider}"></td><td th:text="${request.model}"></td>
+                <td th:text="${request.outcome}"></td><td th:text="${request.attempts}"></td><td th:text="${request.latency}"></td>
+            </tr></tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

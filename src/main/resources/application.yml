@@ -1,16 +1,46 @@
 govaccess:
+  communication:
+    reading-grade-target: 8
+    translation-language: ${NOTICE_TRANSLATION_LANGUAGE:}
+    translation-glossary: ${NOTICE_TRANSLATION_GLOSSARY:}
+  assessment:
+    completeness-weight: 0.5
+    verification-weight: 0.3
+    extraction-weight: 0.2
+    medium-threshold: 0.6
+    high-threshold: 0.85
   ai:
     enabled: true
+    user-requests-per-minute: 60
+    user-requests-per-day: 500
     # Profiles can replace this ordered list. Keep each provider's connection settings in environment variables.
     providers:
       - name: primary
         base-url: ${AI_BASE_URL:}
         api-key: ${AI_API_KEY:}
         model: ${AI_MODEL:}
-        hosted: true
+        hosted: ${AI_HOSTED:true}
+      - name: ollama-local
+        base-url: ${OLLAMA_BASE_URL:http://localhost:11434/v1}
+        api-key: ${OLLAMA_API_KEY:}
+        model: ${OLLAMA_MODEL:gemma3:4b}
+        hosted: false
     prompts:
       policy-interpretation: 2
       provider-probe: 1
+      document-classification: 1
+      document-extraction: 2
+      explanation: 2
+      evidence-recovery: 1
+      decision-notice: 1
+      translation: 1
     cache-mode: OFF
     redaction-mode: BLOCK
     kill-switch: false
+  documents:
+    storage-directory: ${DOCUMENT_STORAGE_DIRECTORY:./var/private-documents}
+    tessdata-directory: ${TESSDATA_PREFIX:}
+    image-extraction-enabled: ${AI_DOCUMENT_IMAGES:false}
+  policy-import:
+    chunk-characters: ${POLICY_IMPORT_CHUNK_CHARACTERS:12000}
+    max-chunks: ${POLICY_IMPORT_MAX_CHUNKS:500}

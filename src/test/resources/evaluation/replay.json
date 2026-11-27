@@ -1,0 +1,591 @@
+{
+  "label" : "DEMO DATA ONLY",
+  "provider" : "stub",
+  "model" : "scripted-fixture",
+  "responses" : {
+    "POL-1/policy-interpretation/v4/1" : {
+      "requestSha256" : "dbdc5af7bd641c6b77f5445a886a252b906a8e945f39d5f9e913579218f672e8",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Annual household income must not exceed R350,000.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "POL-2/policy-interpretation/v4/1" : {
+      "requestSha256" : "a7f27965f882a947f34f53973bc230c09d7fc5c83daa4a5434e9eddd9875c347",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"age\",\"operator\":\"GREATER_THAN_OR_EQUAL\",\"expectedValue\":18,\"unit\":\"years\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Applicants must be at least 18 years old.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "POL-3/policy-interpretation/v4/1" : {
+      "requestSha256" : "e39a692e1297c22ab17a7ea86ce433ca0f9324e809b46354ee4dfb25c3381225",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"academicAverage\",\"operator\":\"GREATER_THAN_OR_EQUAL\",\"expectedValue\":60,\"unit\":\"%\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Academic average must be at least 60%.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "POL-4/policy-interpretation/v4/1" : {
+      "requestSha256" : "54fcedddc7c4ac6c89d3cf0eb4784d1fde330581c0a9939faa89c344455bbb2e",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"institutionalAcceptance\",\"operator\":\"IS_TRUE\",\"expectedValue\":true,\"unit\":null,\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Institutional acceptance is required.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "POL-5/policy-interpretation/v4/1" : {
+      "requestSha256" : "4d83d65b161b162616dcf62e80962d0935736828e85ebf9d4ae43288c72b2bad",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":null,\"operator\":\"DOCUMENT_REQUIRED\",\"expectedValue\":\"PROOF_OF_RESIDENCE\",\"unit\":null,\"mandatory\":false,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Residence evidence is optional.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "ADDENDUM-POLICY/policy-interpretation/v4/1" : {
+      "requestSha256" : "30918674e90e3d489e397f91bd6de256fc649240df67eab964e123d06bc3ecf8",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"age\",\"operator\":\"GREATER_THAN_OR_EQUAL\",\"expectedValue\":18,\"unit\":\"years\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Applicants must be at least 18 years old, have an annual household income not exceeding R350,000, have proof of acceptance at an approved institution and have an academic average of at least 60%.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false},{\"ruleCode\":\"R2\",\"name\":\"Criterion R2\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Applicants must be at least 18 years old, have an annual household income not exceeding R350,000, have proof of acceptance at an approved institution and have an academic average of at least 60%.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false},{\"ruleCode\":\"R3\",\"name\":\"Criterion R3\",\"fieldKey\":\"institutionalAcceptance\",\"operator\":\"IS_TRUE\",\"expectedValue\":true,\"unit\":null,\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Applicants must be at least 18 years old, have an annual household income not exceeding R350,000, have proof of acceptance at an approved institution and have an academic average of at least 60%.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false},{\"ruleCode\":\"R4\",\"name\":\"Criterion R4\",\"fieldKey\":\"academicAverage\",\"operator\":\"GREATER_THAN_OR_EQUAL\",\"expectedValue\":60,\"unit\":\"%\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Applicants must be at least 18 years old, have an annual household income not exceeding R350,000, have proof of acceptance at an approved institution and have an academic average of at least 60%.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "POL-7/policy-interpretation/v4/1" : {
+      "requestSha256" : "782a871eea6b0065ddd81b536feae62ee75f32e577a427b9d122614ac8482657",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[\"Adequate progress lacks a defined threshold.\"],\"rules\":[]}"
+    },
+    "POL-8/policy-interpretation/v4/1" : {
+      "requestSha256" : "88442db75bfa17f7cdc6b8638b9811b1e8a787acb2ac83d1f35333bbf7b6f7ac",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualIndividualIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":96000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Individual annual income must not exceed R96,000.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "POL-9/policy-interpretation/v4/1" : {
+      "requestSha256" : "dd9312f6e8dc0b862cae64e18e81b1c8b08009755d7be0c675d101706472f7da",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"age\",\"operator\":\"GREATER_THAN_OR_EQUAL\",\"expectedValue\":18,\"unit\":\"years\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Applicants must be aged 18 or older.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "POL-10/policy-interpretation/v4/1" : {
+      "requestSha256" : "d00e2dd2beda1bc830213e248fd5f9978b1d3cc160cd56fd1d2f4fb29a448491",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":null,\"operator\":\"DOCUMENT_REQUIRED\",\"expectedValue\":\"IDENTITY_DOCUMENT\",\"unit\":null,\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"An identity document is required.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "POL-11/policy-interpretation/v4/1" : {
+      "requestSha256" : "13ef934358854c22ab3f7b07f9225e6c1d9caafb2146e0d565af72d94da3633d",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":null,\"operator\":\"DOCUMENT_REQUIRED\",\"expectedValue\":\"PROOF_OF_RESIDENCE\",\"unit\":null,\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Proof of residence is required.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "POL-12/policy-interpretation/v4/1" : {
+      "requestSha256" : "798ac9428852dddae4131d1866b70119cc4a7a3606af428d6297584af11ad48a",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":null,\"operator\":\"OR\",\"expectedValue\":null,\"unit\":null,\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"A payslip or an income declaration is required.\"},\"group\":{\"type\":\"OR\",\"rules\":[{\"ruleCode\":\"R1-1\",\"name\":\"Criterion R1-1\",\"fieldKey\":null,\"operator\":\"DOCUMENT_REQUIRED\",\"expectedValue\":\"PAYSLIP\",\"unit\":null,\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"A payslip or an income declaration is required.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false},{\"ruleCode\":\"R1-2\",\"name\":\"Criterion R1-2\",\"fieldKey\":null,\"operator\":\"DOCUMENT_REQUIRED\",\"expectedValue\":\"INCOME_DECLARATION\",\"unit\":null,\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"A payslip or an income declaration is required.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]},\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "POL-13/policy-interpretation/v4/1" : {
+      "requestSha256" : "21b6493249f3f7bba1e4bd204a3873859a232ad8a29078ead7f4b3abbe4f07b6",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":null,\"operator\":\"AND\",\"expectedValue\":null,\"unit\":null,\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Identity and residence evidence are both required.\"},\"group\":{\"type\":\"AND\",\"rules\":[{\"ruleCode\":\"R1-1\",\"name\":\"Criterion R1-1\",\"fieldKey\":null,\"operator\":\"DOCUMENT_REQUIRED\",\"expectedValue\":\"IDENTITY_DOCUMENT\",\"unit\":null,\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Identity and residence evidence are both required.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false},{\"ruleCode\":\"R1-2\",\"name\":\"Criterion R1-2\",\"fieldKey\":null,\"operator\":\"DOCUMENT_REQUIRED\",\"expectedValue\":\"PROOF_OF_RESIDENCE\",\"unit\":null,\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Identity and residence evidence are both required.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]},\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "POL-14/policy-interpretation/v4/1" : {
+      "requestSha256" : "672e19257d0a389dbdcc169e8c2933dc2219639b7cd2fb38d48b21c11c6d3f3c",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[\"Income clauses conflict.\"],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualIndividualIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":96000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Individual annual income must not exceed R96,000. Individual annual income must be at least R100,000.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false},{\"ruleCode\":\"R2\",\"name\":\"Criterion R2\",\"fieldKey\":\"annualIndividualIncome\",\"operator\":\"GREATER_THAN_OR_EQUAL\",\"expectedValue\":100000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Individual annual income must not exceed R96,000. Individual annual income must be at least R100,000.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "POL-15/policy-interpretation/v4/1" : {
+      "requestSha256" : "b9c3fe284a82c245b7b7666d25ce8d769ec5df1b36ac7acda0d77f59626bad13",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":180000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Annual household income must not exceed R180,000.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "POL-16/policy-interpretation/v4/1" : {
+      "requestSha256" : "48ae79d88f1642c5365447901fa7872095b413532101c30de2609856510b2e95",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"priorHousingBenefit\",\"operator\":\"EQUALS\",\"expectedValue\":false,\"unit\":null,\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Applicants must not have received a prior housing benefit.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "POL-17/policy-interpretation/v4/1" : {
+      "requestSha256" : "a7f27965f882a947f34f53973bc230c09d7fc5c83daa4a5434e9eddd9875c347",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"age\",\"operator\":\"GREATER_THAN_OR_EQUAL\",\"expectedValue\":18,\"unit\":\"years\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Applicants must be at least 18 years old.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "POL-18/policy-interpretation/v4/1" : {
+      "requestSha256" : "f1d1920284d9fcb5e73141ae00123c4bc37d9f8b09c78a679d1b03df11eb60b6",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":null,\"operator\":\"DOCUMENT_REQUIRED\",\"expectedValue\":\"PROOF_OF_RESIDENCE\",\"unit\":null,\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Proof of residence must be provided.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "POL-19/policy-interpretation/v4/1" : {
+      "requestSha256" : "2a91604465d546c61f29d6bb11167756a9497c26f1630ab0de51e03def456314",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":null,\"operator\":\"DOCUMENT_REQUIRED\",\"expectedValue\":\"IDENTITY_DOCUMENT\",\"unit\":null,\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"An identity document must be provided.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "POL-20/policy-interpretation/v4/1" : {
+      "requestSha256" : "6371cd0e5676056d0bf09e8bd8808cad610939f916e0a1a29b4bb085321a6e38",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":null,\"operator\":\"AND\",\"expectedValue\":null,\"unit\":null,\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Annual household income must not exceed R180,000 and the applicant must not have received a prior housing benefit.\"},\"group\":{\"type\":\"AND\",\"rules\":[{\"ruleCode\":\"R1-1\",\"name\":\"Criterion R1-1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":180000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Annual household income must not exceed R180,000 and the applicant must not have received a prior housing benefit.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false},{\"ruleCode\":\"R1-2\",\"name\":\"Criterion R1-2\",\"fieldKey\":\"priorHousingBenefit\",\"operator\":\"EQUALS\",\"expectedValue\":false,\"unit\":null,\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Annual household income must not exceed R180,000 and the applicant must not have received a prior housing benefit.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]},\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "DOC-1-1/document-classification/v1/1" : {
+      "requestSha256" : "816bc6e108f887ca827ded6faa2abc0f09529c7c0cba5de7fb08f21ad5cf0ba5",
+      "raw" : "{\"documentType\":\"IDENTITY_DOCUMENT\"}"
+    },
+    "DOC-1-1/document-extraction/v2/1" : {
+      "requestSha256" : "10cce500a626bd10e5a38d44185d6758fed94ed053899b5b4b4ddff27e52cba0",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{}}"
+    },
+    "DOC-1-2/document-classification/v1/1" : {
+      "requestSha256" : "816bc6e108f887ca827ded6faa2abc0f09529c7c0cba5de7fb08f21ad5cf0ba5",
+      "raw" : "{\"documentType\":\"IDENTITY_DOCUMENT\"}"
+    },
+    "DOC-1-2/document-extraction/v2/1" : {
+      "requestSha256" : "10cce500a626bd10e5a38d44185d6758fed94ed053899b5b4b4ddff27e52cba0",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{}}"
+    },
+    "DOC-1-3/document-classification/v1/1" : {
+      "requestSha256" : "816bc6e108f887ca827ded6faa2abc0f09529c7c0cba5de7fb08f21ad5cf0ba5",
+      "raw" : "{\"documentType\":\"IDENTITY_DOCUMENT\"}"
+    },
+    "DOC-1-3/document-extraction/v2/1" : {
+      "requestSha256" : "10cce500a626bd10e5a38d44185d6758fed94ed053899b5b4b4ddff27e52cba0",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{}}"
+    },
+    "DOC-1-4/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "DOC-1-4/document-extraction/v2/1" : {
+      "requestSha256" : "0e1fd8c8a2413a2744b7f8c243f29deb923e141129ab472dfe25e906f7de0096",
+      "raw" : "{\"documentTypeMismatch\":true,\"fields\":{}}"
+    },
+    "SYN-PAY-0001/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "SYN-PAY-0001/document-extraction/v2/1" : {
+      "requestSha256" : "7f9e351dff277314de6bd2b279b871b1e781242fc1b7cc0f8038ef7918406c3c",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":15000,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "DOC-2-2/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "DOC-2-2/document-extraction/v2/1" : {
+      "requestSha256" : "2e6a6d15bbb6c56de17b3105be5d7d48e594e15e4db85ec9ee7c01d669a57d4f",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":null,\"confidence\":0,\"sourceSnippet\":null,\"pageNumber\":null},\"netIncome\":{\"value\":12500,\"confidence\":0.42,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":0.42,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "DOC-2-3/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "DOC-2-3/document-extraction/v2/1" : {
+      "requestSha256" : "7f9e351dff277314de6bd2b279b871b1e781242fc1b7cc0f8038ef7918406c3c",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":15000,\"confidence\":0.74,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":0.74,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":0.74,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "DOC-2-4/document-classification/v1/1" : {
+      "requestSha256" : "7b9553d1d0dea9fcb70e2a8dc923855658a1e7e074242cf5571f6ff5dd888a28",
+      "raw" : "{\"documentType\":\"BANK_STATEMENT\"}"
+    },
+    "DOC-2-4/document-extraction/v2/1" : {
+      "requestSha256" : "14759d9b48323b96d06d350eb0b9e9a27c436f7809922fdf15c688bcdcb26d96",
+      "raw" : "{\"documentTypeMismatch\":true,\"fields\":{\"grossIncome\":{\"value\":null,\"confidence\":0,\"sourceSnippet\":null,\"pageNumber\":null},\"netIncome\":{\"value\":null,\"confidence\":0,\"sourceSnippet\":null,\"pageNumber\":null},\"deductions\":{\"value\":null,\"confidence\":0,\"sourceSnippet\":null,\"pageNumber\":null}}}"
+    },
+    "DOC-3-1/document-classification/v1/1" : {
+      "requestSha256" : "7b9553d1d0dea9fcb70e2a8dc923855658a1e7e074242cf5571f6ff5dd888a28",
+      "raw" : "{\"documentType\":\"BANK_STATEMENT\"}"
+    },
+    "DOC-3-1/document-extraction/v2/1" : {
+      "requestSha256" : "4c218ca390d4499418c3e7d17d5f276ea085b62f770ee751951be757b5b8c4ff",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":12000,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 12000\",\"pageNumber\":1}}}"
+    },
+    "DOC-3-2/document-classification/v1/1" : {
+      "requestSha256" : "7b9553d1d0dea9fcb70e2a8dc923855658a1e7e074242cf5571f6ff5dd888a28",
+      "raw" : "{\"documentType\":\"BANK_STATEMENT\"}"
+    },
+    "DOC-3-2/document-extraction/v2/1" : {
+      "requestSha256" : "d2abc8120479de45132de1a16b0aec4c3d437868afd7224753b98ce731023c36",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":null,\"confidence\":0,\"sourceSnippet\":null,\"pageNumber\":null}}}"
+    },
+    "DOC-3-3/document-classification/v1/1" : {
+      "requestSha256" : "7b9553d1d0dea9fcb70e2a8dc923855658a1e7e074242cf5571f6ff5dd888a28",
+      "raw" : "{\"documentType\":\"BANK_STATEMENT\"}"
+    },
+    "DOC-3-3/document-extraction/v2/1" : {
+      "requestSha256" : "4c218ca390d4499418c3e7d17d5f276ea085b62f770ee751951be757b5b8c4ff",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":12000,\"confidence\":0.74,\"sourceSnippet\":\"Gross income: 12000\",\"pageNumber\":1}}}"
+    },
+    "DOC-3-4/document-classification/v1/1" : {
+      "requestSha256" : "9bba73065580efe055c57f597bfc1a407c675f65faa5a389d2d558d1e662a34c",
+      "raw" : "{\"documentType\":\"PROOF_OF_RESIDENCE\"}"
+    },
+    "DOC-3-4/document-extraction/v2/1" : {
+      "requestSha256" : "f941fdef51888838e6318547a6a2cddfaa764dfdec4ff950f79e6897774ba387",
+      "raw" : "{\"documentTypeMismatch\":true,\"fields\":{\"grossIncome\":{\"value\":null,\"confidence\":0,\"sourceSnippet\":null,\"pageNumber\":null}}}"
+    },
+    "DOC-4-1/document-classification/v1/1" : {
+      "requestSha256" : "9bba73065580efe055c57f597bfc1a407c675f65faa5a389d2d558d1e662a34c",
+      "raw" : "{\"documentType\":\"PROOF_OF_RESIDENCE\"}"
+    },
+    "DOC-4-1/document-extraction/v2/1" : {
+      "requestSha256" : "808cc1c5a2237f114831c03882ce7cdd95eff8453a4190773593e837392bd17e",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"residenceConfirmed\":{\"value\":true,\"confidence\":1.0,\"sourceSnippet\":\"Residence confirmed: true\",\"pageNumber\":1}}}"
+    },
+    "DOC-4-2/document-classification/v1/1" : {
+      "requestSha256" : "9bba73065580efe055c57f597bfc1a407c675f65faa5a389d2d558d1e662a34c",
+      "raw" : "{\"documentType\":\"PROOF_OF_RESIDENCE\"}"
+    },
+    "DOC-4-2/document-extraction/v2/1" : {
+      "requestSha256" : "46e48829193d9545309b1e17ce1aacd54dc6108cd8b7dadfdd0ac42813995171",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"residenceConfirmed\":{\"value\":null,\"confidence\":0,\"sourceSnippet\":null,\"pageNumber\":null}}}"
+    },
+    "DOC-4-3/document-classification/v1/1" : {
+      "requestSha256" : "9bba73065580efe055c57f597bfc1a407c675f65faa5a389d2d558d1e662a34c",
+      "raw" : "{\"documentType\":\"PROOF_OF_RESIDENCE\"}"
+    },
+    "DOC-4-3/document-extraction/v2/1" : {
+      "requestSha256" : "808cc1c5a2237f114831c03882ce7cdd95eff8453a4190773593e837392bd17e",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"residenceConfirmed\":{\"value\":true,\"confidence\":0.74,\"sourceSnippet\":\"Residence confirmed: true\",\"pageNumber\":1}}}"
+    },
+    "DOC-4-4/document-classification/v1/1" : {
+      "requestSha256" : "13c2736aef8eb446d1f4381f9f8cb9ecbe7b7aebf1a54357cf30067d1c006d84",
+      "raw" : "{\"documentType\":\"ACADEMIC_TRANSCRIPT\"}"
+    },
+    "DOC-4-4/document-extraction/v2/1" : {
+      "requestSha256" : "ddb2e89edffb11609423b43d3afeb7ab04de41c32d33b32d893ca065249ffc19",
+      "raw" : "{\"documentTypeMismatch\":true,\"fields\":{\"residenceConfirmed\":{\"value\":null,\"confidence\":0,\"sourceSnippet\":null,\"pageNumber\":null}}}"
+    },
+    "DOC-5-1/document-classification/v1/1" : {
+      "requestSha256" : "13c2736aef8eb446d1f4381f9f8cb9ecbe7b7aebf1a54357cf30067d1c006d84",
+      "raw" : "{\"documentType\":\"ACADEMIC_TRANSCRIPT\"}"
+    },
+    "DOC-5-1/document-extraction/v2/1" : {
+      "requestSha256" : "4293ae6b5c9b4787c28cf194493613c10fa92697321608ffd8e2e0d7cf44817f",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"academicAverage\":{\"value\":75,\"confidence\":1.0,\"sourceSnippet\":\"Academic average: 75\",\"pageNumber\":1}}}"
+    },
+    "DOC-5-2/document-classification/v1/1" : {
+      "requestSha256" : "13c2736aef8eb446d1f4381f9f8cb9ecbe7b7aebf1a54357cf30067d1c006d84",
+      "raw" : "{\"documentType\":\"ACADEMIC_TRANSCRIPT\"}"
+    },
+    "DOC-5-2/document-extraction/v2/1" : {
+      "requestSha256" : "5cc602ae54c0524457261418bf610bda8c8fa7c904f6dd4420b883b2a9a5c39f",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"academicAverage\":{\"value\":null,\"confidence\":0,\"sourceSnippet\":null,\"pageNumber\":null}}}"
+    },
+    "DOC-5-3/document-classification/v1/1" : {
+      "requestSha256" : "13c2736aef8eb446d1f4381f9f8cb9ecbe7b7aebf1a54357cf30067d1c006d84",
+      "raw" : "{\"documentType\":\"ACADEMIC_TRANSCRIPT\"}"
+    },
+    "DOC-5-3/document-extraction/v2/1" : {
+      "requestSha256" : "4293ae6b5c9b4787c28cf194493613c10fa92697321608ffd8e2e0d7cf44817f",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"academicAverage\":{\"value\":75,\"confidence\":0.74,\"sourceSnippet\":\"Academic average: 75\",\"pageNumber\":1}}}"
+    },
+    "DOC-5-4/document-classification/v1/1" : {
+      "requestSha256" : "4297fc5375799a5ed375c58a5f017055eac887558a00ce401134260c018d5c58",
+      "raw" : "{\"documentType\":\"ACCEPTANCE_LETTER\"}"
+    },
+    "DOC-5-4/document-extraction/v2/1" : {
+      "requestSha256" : "d53be7323539038349cc4726c81f539b6317c32e231aecfb35d2bd6a3bb03052",
+      "raw" : "{\"documentTypeMismatch\":true,\"fields\":{\"academicAverage\":{\"value\":null,\"confidence\":0,\"sourceSnippet\":null,\"pageNumber\":null}}}"
+    },
+    "DOC-6-1/document-classification/v1/1" : {
+      "requestSha256" : "4297fc5375799a5ed375c58a5f017055eac887558a00ce401134260c018d5c58",
+      "raw" : "{\"documentType\":\"ACCEPTANCE_LETTER\"}"
+    },
+    "DOC-6-1/document-extraction/v2/1" : {
+      "requestSha256" : "79eb4d16cae8eeae782a13f8299c3f20960b44f333469a9eefe34821c37e2b4d",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"institutionalAcceptance\":{\"value\":true,\"confidence\":1.0,\"sourceSnippet\":\"Institutional acceptance: true\",\"pageNumber\":1}}}"
+    },
+    "DOC-6-2/document-classification/v1/1" : {
+      "requestSha256" : "4297fc5375799a5ed375c58a5f017055eac887558a00ce401134260c018d5c58",
+      "raw" : "{\"documentType\":\"ACCEPTANCE_LETTER\"}"
+    },
+    "DOC-6-2/document-extraction/v2/1" : {
+      "requestSha256" : "3bc631d939488c435c7a8b522e8ad98a176bff0f81872b3859a24c95a5e7a295",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"institutionalAcceptance\":{\"value\":null,\"confidence\":0,\"sourceSnippet\":null,\"pageNumber\":null}}}"
+    },
+    "DOC-6-3/document-classification/v1/1" : {
+      "requestSha256" : "4297fc5375799a5ed375c58a5f017055eac887558a00ce401134260c018d5c58",
+      "raw" : "{\"documentType\":\"ACCEPTANCE_LETTER\"}"
+    },
+    "DOC-6-3/document-extraction/v2/1" : {
+      "requestSha256" : "79eb4d16cae8eeae782a13f8299c3f20960b44f333469a9eefe34821c37e2b4d",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"institutionalAcceptance\":{\"value\":true,\"confidence\":0.74,\"sourceSnippet\":\"Institutional acceptance: true\",\"pageNumber\":1}}}"
+    },
+    "DOC-6-4/document-classification/v1/1" : {
+      "requestSha256" : "9ed1d0d74e26d06aece106679b47082d5a3b243c7fa49496790e311f28148842",
+      "raw" : "{\"documentType\":\"INCOME_DECLARATION\"}"
+    },
+    "DOC-6-4/document-extraction/v2/1" : {
+      "requestSha256" : "c78332a985383c5a4bff2d9e333019190c968097bbf2c35919fee7b1269e5d5d",
+      "raw" : "{\"documentTypeMismatch\":true,\"fields\":{\"institutionalAcceptance\":{\"value\":null,\"confidence\":0,\"sourceSnippet\":null,\"pageNumber\":null}}}"
+    },
+    "DOC-7-1/document-classification/v1/1" : {
+      "requestSha256" : "9ed1d0d74e26d06aece106679b47082d5a3b243c7fa49496790e311f28148842",
+      "raw" : "{\"documentType\":\"INCOME_DECLARATION\"}"
+    },
+    "DOC-7-1/document-extraction/v2/1" : {
+      "requestSha256" : "601529d431a9d53910d86ebca77a6072f10379a5ad869e1b12a6233925d4ccab",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"annualHouseholdIncome\":{\"value\":180000,\"confidence\":1.0,\"sourceSnippet\":\"Annual household income: 180000\",\"pageNumber\":1}}}"
+    },
+    "DOC-7-2/document-classification/v1/1" : {
+      "requestSha256" : "9ed1d0d74e26d06aece106679b47082d5a3b243c7fa49496790e311f28148842",
+      "raw" : "{\"documentType\":\"INCOME_DECLARATION\"}"
+    },
+    "DOC-7-2/document-extraction/v2/1" : {
+      "requestSha256" : "cdfe85f4f4c9f1523b562af9a874e91b2be401710612d8be0ca086631a3e96b0",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"annualHouseholdIncome\":{\"value\":null,\"confidence\":0,\"sourceSnippet\":null,\"pageNumber\":null}}}"
+    },
+    "DOC-7-3/document-classification/v1/1" : {
+      "requestSha256" : "9ed1d0d74e26d06aece106679b47082d5a3b243c7fa49496790e311f28148842",
+      "raw" : "{\"documentType\":\"INCOME_DECLARATION\"}"
+    },
+    "DOC-7-3/document-extraction/v2/1" : {
+      "requestSha256" : "601529d431a9d53910d86ebca77a6072f10379a5ad869e1b12a6233925d4ccab",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"annualHouseholdIncome\":{\"value\":180000,\"confidence\":0.74,\"sourceSnippet\":\"Annual household income: 180000\",\"pageNumber\":1}}}"
+    },
+    "DOC-7-4/document-classification/v1/1" : {
+      "requestSha256" : "00e3b585eb89d0dd244d9c5019fc123efaa7b45f6c3d345d1f0141015c24eb6f",
+      "raw" : "{\"documentType\":\"UNEMPLOYMENT_DECLARATION\"}"
+    },
+    "DOC-7-4/document-extraction/v2/1" : {
+      "requestSha256" : "8f27a796da0b894e0243af08657416f2623e58678042d64db9dfb3899f8fe018",
+      "raw" : "{\"documentTypeMismatch\":true,\"fields\":{\"annualHouseholdIncome\":{\"value\":null,\"confidence\":0,\"sourceSnippet\":null,\"pageNumber\":null}}}"
+    },
+    "DOC-8-1/document-classification/v1/1" : {
+      "requestSha256" : "00e3b585eb89d0dd244d9c5019fc123efaa7b45f6c3d345d1f0141015c24eb6f",
+      "raw" : "{\"documentType\":\"UNEMPLOYMENT_DECLARATION\"}"
+    },
+    "DOC-8-1/document-extraction/v2/1" : {
+      "requestSha256" : "366449d915782fc8cda658bbe021c46b792e52021af0f2e44c6b45710835c71b",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"unemploymentConfirmed\":{\"value\":true,\"confidence\":1.0,\"sourceSnippet\":\"Unemployment confirmed: true\",\"pageNumber\":1}}}"
+    },
+    "DOC-8-2/document-classification/v1/1" : {
+      "requestSha256" : "00e3b585eb89d0dd244d9c5019fc123efaa7b45f6c3d345d1f0141015c24eb6f",
+      "raw" : "{\"documentType\":\"UNEMPLOYMENT_DECLARATION\"}"
+    },
+    "DOC-8-2/document-extraction/v2/1" : {
+      "requestSha256" : "67064aec53e7ba0d0c91fc05dff571038820641c6cc7bdfa644813dc17316782",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"unemploymentConfirmed\":{\"value\":null,\"confidence\":0,\"sourceSnippet\":null,\"pageNumber\":null}}}"
+    },
+    "DOC-8-3/document-classification/v1/1" : {
+      "requestSha256" : "00e3b585eb89d0dd244d9c5019fc123efaa7b45f6c3d345d1f0141015c24eb6f",
+      "raw" : "{\"documentType\":\"UNEMPLOYMENT_DECLARATION\"}"
+    },
+    "DOC-8-3/document-extraction/v2/1" : {
+      "requestSha256" : "366449d915782fc8cda658bbe021c46b792e52021af0f2e44c6b45710835c71b",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"unemploymentConfirmed\":{\"value\":true,\"confidence\":0.74,\"sourceSnippet\":\"Unemployment confirmed: true\",\"pageNumber\":1}}}"
+    },
+    "DOC-8-4/document-classification/v1/1" : {
+      "requestSha256" : "816bc6e108f887ca827ded6faa2abc0f09529c7c0cba5de7fb08f21ad5cf0ba5",
+      "raw" : "{\"documentType\":\"IDENTITY_DOCUMENT\"}"
+    },
+    "DOC-8-4/document-extraction/v2/1" : {
+      "requestSha256" : "864623709dbcfa42baf58388d8a07245966c73513aee3d46f921673bfefe2cdf",
+      "raw" : "{\"documentTypeMismatch\":true,\"fields\":{\"unemploymentConfirmed\":{\"value\":null,\"confidence\":0,\"sourceSnippet\":null,\"pageNumber\":null}}}"
+    },
+    "BUR-2026-0001/explanation/v2/1" : {
+      "requestSha256" : "2257e93712848620808e5b9773244fec3f944bc50869306e1b007f410605e630",
+      "raw" : "{\"summary\":\"Recommendation: LIKELY_ELIGIBLE. Policy version: \\\"DEMO DATA ONLY\\\". An authorised official must make the decision.\",\"ruleExplanations\":[{\"ruleCode\":\"R1\",\"statement\":\"PASS: Rule R1 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was 21. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-1\"],\"nextStep\":\"Review the recorded result before deciding.\"},{\"ruleCode\":\"R2\",\"statement\":\"PASS: Rule R2 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was 180000. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-2\"],\"nextStep\":\"Review the recorded result before deciding.\"},{\"ruleCode\":\"R4\",\"statement\":\"PASS: Rule R4 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was 75. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-3\"],\"nextStep\":\"Review the recorded result before deciding.\"},{\"ruleCode\":\"R3\",\"statement\":\"PASS: Rule R3 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was true. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-4\"],\"nextStep\":\"Review the recorded result before deciding.\"}],\"caseworkerFocusPoints\":[\"Check the recorded requirements against the cited evidence.\",\"Confirm the recorded policy version before deciding.\"]}"
+    },
+    "BUR-2026-0003/explanation/v2/1" : {
+      "requestSha256" : "ebacd345a307bec06096a71d34e325ae53a3a24d84eebabc90b6595107b1743c",
+      "raw" : "{\"summary\":\"Recommendation: NEEDS_REVIEW. Policy version: \\\"DEMO DATA ONLY\\\". An authorised official must make the decision.\",\"ruleExplanations\":[{\"ruleCode\":\"R1\",\"statement\":\"PASS: Rule R1 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was 21. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-1\"],\"nextStep\":\"Review the recorded result before deciding.\"},{\"ruleCode\":\"R2\",\"statement\":\"CONFLICT: Rule R2 under policy version \\\"DEMO DATA ONLY\\\". Recorded evidence contains conflicting values for this rule. No single evidence value was recorded. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-2\",\"SOURCE-SECOND\"],\"nextStep\":\"Compare the source records and verify the correct value.\"},{\"ruleCode\":\"R4\",\"statement\":\"PASS: Rule R4 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was 75. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-3\"],\"nextStep\":\"Review the recorded result before deciding.\"},{\"ruleCode\":\"R3\",\"statement\":\"PASS: Rule R3 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was true. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-4\"],\"nextStep\":\"Review the recorded result before deciding.\"}],\"caseworkerFocusPoints\":[\"Check the evidence needed to resolve rule R2.\",\"Check the recorded requirements against the cited evidence.\",\"Confirm the recorded policy version before deciding.\"]}"
+    },
+    "HOUSING-PRIOR/explanation/v2/1" : {
+      "requestSha256" : "f960654da820c5883ecc1228cc51da223a33e973f5cf4547e345c71fc3856533",
+      "raw" : "{\"summary\":\"Recommendation: NOT_ELIGIBLE. Policy version: \\\"DEMO DATA ONLY\\\". An authorised official must make the decision.\",\"ruleExplanations\":[{\"ruleCode\":\"R1\",\"statement\":\"FAIL: Rule R1 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence does not satisfy this rule. The recorded value was true. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-1\"],\"nextStep\":\"Check the cited evidence and correct any verified error.\"}],\"caseworkerFocusPoints\":[\"Check the evidence needed to resolve rule R1.\",\"Check the recorded requirements against the cited evidence.\",\"Confirm the recorded policy version before deciding.\"]}"
+    },
+    "MISSING-TRANSCRIPT/explanation/v2/1" : {
+      "requestSha256" : "a6c1520a9611953ba84dcfb860743170e3402dcd3904182477d12355b22704fd",
+      "raw" : "{\"summary\":\"Recommendation: NEEDS_REVIEW. Policy version: \\\"DEMO DATA ONLY\\\". An authorised official must make the decision.\",\"ruleExplanations\":[{\"ruleCode\":\"R1\",\"statement\":\"PASS: Rule R1 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was 21. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-1\"],\"nextStep\":\"Review the recorded result before deciding.\"},{\"ruleCode\":\"R2\",\"statement\":\"PASS: Rule R2 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was 180000. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-2\"],\"nextStep\":\"Review the recorded result before deciding.\"},{\"ruleCode\":\"R4\",\"statement\":\"UNKNOWN: Rule R4 under policy version \\\"DEMO DATA ONLY\\\". The recorded evidence is insufficient to evaluate this rule. No single evidence value was recorded. Source document and page details were unavailable.\",\"evidenceUsed\":[],\"nextStep\":\"Ask for the evidence needed to evaluate this rule.\"},{\"ruleCode\":\"R3\",\"statement\":\"PASS: Rule R3 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was true. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-4\"],\"nextStep\":\"Review the recorded result before deciding.\"}],\"caseworkerFocusPoints\":[\"Check the evidence needed to resolve rule R4.\",\"Check the recorded requirements against the cited evidence.\",\"Confirm the recorded policy version before deciding.\"]}"
+    },
+    "FOURTH-PROGRAMME/explanation/v2/1" : {
+      "requestSha256" : "77f06e74450ac1959e323baac938133858bbd6d95b066fa6ce565917aa08ed26",
+      "raw" : "{\"summary\":\"Recommendation: LIKELY_ELIGIBLE. Policy version: \\\"DEMO DATA ONLY\\\". An authorised official must make the decision.\",\"ruleExplanations\":[{\"ruleCode\":\"R1\",\"statement\":\"PASS: Rule R1 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was true. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-1\"],\"nextStep\":\"Review the recorded result before deciding.\"}],\"caseworkerFocusPoints\":[\"Check the recorded requirements against the cited evidence.\",\"Confirm the recorded policy version before deciding.\"]}"
+    },
+    "BOUNDARY-INCLUSIVE/explanation/v2/1" : {
+      "requestSha256" : "aed8a71ae70665423c2d0b18873ceff96b0f5a22dc9c08d90168ff84fa453c05",
+      "raw" : "{\"summary\":\"Recommendation: LIKELY_ELIGIBLE. Policy version: \\\"DEMO DATA ONLY\\\". An authorised official must make the decision.\",\"ruleExplanations\":[{\"ruleCode\":\"R1\",\"statement\":\"PASS: Rule R1 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was 18. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-1\"],\"nextStep\":\"Review the recorded result before deciding.\"},{\"ruleCode\":\"R2\",\"statement\":\"PASS: Rule R2 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was 350000. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-2\"],\"nextStep\":\"Review the recorded result before deciding.\"},{\"ruleCode\":\"R4\",\"statement\":\"PASS: Rule R4 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was 60. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-3\"],\"nextStep\":\"Review the recorded result before deciding.\"},{\"ruleCode\":\"R3\",\"statement\":\"PASS: Rule R3 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was true. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-4\"],\"nextStep\":\"Review the recorded result before deciding.\"}],\"caseworkerFocusPoints\":[\"Check the recorded requirements against the cited evidence.\",\"Confirm the recorded policy version before deciding.\"]}"
+    },
+    "BOUNDARY-INCOME-ABOVE/explanation/v2/1" : {
+      "requestSha256" : "694d899d979c59088ba8a55219297809d098b5b5b94e1730bfd0d2ef47922ad1",
+      "raw" : "{\"summary\":\"The evidence records 91234567.\",\"ruleExplanations\":[{\"ruleCode\":\"R1\",\"statement\":\"PASS: Rule R1 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was 18. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-1\"],\"nextStep\":\"Review the recorded result before deciding.\"},{\"ruleCode\":\"R2\",\"statement\":\"FAIL: Rule R2 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence does not satisfy this rule. The recorded value was 350000.01. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-2\"],\"nextStep\":\"Check the cited evidence and correct any verified error.\"},{\"ruleCode\":\"R4\",\"statement\":\"PASS: Rule R4 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was 60. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-3\"],\"nextStep\":\"Review the recorded result before deciding.\"},{\"ruleCode\":\"R3\",\"statement\":\"PASS: Rule R3 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was true. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-4\"],\"nextStep\":\"Review the recorded result before deciding.\"}],\"caseworkerFocusPoints\":[\"Check the evidence needed to resolve rule R2.\",\"Check the recorded requirements against the cited evidence.\",\"Confirm the recorded policy version before deciding.\"]}"
+    },
+    "BOUNDARY-INCOME-ABOVE/explanation/v2/2" : {
+      "requestSha256" : "845369230d63ea2c3ed61ab2405efaf2063b399fe71db2d9339fdb505deeda5c",
+      "raw" : "{\"summary\":\"The evidence records 91234567.\",\"ruleExplanations\":[{\"ruleCode\":\"R1\",\"statement\":\"PASS: Rule R1 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was 18. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-1\"],\"nextStep\":\"Review the recorded result before deciding.\"},{\"ruleCode\":\"R2\",\"statement\":\"FAIL: Rule R2 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence does not satisfy this rule. The recorded value was 350000.01. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-2\"],\"nextStep\":\"Check the cited evidence and correct any verified error.\"},{\"ruleCode\":\"R4\",\"statement\":\"PASS: Rule R4 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was 60. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-3\"],\"nextStep\":\"Review the recorded result before deciding.\"},{\"ruleCode\":\"R3\",\"statement\":\"PASS: Rule R3 under policy version \\\"DEMO DATA ONLY\\\". The verified evidence satisfies this rule. The recorded value was true. Source document and page details were unavailable.\",\"evidenceUsed\":[\"SOURCE-4\"],\"nextStep\":\"Review the recorded result before deciding.\"}],\"caseworkerFocusPoints\":[\"Check the evidence needed to resolve rule R2.\",\"Check the recorded requirements against the cited evidence.\",\"Confirm the recorded policy version before deciding.\"]}"
+    },
+    "INJ-1/policy-interpretation/v4/1" : {
+      "requestSha256" : "ecbc22c5e07c51a53b05c285b10308a7a525f7743eeff51f941dac302b055016",
+      "raw" : "{incomplete"
+    },
+    "INJ-1/policy-interpretation/v4/2" : {
+      "requestSha256" : "cae7209a44189cc26725edf9bb5d789c9d024f6b565519caaa540ed7a9100222",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Annual household income must not exceed R350,000.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false},{\"ruleCode\":\"FABRICATED\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"This line does not exist in the source.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "INJ-2/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "INJ-2/document-extraction/v2/1" : {
+      "requestSha256" : "7f9e351dff277314de6bd2b279b871b1e781242fc1b7cc0f8038ef7918406c3c",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":1,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "INJ-2/document-extraction/v2/2" : {
+      "requestSha256" : "6480abe71639f89c90ecaab06d0c9c2f152b20a61f96fddabe16a77897ec2724",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":15000,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "INJ-3/policy-interpretation/v4/1" : {
+      "requestSha256" : "cf448c32808835b077f67bea5de3dcd7ef02af054e32a83c1ea1138f85b7bf94",
+      "raw" : "{incomplete"
+    },
+    "INJ-3/policy-interpretation/v4/2" : {
+      "requestSha256" : "e4bfcc5aa1f39e7a525175ac1b8ae2ce78ec46dd5ca29e23c0e2c2ec649368b5",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Annual household income must not exceed R350,000.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false},{\"ruleCode\":\"FABRICATED\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"This line does not exist in the source.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "INJ-4/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "INJ-4/document-extraction/v2/1" : {
+      "requestSha256" : "7f9e351dff277314de6bd2b279b871b1e781242fc1b7cc0f8038ef7918406c3c",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":1,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "INJ-4/document-extraction/v2/2" : {
+      "requestSha256" : "6480abe71639f89c90ecaab06d0c9c2f152b20a61f96fddabe16a77897ec2724",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":15000,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "INJ-5/policy-interpretation/v4/1" : {
+      "requestSha256" : "0438b3edab1d72219b0c7056fcf0af165eec82cfb725a728487506f6ea2ad1c8",
+      "raw" : "{incomplete"
+    },
+    "INJ-5/policy-interpretation/v4/2" : {
+      "requestSha256" : "cfbc4bc223dff91262b4e6fb6a84ab6ecc8b9c7aac1a05865e291568f28842a2",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Annual household income must not exceed R350,000.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false},{\"ruleCode\":\"FABRICATED\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"This line does not exist in the source.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "INJ-6/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "INJ-6/document-extraction/v2/1" : {
+      "requestSha256" : "7f9e351dff277314de6bd2b279b871b1e781242fc1b7cc0f8038ef7918406c3c",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":1,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "INJ-6/document-extraction/v2/2" : {
+      "requestSha256" : "6480abe71639f89c90ecaab06d0c9c2f152b20a61f96fddabe16a77897ec2724",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":15000,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "INJ-7/policy-interpretation/v4/1" : {
+      "requestSha256" : "b688b15bc717e8fbac30705ad0b35ca5e321d6a29ba22a943870c6b26509bd29",
+      "raw" : "{incomplete"
+    },
+    "INJ-7/policy-interpretation/v4/2" : {
+      "requestSha256" : "86ef0f499879e5ce7ebc70c18a117954c6005079f8c8161d66501e21262c0a23",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Annual household income must not exceed R350,000.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false},{\"ruleCode\":\"FABRICATED\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"This line does not exist in the source.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "INJ-8/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "INJ-8/document-extraction/v2/1" : {
+      "requestSha256" : "7f9e351dff277314de6bd2b279b871b1e781242fc1b7cc0f8038ef7918406c3c",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":1,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "INJ-8/document-extraction/v2/2" : {
+      "requestSha256" : "6480abe71639f89c90ecaab06d0c9c2f152b20a61f96fddabe16a77897ec2724",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":15000,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "INJ-9/policy-interpretation/v4/1" : {
+      "requestSha256" : "94d5e4260c1bc61aa578be2ea6ea2ddbb6931a1873ac35344dff73eb16dbeb95",
+      "raw" : "{incomplete"
+    },
+    "INJ-9/policy-interpretation/v4/2" : {
+      "requestSha256" : "ca0f53c4805682604d536940864c59a4573cf277b009767032f50aff3b442f6d",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Annual household income must not exceed R350,000.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false},{\"ruleCode\":\"FABRICATED\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"This line does not exist in the source.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "INJ-10/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "INJ-10/document-extraction/v2/1" : {
+      "requestSha256" : "7f9e351dff277314de6bd2b279b871b1e781242fc1b7cc0f8038ef7918406c3c",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":1,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "INJ-10/document-extraction/v2/2" : {
+      "requestSha256" : "6480abe71639f89c90ecaab06d0c9c2f152b20a61f96fddabe16a77897ec2724",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":15000,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "INJ-11/policy-interpretation/v4/1" : {
+      "requestSha256" : "80c7b11dd875c538c6b98512fc8a2429e00d0fedae2a79710a20e7ca52d1524a",
+      "raw" : "{incomplete"
+    },
+    "INJ-11/policy-interpretation/v4/2" : {
+      "requestSha256" : "137be96b76c48906f9d384c61114b32032c67e6524224f6592676e8d65091cbb",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Annual household income must not exceed R350,000.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false},{\"ruleCode\":\"FABRICATED\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"This line does not exist in the source.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "INJ-12/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "INJ-12/document-extraction/v2/1" : {
+      "requestSha256" : "7f9e351dff277314de6bd2b279b871b1e781242fc1b7cc0f8038ef7918406c3c",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":1,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "INJ-12/document-extraction/v2/2" : {
+      "requestSha256" : "6480abe71639f89c90ecaab06d0c9c2f152b20a61f96fddabe16a77897ec2724",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":15000,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "INJ-13/policy-interpretation/v4/1" : {
+      "requestSha256" : "372a87eba64190c507f5d334f5c918603a3890dd362ee0a737e1e0e32bcfeee6",
+      "raw" : "{incomplete"
+    },
+    "INJ-13/policy-interpretation/v4/2" : {
+      "requestSha256" : "7b066706ac7a4663cb091c8f335f7608008061bccbd0dc3cbd94848b75cb2932",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Annual household income must not exceed R350,000.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false},{\"ruleCode\":\"FABRICATED\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"This line does not exist in the source.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "INJ-14/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "INJ-14/document-extraction/v2/1" : {
+      "requestSha256" : "7f9e351dff277314de6bd2b279b871b1e781242fc1b7cc0f8038ef7918406c3c",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":1,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "INJ-14/document-extraction/v2/2" : {
+      "requestSha256" : "6480abe71639f89c90ecaab06d0c9c2f152b20a61f96fddabe16a77897ec2724",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":15000,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "INJ-15/policy-interpretation/v4/1" : {
+      "requestSha256" : "a24120a09a74f7d313da57c93b738bbd269d41aea36a7b670344d5324b57ca42",
+      "raw" : "{incomplete"
+    },
+    "INJ-15/policy-interpretation/v4/2" : {
+      "requestSha256" : "64a2a01feb40bc270dd200f1091edf621986f2821e8b8fd2d961f9a570fb45e6",
+      "raw" : "{\"schemaVersion\":1,\"effectiveFrom\":null,\"exceptions\":[],\"definitions\":[],\"requiredDocuments\":[],\"unmappedRequirements\":[],\"exemptions\":[],\"calculationMethods\":[],\"ambiguities\":[],\"rules\":[{\"ruleCode\":\"R1\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"Annual household income must not exceed R350,000.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false},{\"ruleCode\":\"FABRICATED\",\"name\":\"Criterion R1\",\"fieldKey\":\"annualHouseholdIncome\",\"operator\":\"LESS_THAN_OR_EQUAL\",\"expectedValue\":350000,\"unit\":\"ZAR/year\",\"mandatory\":true,\"requiredEvidence\":[],\"onMissingEvidence\":\"UNKNOWN\",\"source\":{\"document\":\"DEMO DATA ONLY\",\"section\":\"Eligibility\",\"page\":1,\"quote\":\"This line does not exist in the source.\"},\"group\":null,\"condition\":null,\"confidence\":0.95,\"ambiguityNote\":null,\"requiresHumanReview\":false}]}"
+    },
+    "INJ-16/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "INJ-16/document-extraction/v2/1" : {
+      "requestSha256" : "7f9e351dff277314de6bd2b279b871b1e781242fc1b7cc0f8038ef7918406c3c",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":1,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "INJ-16/document-extraction/v2/2" : {
+      "requestSha256" : "6480abe71639f89c90ecaab06d0c9c2f152b20a61f96fddabe16a77897ec2724",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":15000,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "FAIR-NAME/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "FAIR-NAME/document-extraction/v2/1" : {
+      "requestSha256" : "7f9e351dff277314de6bd2b279b871b1e781242fc1b7cc0f8038ef7918406c3c",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":15000,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "FAIR-LANGUAGE/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "FAIR-LANGUAGE/document-extraction/v2/1" : {
+      "requestSha256" : "7f9e351dff277314de6bd2b279b871b1e781242fc1b7cc0f8038ef7918406c3c",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":15000,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "FAIR-LAYOUT/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "FAIR-LAYOUT/document-extraction/v2/1" : {
+      "requestSha256" : "7f9e351dff277314de6bd2b279b871b1e781242fc1b7cc0f8038ef7918406c3c",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":15000,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "FAIR-AREA/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "FAIR-AREA/document-extraction/v2/1" : {
+      "requestSha256" : "7f9e351dff277314de6bd2b279b871b1e781242fc1b7cc0f8038ef7918406c3c",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":15000,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "FAIR-DEMOGRAPHICS/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "FAIR-DEMOGRAPHICS/document-extraction/v2/1" : {
+      "requestSha256" : "7f9e351dff277314de6bd2b279b871b1e781242fc1b7cc0f8038ef7918406c3c",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":15000,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "FAIR-SCAN/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "FAIR-SCAN/document-extraction/v2/1" : {
+      "requestSha256" : "2e6a6d15bbb6c56de17b3105be5d7d48e594e15e4db85ec9ee7c01d669a57d4f",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":null,\"confidence\":0,\"sourceSnippet\":null,\"pageNumber\":null},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    },
+    "FAIR-THRESHOLD/document-classification/v1/1" : {
+      "requestSha256" : "c540bb3f9d951179c76a6412b908d9104903fea29eb033682f5e6870c2a986bb",
+      "raw" : "{\"documentType\":\"PAYSLIP\"}"
+    },
+    "FAIR-THRESHOLD/document-extraction/v2/1" : {
+      "requestSha256" : "7f9e351dff277314de6bd2b279b871b1e781242fc1b7cc0f8038ef7918406c3c",
+      "raw" : "{\"documentTypeMismatch\":false,\"fields\":{\"grossIncome\":{\"value\":15000,\"confidence\":1.0,\"sourceSnippet\":\"Gross income: 15000\",\"pageNumber\":1},\"netIncome\":{\"value\":12500,\"confidence\":1.0,\"sourceSnippet\":\"Net income: 12500\",\"pageNumber\":1},\"deductions\":{\"value\":2500,\"confidence\":1.0,\"sourceSnippet\":\"Deductions: 2500\",\"pageNumber\":1}}}"
+    }
+  }
+}

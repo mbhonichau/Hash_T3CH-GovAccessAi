@@ -3,7 +3,10 @@
       th:replace="~{layouts/base :: page('GovAccess AI · Create case', ~{::#application-create})}">
 <body>
 <section id="application-create" aria-labelledby="create-heading">
-    <div class="overview-heading"><h1 id="create-heading">Create application case</h1><p>Record the minimum information needed to open an intake case.</p></div>
+    <div class="overview-heading d-flex justify-content-between align-items-start gap-3 flex-wrap">
+        <div><h1 id="create-heading">Create application case</h1><p>Record the minimum information needed to open an intake case.</p></div>
+        <a class="btn btn-outline-primary app-nav-button" th:href="@{/applications}">Back to application queue</a>
+    </div>
     <div class="card dashboard-card"><div class="card-body">
         <form th:action="@{/applications}" th:object="${applicationForm}" method="post">
             <div class="mb-3">
@@ -24,8 +27,15 @@
                 <textarea class="form-control" id="summary" rows="4" th:field="*{summary}" maxlength="2000" required></textarea>
                 <div class="text-danger" th:errors="*{summary}"></div>
             </div>
+            <div class="mb-3">
+                <label class="form-label" for="declarations">Declared policy values (optional)</label>
+                <textarea class="form-control" id="declarations" rows="3" th:field="*{declarations}" maxlength="5000"
+                          aria-describedby="declaration-help"></textarea>
+                <div id="declaration-help" class="form-text">Enter a JSON object using field keys from the applicable policy.</div>
+                <div class="text-danger" th:errors="*{declarations}"></div>
+            </div>
             <button class="btn btn-primary" type="submit">Create case</button>
-            <a class="btn btn-outline-secondary" th:href="@{/applications}">Cancel</a>
+            <a class="btn btn-outline-primary app-nav-button" th:href="@{/applications}">Cancel</a>
         </form>
     </div></div>
 </section>

@@ -7,7 +7,7 @@
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/vendor/mazer/icons/bootstrap-icons.css}">
     <link rel="stylesheet" th:href="@{/vendor/mazer/css/app.css}">
-    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/app.css(v='20261127-full-sita-glass-white')}">
 </head>
 <body class="login-page">
     <main class="login-panel">
@@ -19,6 +19,7 @@
             <h1>Sign in</h1>
             <p>Use your account to access the officer workspace.</p>
             <p class="alert alert-danger" role="alert" th:if="${param.error}">The username or password is incorrect.</p>
+            <p class="alert alert-warning" role="alert" th:if="${param.expired}">Your sign-in form expired. Enter your credentials again.</p>
             <p class="alert alert-success" role="status" th:if="${param.logout}">You have signed out.</p>
             <form th:action="@{/login}" method="post">
                 <label class="form-label" for="username">Username</label>
@@ -30,6 +31,5 @@
             </form>
         </div>
     </main>
-    <div class="login-art" aria-hidden="true"><i class="bi-shield-check"></i></div>
 </body>
 </html>

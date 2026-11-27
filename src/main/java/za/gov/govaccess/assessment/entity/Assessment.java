@@ -30,6 +30,9 @@ public class Assessment {
     protected Assessment() {}
     public UUID getId() { return id; }
     public String getRecommendation() { return recommendation; }
+    public String getRecommendationLabel() {
+        return za.gov.govaccess.application.enums.CaseRecommendation.valueOf(recommendation).displayLabel();
+    }
     public BigDecimal getConfidence() { return confidence; }
     public String getSummary() { return summary; }
     public Instant getAssessedAt() { return assessedAt; }

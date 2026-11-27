@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Decision workspace', ~{::#decision-workspace})}">
+<body>
+<section id="decision-workspace">
+    <div class="overview-heading">
+        <nav class="application-navigation" aria-label="Application navigation">
+            <a class="btn btn-outline-primary app-nav-button" th:href="@{/applications/{id}(id=${applicationId})}">Back to application</a>
+            <a class="btn btn-outline-primary app-nav-button" th:href="@{/applications/{id}/communications(id=${applicationId})}">Case messages and notices</a>
+        </nav>
+        <h1>Decision workspace</h1>
+        <p th:text="${reference}"></p>
+    </div>
+    <p th:if="${latest == null}">Assess the available evidence from the case page to begin.</p>
+    <div class="card dashboard-card mb-3" th:if="${latest != null}">
+        <div class="card-body">
+            <h2>Assessment recommendation</h2>
+            <p th:text="${latest.recommendation == 'NOT_ELIGIBLE' ? 'Not eligible recommendation · awaiting an official decision' : #strings.replace(latest.recommendation, '_', ' ')}"></p>
+            <form method="post" th:if="${savedExplanation == null}"
+                  th:action="@{/applications/{id}/decision/explanation(id=${applicationId})}">
+                <button type="submit" class="btn btn-outline-primary">Generate explanation</button>
+            </form>
+            <section th:if="${savedExplanation != null}" aria-label="Assessment explanation">
+                <p th:text="${savedExplanation.explanation.summary}"></p>
+                <p class="small" th:text="|${savedExplanation.generatedBy} explanation · for official review|"></p>
+                <dl th:each="rule : ${savedExplanation.explanation.ruleExplanations}">
+                    <dt th:text="${rule.ruleCode}"></dt>
+                    <dd th:text="${rule.statement}"></dd>
+                    <dd th:if="${#lists.isEmpty(rule.evidenceUsed)}">No evidence was recorded for this rule.</dd>
+                    <dd th:unless="${#lists.isEmpty(rule.evidenceUsed)}"
+                        th:text="|Evidence ${#strings.listJoin(rule.evidenceUsed, ', ')}|"></dd>
+                    <dd th:text="${rule.nextStep}"></dd>
+                </dl>
+                <h3 class="h6" th:unless="${#lists.isEmpty(savedExplanation.explanation.caseworkerFocusPoints)}">Caseworker focus</h3>
+                <ul><li th:each="point : ${savedExplanation.explanation.caseworkerFocusPoints}" th:text="${point}"></li></ul>
+            </section>
+        </div>
+    </div>
+    <div class="card dashboard-card mb-3" th:unless="${#lists.isEmpty(handoffs)}">
+        <div class="card-body">
+            <h2>Open follow-up</h2>
+            <p th:if="${awaitingSupervisor}">An assigned supervisor must resolve the override referral.</p>
+            <ul>
+                <li th:each="item : ${handoffs}">
+                    <strong th:text="${#strings.replace(item.type, '_', ' ')}"></strong>
+                    <span th:if="${item.proposedDecision}" th:text="${item.proposedDecision}"></span>
+                    <p th:text="${item.reason}"></p>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="card dashboard-card mb-3" th:if="${closed}">
+        <div class="card-body">
+            <h2>Official outcome</h2>
+            <div th:each="decision : ${officialDecisions}">
+                <strong th:text="${decision.decision}"></strong>
+                <p th:text="${decision.rationale}"></p>
+            </div>
+        </div>
+    </div>
+    <div class="row g-3" th:if="${latest != null and !closed}">
+        <div class="col-md-6" th:if="${canConfirm and latest.recommendation != 'NEEDS_REVIEW'}">
+            <form class="card dashboard-card card-body" method="post"
+                  th:action="@{/applications/{id}/decision/confirm(id=${applicationId})}">
+                <h2>Confirm recommendation</h2>
+                <p>Records an official outcome.</p>
+                <input type="hidden" name="assessmentId" th:value="${latest.assessmentId}">
+                <label for="confirm-reason" class="form-label">Reason</label>
+                <textarea id="confirm-reason" name="reason" class="form-control mb-2" maxlength="1000" required></textarea>
+                <button type="submit" class="btn btn-primary">Record official decision</button>
+            </form>
+        </div>
+        <div class="col-md-6" th:if="${canOverride}">
+            <form class="card dashboard-card card-body" method="post"
+                  th:action="@{/applications/{id}/decision/override(id=${applicationId})}">
+                <h2>Override recommendation</h2>
+                <input type="hidden" name="assessmentId" th:value="${latest.assessmentId}">
+                <label for="override-outcome" class="form-label">Proposed official outcome</label>
+                <select id="override-outcome" name="outcome" class="form-select mb-2" required>
+                    <option value="">Choose an outcome</option>
+                    <option th:if="${latest.recommendation != 'LIKELY_ELIGIBLE'}" value="APPROVED">Approve</option>
+                    <option th:if="${latest.recommendation != 'NOT_ELIGIBLE'}" value="DECLINED">Decline</option>
+                </select>
+                <label for="override-reason" class="form-label">Reason</label>
+                <textarea id="override-reason" name="reason" class="form-control mb-2" maxlength="1000" required></textarea>
+                <button type="submit" class="btn btn-outline-primary">Submit override</button>
+            </form>
+        </div>
+        <div class="col-md-6" th:if="${canRequestEvidence}">
+            <form class="card dashboard-card card-body" method="post"
+                  th:action="@{/applications/{id}/decision/evidence(id=${applicationId})}">
+                <h2>Request additional evidence</h2>
+                <input type="hidden" name="assessmentId" th:value="${latest.assessmentId}">
+                <label for="evidence-reason" class="form-label">Evidence needed and reason</label>
+                <textarea id="evidence-reason" name="reason" class="form-control mb-2" maxlength="1000" required></textarea>
+                <button type="submit" class="btn btn-outline-primary">Save evidence request</button>
+            </form>
+        </div>
+        <div class="col-md-6" th:if="${canAmend}">
+            <div class="card dashboard-card card-body">
+                <h2>Amend assessment</h2>
+                <p th:if="${#lists.isEmpty(availableDocuments)}">No extracted fields are available.</p>
+                <details th:each="document : ${availableDocuments}" th:unless="${document.fields.isEmpty()}">
+                    <summary th:text="${document.filename}"></summary>
+                    <form class="my-2" method="post" th:each="entry : ${document.fields}"
+                          th:action="@{/applications/{id}/decision/amend(id=${applicationId})}">
+                        <input type="hidden" name="assessmentId" th:value="${latest.assessmentId}">
+                        <input type="hidden" name="documentId" th:value="${document.id}">
+                        <input type="hidden" name="documentVersion" th:value="${document.version}">
+                        <input type="hidden" name="field" th:value="${entry.key}">
+                        <label class="form-label d-block" th:text="|Correct ${entry.key}|"></label>
+                        <label class="form-label d-block">Corrected JSON value
+                            <input class="form-control" name="value" maxlength="400" required>
+                        </label>
+                        <label class="form-label d-block">Reason
+                            <textarea name="reason" class="form-control" maxlength="1000" required></textarea>
+                        </label>
+                        <button type="submit" class="btn btn-outline-primary">Correct and reassess</button>
+                    </form>
+                </details>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

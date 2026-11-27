@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Audit history', ~{::#audit-history})}">
+<body>
+<section id="audit-history">
+    <div class="overview-heading">
+        <h1>Audit history</h1>
+        <p>Up to 100 recent events available to your account.</p>
+        <a th:if="${canVerify}" th:href="@{/audit}">Verify audit chain</a>
+    </div>
+    <div class="card dashboard-card">
+        <p class="card-body mb-0" th:if="${#lists.isEmpty(events)}">No audit events are available in your scope.</p>
+        <div class="table-responsive" th:unless="${#lists.isEmpty(events)}">
+            <table class="table policy-table">
+                <thead><tr><th scope="col">Action</th><th scope="col">Actor role</th><th scope="col">Time</th><th scope="col">Event ID</th></tr></thead>
+                <tbody>
+                <tr th:each="event : ${events}">
+                    <td th:text="${event.action}"></td><td th:text="${event.actorRole}"></td>
+                    <td th:text="${event.occurredAt}"></td><td><code th:text="${event.id}"></code></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+</body>
+</html>

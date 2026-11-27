@@ -1,6 +1,7 @@
 package za.gov.govaccess.ai.provider;
 
 import java.util.List;
+import java.net.URI;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.springframework.stereotype.Component;
@@ -46,11 +47,19 @@ public class FallbackAiProvider implements AiProvider {
     }
 
     public <T> T completeValidated(AiRequest request, Function<AiResponse, T> validate) {
-        return inRequest(request, () -> execute(request, null, validate, true, false));
+        return completeValidated(request, validate, true);
+    }
+
+    public <T> T completeValidated(AiRequest request, Function<AiResponse, T> validate, boolean cacheable) {
+        return inRequest(request, () -> execute(request, null, validate, cacheable, false));
     }
 
     public <T> T completeRepair(AiRequest request, AiRequest original, Function<AiResponse, T> validate) {
-        return inRequest(original, () -> execute(request, original, validate, true, false));
+        return completeRepair(request, original, validate, true);
+    }
+
+    public <T> T completeRepair(AiRequest request, AiRequest original, Function<AiResponse, T> validate, boolean cacheable) {
+        return inRequest(original, () -> execute(request, original, validate, cacheable, false));
     }
 
     public <T> T probe(AiRequest request, Function<AiResponse, T> validate) {
@@ -77,8 +86,8 @@ public class FallbackAiProvider implements AiProvider {
         AiProviderException lastFailure = null;
         for (Target target : targets) {
             Provider settings = target.settings();
-            AiRequest request = settings.hosted() ? redactor.redact(original, properties.redactionMode()) : original;
-            if (request == null || settings.hosted() && !original.synthetic()) {
+            AiRequest request = AiPromptBuilder.forProvider(original, settings.hosted(), properties.redactionMode(), redactor);
+            if (request == null || !original.synthetic() && (settings.hosted() || !loopback(settings.baseUrl()))) {
                 blocked = true;
                 if (lastFailure == null) {
                     audit.logicalOutcome(event(settings, null, 0), AiOutcome.BLOCKED_PII);
@@ -87,7 +96,8 @@ public class FallbackAiProvider implements AiProvider {
             }
 
             String key = AiRequestHashes.cacheKey(request, settings.model());
-            if (cacheable && cacheIdentity == null && properties.cacheMode() != AiCacheMode.OFF) {
+            if (!probe && (cacheable || request.synthetic() && replayOnly())
+                    && cacheIdentity == null && (properties.cacheMode() == AiCacheMode.READ_WRITE || replayOnly())) {
                 var cached = cache.get(key);
                 if (cached.isPresent()) {
                     return validated(request, cached.get(), validate, AiOutcome.CACHE_HIT, false);
@@ -97,6 +107,7 @@ public class FallbackAiProvider implements AiProvider {
                 audit.logicalOutcome(event(settings, null, 0), AiOutcome.PROVIDER_ERROR);
                 continue;
             }
+            if (lastFailure != null) audit.providerFallback();
 
             AiResponse response;
             int[] failures = {0};
@@ -120,11 +131,13 @@ public class FallbackAiProvider implements AiProvider {
                 lastFailure = e;
                 continue;
             }
+            if (properties.cacheMode() == AiCacheMode.RECORD) cache.recordSynthetic(request, response);
             T result = validated(request, response, validate,
                     failedAttempt || failures[0] > 0 ? AiOutcome.RETRY_SUCCESS : AiOutcome.SUCCESS, true);
-            if (cacheable && properties.cacheMode() == AiCacheMode.READ_WRITE) {
-                AiRequest identity = cacheIdentity == null ? request : settings.hosted()
-                        ? redactor.redact(cacheIdentity, properties.redactionMode()) : cacheIdentity;
+            if ((cacheable && properties.cacheMode() == AiCacheMode.READ_WRITE)
+                    || (request.synthetic() && !probe && properties.cacheMode() == AiCacheMode.RECORD)) {
+                AiRequest identity = cacheIdentity == null ? request
+                        : AiPromptBuilder.forProvider(cacheIdentity, settings.hosted(), properties.redactionMode(), redactor);
                 if (identity != null) {
                     cache.put(AiRequestHashes.cacheKey(identity, settings.model()), response);
                 }
@@ -144,6 +157,14 @@ public class FallbackAiProvider implements AiProvider {
             throw new AiProviderException(Reason.BLOCKED, "Hosted AI input was blocked");
         }
         throw new AiProviderException(Reason.NOT_CONFIGURED, "No AI provider configured");
+    }
+
+    private static boolean loopback(String baseUrl) {
+        if (baseUrl == null) {
+            return false;
+        }
+        String host = URI.create(baseUrl).getHost();
+        return "localhost".equalsIgnoreCase(host) || "127.0.0.1".equals(host) || "[::1]".equals(host);
     }
 
     private <T> T validated(AiRequest request, AiResponse response, Function<AiResponse, T> validate,

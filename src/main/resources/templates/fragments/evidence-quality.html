@@ -1,0 +1,26 @@
+<section xmlns:th="http://www.thymeleaf.org" th:fragment="quality(report)" aria-label="Evidence quality">
+    <dl class="row g-2">
+        <div class="col-12 col-md-4">
+            <dt>Rule satisfaction</dt><dd th:text="${#numbers.formatPercent(report.quality.satisfaction, 0, 0)}"></dd>
+        </div>
+        <div class="col-12 col-md-4">
+            <dt>Evidence completeness</dt><dd th:text="${#numbers.formatPercent(report.quality.completeness, 0, 0)}"></dd>
+        </div>
+        <div class="col-12 col-md-4">
+            <dt>Assessment confidence</dt>
+            <dd th:text="|${#numbers.formatPercent(report.quality.confidence, 0, 0)} · ${report.quality.label}|"></dd>
+        </div>
+    </dl>
+    <p>The confidence index is a heuristic, not a probability of eligibility.</p>
+    <h3 class="h6">Confidence factors</h3>
+    <ul>
+        <li th:each="factor : ${report.quality.factors}"
+            th:text="|${factor.name} · ${#numbers.formatPercent(factor.value, 0, 0)} (weight ${#numbers.formatPercent(factor.weight, 0, 0)})|"></li>
+    </ul>
+    <h3 class="h6" th:if="${!#lists.isEmpty(report.findings)}">Evidence exceptions</h3>
+    <ul th:if="${!#lists.isEmpty(report.findings)}">
+        <li th:each="finding : ${report.findings}"
+            th:text="|${#strings.replace(finding.code, '_', ' ')} · ${finding.field}|"></li>
+    </ul>
+    <p class="small">Assessment input snapshot <code th:text="${report.snapshotId}"></code></p>
+</section>

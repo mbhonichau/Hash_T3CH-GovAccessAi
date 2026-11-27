@@ -42,7 +42,12 @@ public class StructuredOutputService {
 
     public <T> T generate(AiRequest request, Class<T> type, Consumer<T> verify) {
         JsonSchema schema = schema(request, type);
-        return provider.inRequest(request, () -> generate(request, type, verify, schema));
+        return provider.inRequest(request, () -> generate(request, type, verify, schema, true));
+    }
+
+    public <T> T generateWithoutProviderCache(AiRequest request, Class<T> type, Consumer<T> verify) {
+        var schema = schema(request, type);
+        return provider.inRequest(request, () -> generate(request, type, verify, schema, false));
     }
 
     public <T> T probe(AiRequest request, Class<T> type) {
@@ -59,19 +64,16 @@ public class StructuredOutputService {
         return schemas.getSchema(definition);
     }
 
-    private <T> T generate(AiRequest request, Class<T> type, Consumer<T> verify, JsonSchema schema) {
-        AiRequest structured = request.withContent(request.systemPrompt() + "\n\nReturn a JSON object.",
-                request.userContent(), request.attachments());
+    private <T> T generate(AiRequest request, Class<T> type, Consumer<T> verify, JsonSchema schema, boolean cacheable) {
+        AiRequest structured = AiPromptBuilder.structured(request);
         try {
-            return provider.completeValidated(structured, response -> validate(response.rawText(), type, schema, verify));
+            return provider.completeValidated(structured, response -> validate(response.rawText(), type, schema, verify), cacheable);
         } catch (AiOutputInvalidException invalid) {
             if (provider.replayOnly()) {
                 throw invalid;
             }
-            var repair = structured.withContent(structured.systemPrompt(),
-                    structured.userContent() + "\n\nReturn a corrected JSON response. Validation errors:\n"
-                            + String.join("\n", invalid.errors()), structured.attachments());
-            return provider.completeRepair(repair, structured, response -> validate(response.rawText(), type, schema, verify));
+            var repair = AiPromptBuilder.repair(structured, invalid.errors());
+            return provider.completeRepair(repair, structured, response -> validate(response.rawText(), type, schema, verify), cacheable);
         }
     }
 
@@ -92,6 +94,7 @@ public class StructuredOutputService {
     }
 
     private <T> T validate(String raw, Class<T> type, JsonSchema schema, Consumer<T> verify) {
+        if (raw == null || raw.length() > 200_000) throw invalid("AI response exceeds the maximum text length");
         try {
             String json = raw.strip();
             var fenced = FENCE.matcher(json);
@@ -99,7 +102,8 @@ public class StructuredOutputService {
                 json = fenced.group(1);
             }
             JsonNode tree = mapper.reader().with(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
-                    .with(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY).readTree(json);
+                    .with(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY,
+                            DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS).readTree(json);
             if (tree == null || !tree.isObject()) {
                 throw invalid("Expected a JSON object");
             }
@@ -110,6 +114,8 @@ public class StructuredOutputService {
             if (!errors.isEmpty()) {
                 throw new AiOutputInvalidException(errors.stream().distinct().sorted().toList());
             }
+            AiTextHygiene.clean(tree);
+            if (!schema.validate(tree).isEmpty()) throw invalid("Sanitised response does not match the output schema");
             T value = mapper.readerFor(type).with(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                     .with(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES).readValue(tree);
             var violations = validator.validate(value);

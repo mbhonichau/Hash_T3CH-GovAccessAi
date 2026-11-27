@@ -70,6 +70,7 @@ class AiFoundationTests {
     @Autowired AiCacheRepository cacheRows;
     @Autowired AiCallLogRepository auditRows;
     @Autowired AiRequestLogRepository requestRows;
+    @Autowired org.springframework.jdbc.core.JdbcTemplate jdbc;
 
     private MockWebServer server;
 
@@ -85,6 +86,42 @@ class AiFoundationTests {
     @AfterEach
     void close() throws Exception {
         server.close();
+    }
+
+    @Test
+    void enforcesBothUserBudgetsBeforeContactingTheProvider() throws Exception {
+        long now = java.time.Instant.now().getEpochSecond();
+        for (boolean daily : List.of(false, true)) {
+            var identity = java.util.UUID.randomUUID();
+            jdbc.update("INSERT INTO govaccess.ai_user_quota VALUES (?,?,?,?,?)",
+                    identity, now / 60, now / 86400, daily ? 0 : 60, daily ? 500 : 0);
+            var request = new AiRequest("draft", 1, "System", "Draft", null, mapper.readTree(SCHEMA),
+                    0, true, new AiCallContext(identity, null, null));
+            assertThatThrownBy(() -> service(AiCacheMode.OFF, false, local(server, "local")).generate(request, Draft.class))
+                    .isInstanceOf(za.gov.govaccess.ai.provider.AiRateLimitException.class)
+                    .hasMessageContaining("request limit");
+        }
+        assertThat(server.getRequestCount()).isZero();
+        logicalOutcomes(RATE_LIMITED, RATE_LIMITED);
+        assertThat(auditRows.count()).isZero();
+    }
+
+    @Test
+    void recordsSyntheticResponsesAndReplaysTheValidatedCompletion() throws Exception {
+        String prompt = "synthetic-recording-test";
+        jdbc.update("DELETE FROM govaccess.ai_demo_response WHERE prompt_id=?", prompt);
+        var request = new AiRequest(prompt, 1, "System", "Draft", null, mapper.readTree(SCHEMA),
+                0, true, new AiCallContext(null, null, null));
+        reply(server, "invalid JSON");
+        reply(server, "{\"draft\":\"Validated demo\"}");
+        var provider = local(server, "local");
+        assertThat(service(AiCacheMode.RECORD, false, provider).generate(request, Draft.class).draft())
+                .isEqualTo("Validated demo");
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM govaccess.ai_demo_response WHERE prompt_id=?", Long.class, prompt))
+                .isEqualTo(2);
+        assertThat(service(AiCacheMode.REPLAY_ONLY, false, provider).generate(request, Draft.class).draft())
+                .isEqualTo("Validated demo");
+        assertThat(server.getRequestCount()).isEqualTo(2);
     }
 
     @Test
@@ -260,6 +297,24 @@ class AiFoundationTests {
     }
 
     @Test
+    void fallsBackToLocalProviderForNonSyntheticPolicyInput() throws Exception {
+        reply(server, "{\"draft\":\"Parsed locally\"}");
+        var hosted = new Provider("hosted", server.url("/v1/").toString(), "test-key", "hosted-model", true);
+        var local = new Provider("ollama-local", server.url("/v1/").toString(), "", "gemma3:4b", false);
+        var properties = new AiProperties(List.of(hosted, local), Map.of(), AiCacheMode.OFF,
+                AiRedactionMode.BLOCK, false);
+        var provider = new FallbackAiProvider(properties, builder, new RegexPiiRedactor(), cache, audit,
+                new AiAvailability(properties));
+
+        var result = new StructuredOutputService(provider, mapper, validator).generate(request(), Draft.class);
+
+        assertThat(result).isEqualTo(new Draft("Parsed locally"));
+        assertThat(server.getRequestCount()).isEqualTo(1);
+        assertThat(mapper.readTree(server.takeRequest(1, TimeUnit.SECONDS).getBody().readUtf8())
+                .path("model").asText()).isEqualTo("gemma3:4b");
+    }
+
+    @Test
     void auditsAttributedProbeAndHonorsRuntimeSwitchWithoutRetries() throws Exception {
         var config = new AiProperties(List.of(local(server, "primary")), Map.of(), AiCacheMode.READ_WRITE,
                 AiRedactionMode.BLOCK, false);
@@ -334,6 +389,7 @@ class AiFoundationTests {
     private void logicalOutcomes(AiOutcome... expected) {
         var requests = requestRows.findAll();
         assertThat(requests).extracting(AiRequestLog::getOutcome).containsExactlyInAnyOrder(expected);
+        assertThat(requests).extracting(AiRequestLog::getAuditEventId).doesNotContainNull().doesNotHaveDuplicates();
         var attempts = auditRows.findAll();
         requests.forEach(request -> assertThat(request.getAttemptCount())
                 .isEqualTo(Math.toIntExact(attempts.stream()

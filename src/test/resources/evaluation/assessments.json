@@ -1,0 +1,122 @@
+{
+  "label": "DEMO DATA ONLY",
+  "cases": [
+    {
+      "id": "BUR-2026-0001",
+      "facts": [
+        21,
+        180000,
+        75,
+        true
+      ],
+      "recommendation": "LIKELY_ELIGIBLE",
+      "statuses": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "id": "BUR-2026-0003",
+      "facts": [
+        21,
+        120000,
+        75,
+        true
+      ],
+      "secondIncome": 180000,
+      "monthlyConflict": [
+        10000,
+        15000
+      ],
+      "recommendation": "NEEDS_REVIEW",
+      "statuses": [
+        "PASS",
+        "CONFLICT",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "id": "HOUSING-PRIOR",
+      "facts": [
+        true
+      ],
+      "recommendation": "NOT_ELIGIBLE",
+      "statuses": [
+        "FAIL"
+      ]
+    },
+    {
+      "id": "MISSING-TRANSCRIPT",
+      "facts": [
+        21,
+        180000,
+        null,
+        true
+      ],
+      "recommendation": "NEEDS_REVIEW",
+      "statuses": [
+        "PASS",
+        "PASS",
+        "UNKNOWN",
+        "PASS"
+      ]
+    },
+    {
+      "id": "FOURTH-PROGRAMME",
+      "facts": [
+        true
+      ],
+      "recommendation": "LIKELY_ELIGIBLE",
+      "statuses": [
+        "PASS"
+      ]
+    },
+    {
+      "id": "BOUNDARY-INCLUSIVE",
+      "facts": [
+        18,
+        350000,
+        60,
+        true
+      ],
+      "recommendation": "LIKELY_ELIGIBLE",
+      "statuses": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "id": "BOUNDARY-INCOME-ABOVE",
+      "facts": [
+        18,
+        350000.01,
+        60,
+        true
+      ],
+      "recommendation": "NOT_ELIGIBLE",
+      "statuses": [
+        "PASS",
+        "FAIL",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "id": "ADDENDUM-POLICY",
+      "reference": "ADDENDUM-POLICY"
+    },
+    {
+      "id": "ADDENDUM-PAYSLIP",
+      "reference": "SYN-PAY-0001"
+    },
+    {
+      "id": "DUPLICATE-UPLOAD",
+      "reference": "SYN-PAY-0001"
+    }
+  ]
+}

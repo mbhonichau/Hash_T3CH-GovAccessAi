@@ -1,7 +1,7 @@
 package za.gov.govaccess.ai.provider;
 
 public class AiProviderException extends RuntimeException {
-    public enum Reason { NOT_CONFIGURED, HTTP_ERROR, UNAVAILABLE, BLOCKED, DISABLED }
+    public enum Reason { NOT_CONFIGURED, HTTP_ERROR, UNAVAILABLE, BLOCKED, DISABLED, RATE_LIMITED }
 
     private final Reason reason;
     private final int status;

@@ -54,6 +54,15 @@ public class ApplicationRecord {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    private UUID ownerId;
+    private java.time.LocalDate applicationDate;
+    private UUID policyVersionId;
+    private UUID assignedOfficerId;
+    private UUID teamSupervisorId;
+    private UUID escalatedToId;
+    @Column(columnDefinition = "text")
+    private String declaredValues;
+
     protected ApplicationRecord() {}
 
     public ApplicationRecord(String reference, Applicant applicant, Programme programme, String summary, String createdBy) {
@@ -80,4 +89,56 @@ public class ApplicationRecord {
     public String getSummary() { return summary; }
     public String getCreatedBy() { return createdBy; }
     public Instant getCreatedAt() { return createdAt; }
+    public UUID getOwnerId() { return ownerId; }
+    public java.time.LocalDate getApplicationDate() { return applicationDate; }
+    public UUID getPolicyVersionId() { return policyVersionId; }
+    public UUID getAssignedOfficerId() { return assignedOfficerId; }
+    public UUID getTeamSupervisorId() { return teamSupervisorId; }
+    public UUID getEscalatedToId() { return escalatedToId; }
+    public String getDeclaredValues() { return declaredValues; }
+
+    public void recordSubmission(UUID owner, java.time.LocalDate date, UUID policy, UUID officer) {
+        if (policyVersionId != null) throw new IllegalStateException("The application policy is already fixed");
+        ownerId = owner;
+        applicationDate = java.util.Objects.requireNonNull(date);
+        policyVersionId = java.util.Objects.requireNonNull(policy);
+        assignedOfficerId = officer;
+    }
+
+    public void recordDeclarations(String values) { declaredValues = values; }
+
+    public void recordAssessment(CaseRecommendation value) {
+        requireOpen();
+        recommendation = value;
+        status = ApplicationStatus.ASSESSED;
+    }
+
+    public void recordOfficialDecision() {
+        requireOpen();
+        status = ApplicationStatus.DECISION_RECORDED;
+    }
+
+    public void requestEvidence() {
+        requireOpen();
+        status = ApplicationStatus.NEEDS_EVIDENCE;
+    }
+
+    public void escalateTo(UUID supervisor) {
+        requireOpen();
+        escalatedToId = java.util.Objects.requireNonNull(supervisor);
+        status = ApplicationStatus.IN_REVIEW;
+    }
+
+    public void requireOpen() {
+        if (status == ApplicationStatus.DECISION_RECORDED || status == ApplicationStatus.CLOSED) {
+            throw new IllegalArgumentException("This application already has an official outcome.");
+        }
+    }
+
+    public void assign(UUID owner, UUID officer, UUID teamSupervisor, UUID escalation) {
+        ownerId = owner;
+        assignedOfficerId = officer;
+        teamSupervisorId = teamSupervisor;
+        escalatedToId = escalation;
+    }
 }

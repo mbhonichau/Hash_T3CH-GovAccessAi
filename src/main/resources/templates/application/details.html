@@ -4,10 +4,30 @@
 <body>
 <section id="application-details" aria-labelledby="case-heading">
     <div class="overview-heading d-flex justify-content-between align-items-start gap-3 flex-wrap">
-        <div><a th:href="@{/applications}">← Application queue</a>
+        <div><a class="btn btn-outline-primary app-nav-button mb-2" th:href="@{/applications}">← Application queue</a>
             <h1 id="case-heading" th:text="${caseDetail.application().reference()}">Case reference</h1>
             <p>Case details and workflow history.</p></div>
         <span class="badge rounded-pill text-bg-secondary" th:text="${#strings.replace(caseDetail.application().status().name(), '_', ' ')}">Received</span>
+    </div>
+    <div class="card dashboard-card mb-3">
+        <div class="card-body">
+            <h2>Supporting documents</h2>
+            <p th:if="${caseDetail.policyVersionId != null}">Policy version <code th:text="${caseDetail.policyVersionId}"></code></p>
+            <p th:if="${#lists.isEmpty(caseDocuments)}">No supporting documents uploaded.</p>
+            <ul th:unless="${#lists.isEmpty(caseDocuments)}">
+                <li th:each="item : ${caseDocuments}">
+                    <a class="btn btn-outline-primary app-nav-button btn-sm" th:href="@{/applications/{caseId}/documents/{id}(caseId=${item.applicationId},id=${item.id})}"
+                       th:text="${item.filename}"></a>
+                    <span th:text="${#strings.replace(item.state, '_', ' ')}"></span>
+                </li>
+            </ul>
+            <form method="post" enctype="multipart/form-data" th:if="${canUpload and caseDetail.policyVersionId != null}"
+                  th:action="@{/applications/{id}/documents(id=${caseDetail.application().id()})}">
+                <label class="form-label" for="supporting-document">Supporting document (PDF, up to 8 MB)</label>
+                <input class="form-control mb-2" type="file" id="supporting-document" name="file" accept=".pdf,application/pdf" required>
+                <button class="btn btn-primary" type="submit">Upload document</button>
+            </form>
+        </div>
     </div>
     <div class="dashboard-grid">
         <section class="card dashboard-card" aria-labelledby="intake-heading">
@@ -18,7 +38,7 @@
                 <dt class="col-sm-4">Created by</dt><dd class="col-sm-8" th:text="${caseDetail.application().createdBy()}">Officer</dd>
                 <dt class="col-sm-4">Created</dt><dd class="col-sm-8" th:text="${#temporals.format(caseDetail.application().createdAt(), 'd MMM yyyy HH:mm')}">Date</dd>
                 <dt class="col-sm-4">Intake notes</dt><dd class="col-sm-8 text-break" th:text="${caseDetail.application().summary()}">Summary</dd>
-                <dt class="col-sm-4">Recommendation</dt><dd class="col-sm-8" th:text="${caseDetail.application().recommendation() == null ? 'Pending assessment' : #strings.replace(caseDetail.application().recommendation().name(), '_', ' ')}">Pending</dd>
+                <dt class="col-sm-4">Recommendation</dt><dd class="col-sm-8" th:text="${caseDetail.application().recommendation() == null ? 'Pending assessment' : caseDetail.application().recommendation().displayLabel()}">Pending</dd>
             </dl>
         </section>
         <section class="card dashboard-card" aria-labelledby="evidence-heading">
@@ -34,15 +54,32 @@
         </section>
         <section class="card dashboard-card" aria-labelledby="assessment-heading">
             <div class="card-header"><h2 id="assessment-heading">Latest assessment</h2></div>
+            <div class="card-body" th:if="${canAssess and caseDetail.policyVersionId != null}">
+                <form method="post" th:action="@{/applications/{id}/assessment(id=${caseDetail.application().id()})}">
+                    <button type="submit" class="btn btn-primary">Assess available evidence</button>
+                </form>
+            </div>
             <div class="card-body" th:if="${caseDetail.latestAssessment() != null}">
-                <p><strong th:text="${#strings.replace(caseDetail.latestAssessment().recommendation, '_', ' ')}">Needs review</strong>
+                <p><strong th:text="${caseDetail.latestAssessment().recommendationLabel}">Needs review</strong>
                     <span th:if="${caseDetail.latestAssessment().confidence != null}" th:text="${#numbers.formatPercent(caseDetail.latestAssessment().confidence, 0, 1)}">Confidence</span></p>
                 <p th:text="${caseDetail.latestAssessment().summary}">Assessment summary</p>
             </div>
             <div class="card-body" th:if="${caseDetail.latestAssessment() == null}">No assessment has been run.</div>
+            <div class="card-body" th:if="${evidenceQuality != null}">
+                <div th:replace="~{fragments/evidence-quality :: quality(${evidenceQuality})}"></div>
+            </div>
+            <div class="card-body" th:if="${canReadAssessmentHistory}">
+                <a class="btn btn-outline-primary app-nav-button" th:href="@{/applications/{id}/assessments(id=${caseDetail.application().id()})}">Assessment history</a>
+            </div>
         </section>
         <section class="card dashboard-card" aria-labelledby="decision-heading">
             <div class="card-header"><h2 id="decision-heading">Official decisions</h2></div>
+            <div class="card-body">
+                <a class="btn btn-outline-primary app-nav-button" th:href="@{/applications/{id}/communications(id=${caseDetail.application().id()})}">Case messages and notices</a>
+            </div>
+            <div class="card-body" th:if="${canUseDecisionWorkspace}">
+                <a class="btn btn-outline-primary" th:href="@{/applications/{id}/decision(id=${caseDetail.application().id()})}">Decision workspace</a>
+            </div>
             <div class="card-body" th:if="${#lists.isEmpty(caseDetail.decisions())}">No official decision recorded. A staff decision is required before an outcome is final.</div>
             <div class="list-group list-group-flush" th:unless="${#lists.isEmpty(caseDetail.decisions())}">
                 <div class="list-group-item" th:each="decision : ${caseDetail.decisions()}">
@@ -55,8 +92,9 @@
             <div class="card-header"><h2 id="audit-heading">Case history</h2></div>
             <div class="list-group list-group-flush" th:if="${!#lists.isEmpty(caseDetail.auditEvents())}">
                 <div class="list-group-item" th:each="event : ${caseDetail.auditEvents()}">
-                    <strong th:text="${event.action}">Action</strong> · <span th:text="${event.actorUsername}">Officer</span>
-                    <p class="mb-0" th:text="${event.detail}">Detail</p>
+                    <strong th:text="${#strings.replace(event.action, '_', ' ')}">Action</strong>
+                    <span th:text="| · ${event.actorRole}|">Officer</span>
+                    <time class="d-block" th:text="${#temporals.format(event.occurredAt, 'd MMM yyyy HH:mm')}"></time>
                 </div>
             </div>
             <div class="card-body" th:if="${#lists.isEmpty(caseDetail.auditEvents())}">No case events recorded.</div>

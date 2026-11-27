@@ -32,7 +32,7 @@ class FlywayLegacySchemaTests {
                 .locations("classpath:db/migration", "classpath:za/gov/govaccess/rules/migration")
                 .callbacks(adoption.adoptLegacyPolicyTables()).load();
         adoption.migrateGovAccess().migrate(current);
-        assertThat(current.info().current().getVersion().getVersion()).isEqualTo("10");
+        assertThat(current.info().current().getVersion().getVersion()).isEqualTo("22");
         assertThat(jdbc.queryForObject("SELECT request_id FROM govaccess.ai_call_log WHERE id = ?", UUID.class, attemptId))
                 .isEqualTo(attemptId);
         assertThat(jdbc.queryForObject("SELECT attempt_count FROM govaccess.ai_request_log WHERE id = ?", Integer.class, attemptId))
@@ -51,11 +51,11 @@ class FlywayLegacySchemaTests {
         var flyway = settings.load();
         adoption.migrateGovAccess().migrate(flyway);
         var jdbc = new JdbcTemplate(flyway.getConfiguration().getDataSource());
-        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("10");
+        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("21");
         assertThat(jdbc.queryForObject("SELECT checksum FROM govaccess.flyway_schema_history WHERE version = '6'",
                 Integer.class)).isEqualTo(1487642100);
         adoption.migrateGovAccess().migrate(flyway);
-        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM govaccess.flyway_schema_history WHERE version = '10'",
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM govaccess.flyway_schema_history WHERE version = '21'",
                 Integer.class)).isEqualTo(1);
     }
 
@@ -77,10 +77,19 @@ class FlywayLegacySchemaTests {
                 .locations("classpath:db/migration", "classpath:za/gov/govaccess/rules/migration");
         settings.target("4").load().migrate();
         var jdbc = new JdbcTemplate(dataSource);
+        try (var connection = dataSource.getConnection()) {
+            connection.setSchema("govaccess");
+            for (String script : java.util.List.of("V5__persistent_user_accounts.sql", "V6__application_intake_and_workflow.sql")) {
+                org.springframework.jdbc.datasource.init.ScriptUtils.executeSqlScript(connection,
+                        new org.springframework.core.io.ClassPathResource("db/migration/" + script));
+            }
+        } catch (java.sql.SQLException e) {
+            throw new IllegalStateException("Could not install the external intake schema fixture", e);
+        }
         addHistory(jdbc, 50, "5", "persistent user accounts", "V5__ai_request_audit.sql", 1555748309);
         addHistory(jdbc, 51, "6", "application intake and workflow", "V6__application_intake_and_workflow.sql", 1487642100);
         addHistory(jdbc, 52, "7", "synthetic intake cases", "V7__synthetic_intake_cases.sql", 2096334706);
-        return settings.target("10");
+        return settings.target("21");
     }
 
     private static void addHistory(JdbcTemplate jdbc, int rank, String version, String description, String script,

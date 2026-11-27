@@ -9,7 +9,7 @@
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/vendor/mazer/icons/bootstrap-icons.css}">
     <link rel="stylesheet" th:href="@{/vendor/mazer/css/app.css}">
-    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/app.css(v='20261127-full-sita-glass-white')}">
     <script defer th:src="@{/js/navigation.js}"></script>
 </head>
 <body>
@@ -29,6 +29,7 @@
                 </div>
             </div>
             <main id="main-content" tabindex="-1">
+                <p class="alert alert-warning" role="status" th:if="${navHostedAi}">Hosted AI configured. Synthetic data only.</p>
                 <div th:replace="~{fragments/alerts :: alerts}"></div>
                 <th:block th:replace="${content}"></th:block>
             </main>

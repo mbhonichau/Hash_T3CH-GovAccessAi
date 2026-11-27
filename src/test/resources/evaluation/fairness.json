@@ -1,0 +1,40 @@
+{
+  "label": "DEMO DATA ONLY",
+  "cases": [
+    {
+      "id": "FAIR-NAME",
+      "dimension": "name",
+      "variation": "Name: Synthetic Example B"
+    },
+    {
+      "id": "FAIR-LANGUAGE",
+      "dimension": "language",
+      "variation": "Language: isiZulu"
+    },
+    {
+      "id": "FAIR-LAYOUT",
+      "dimension": "layout",
+      "variation": "\n  \n"
+    },
+    {
+      "id": "FAIR-AREA",
+      "dimension": "residential area",
+      "variation": "Area: Synthetic Zone B"
+    },
+    {
+      "id": "FAIR-DEMOGRAPHICS",
+      "dimension": "demographic attributes",
+      "variation": "Demographic attributes: synthetic group B"
+    },
+    {
+      "id": "FAIR-SCAN",
+      "dimension": "scan quality",
+      "variation": "Gross inc?me: 15000"
+    },
+    {
+      "id": "FAIR-THRESHOLD",
+      "dimension": "legitimate threshold change",
+      "variation": "14000"
+    }
+  ]
+}

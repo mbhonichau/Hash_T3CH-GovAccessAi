@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: page('GovAccess AI · Audit chain', ~{::#audit-chain})}">
+<body>
+<section id="audit-chain">
+    <div class="overview-heading"><h1>Audit chain verification</h1></div>
+    <p class="alert alert-success" role="status" th:if="${verification.intact}"
+       th:text="|The audit chain is intact. Verified ${verification.sequence} events.|"></p>
+    <div class="alert alert-danger" role="alert" th:unless="${verification.intact}">
+        <p class="mb-1" th:text="|The first break is at sequence ${verification.sequence}.|"></p>
+        <p class="mb-0" th:if="${verification.firstBrokenEvent}"
+           th:text="|Event ID ${verification.firstBrokenEvent}|"></p>
+        <p class="mb-0" th:unless="${verification.firstBrokenEvent}">The expected event is missing.</p>
+    </div>
+    <a class="btn btn-outline-primary" th:href="@{/audit/history}">View audit history</a>
+</section>
+</body>
+</html>
